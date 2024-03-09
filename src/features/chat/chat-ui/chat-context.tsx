@@ -19,7 +19,7 @@ import { TextToSpeechProps, useTextToSpeech } from "./chat-speech/use-text-to-sp
 import { useRouter } from "next/navigation"
 
 interface ChatContextProps extends UseChatHelpers {
-  id: string
+  chatThreadId: string
   setChatBody: (body: PromptGPTBody) => void
   chatBody: PromptGPTBody
   fileState: FileState
@@ -36,7 +36,7 @@ interface ChatContextProps extends UseChatHelpers {
 const ChatContext = createContext<ChatContextProps | null>(null)
 interface Prop {
   children: React.ReactNode
-  id: string
+  chatThreadId: string
   chats: Array<ChatMessageModel>
   chatThread: ChatThreadModel
   offenderId?: string
@@ -56,7 +56,7 @@ export const ChatProvider: FC<Prop> = props => {
   const fileState = useFileState()
 
   const [chatBody, setBody] = useState<PromptGPTBody>({
-    id: props.chatThread.id,
+    chatThreadId: props.chatThreadId,
     chatType: props.chatThread.chatType,
     conversationStyle: props.chatThread.conversationStyle,
     conversationSensitivity: props.chatThread.conversationSensitivity,
@@ -72,7 +72,7 @@ export const ChatProvider: FC<Prop> = props => {
 
   const response = useChat({
     onError,
-    id: props.id,
+    id: props.chatThreadId,
     body: chatBody,
     initialMessages: transformCosmosToAIModel(props.chats),
     onFinish: (lastMessage: Message) => {
@@ -120,7 +120,7 @@ export const ChatProvider: FC<Prop> = props => {
         onConversationStyleChange,
         onConversationSensitivityChange,
         fileState,
-        id: props.id,
+        chatThreadId: props.chatThreadId,
         speech: {
           ...speechSynthesizer,
           ...speechRecognizer,

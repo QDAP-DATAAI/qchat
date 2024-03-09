@@ -61,6 +61,6 @@ RUN npm install --omit=dev
 USER nextjs
 
 ENV PORT 443
-ENV HOSTNAME 0.0.0.0
+ENV HOSTNAME 20.211.64.16
 
 CMD ["node", "server.js"]

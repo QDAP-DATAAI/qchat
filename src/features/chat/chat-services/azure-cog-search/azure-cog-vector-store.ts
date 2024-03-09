@@ -13,7 +13,7 @@ export interface AzureCogDocumentIndex {
   order: number
 }
 
-interface DocumentSearchResponseModel<TModel> {
+export interface DocumentSearchResponseModel<TModel> {
   value: TModel[]
 }
 
@@ -21,28 +21,28 @@ export type DocumentSearchModel = {
   "@search.score": number
 }
 
-type DocumentDeleteModel = {
+export type DocumentDeleteModel = {
   id: string
   "@search.action": "delete"
 }
 
 export interface AzureCogDocument {}
 
-type AzureCogVectorField = {
+export type AzureCogVectorField = {
   vector: number[]
   fields: string
   k: number
   kind: string
 }
 
-type AzureCogFilter = {
+export type AzureCogFilter = {
   search?: string
   facets?: string[]
   filter?: string
   top?: number
 }
 
-type AzureCogRequestObject = {
+export type AzureCogRequestObject = {
   search: string
   facets: string[]
   filter: string

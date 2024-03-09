@@ -1,302 +1,275 @@
 "use server"
+
 import "server-only"
-import { getCurrentUser, getTenantId, userHashedId, userSession } from "@/features/auth/helpers"
+import { getTenantId, userHashedId, userSession } from "@/features/auth/helpers"
+import { FindAllChats } from "@/features/chat/chat-services/chat-service"
 import { uniqueId } from "@/lib/utils"
+import { ItemResponse, Resource, SqlQuerySpec } from "@azure/cosmos"
+import { CosmosDBContainer } from "../../common/services/cosmos"
 import {
+  CHAT_THREAD_ATTRIBUTE,
   ChatMessageModel,
-  ChatRecordType,
   ChatRole,
   ChatSentiment,
   ChatThreadModel,
   ChatType,
   ConversationSensitivity,
   ConversationStyle,
-  FeedbackType,
   PromptGPTProps,
-} from "@/features/chat/models"
+} from "./models"
+import { FindAllChatDocuments } from "./chat-document-service"
 import { deleteDocuments } from "@/features/chat/chat-services/azure-cog-search/azure-cog-vector-store"
-import { DEFAULT_MONTHS_AGO } from "@/features/chat/constants"
-import { HistoryContainer } from "@/features/common/services/cosmos"
-import { ServerActionResponseAsync } from "@/features/common/server-action-response"
-import { SqlQuerySpec } from "@azure/cosmos"
-import { FindAllChatMessagesForCurrentUser } from "./chat-message-service"
-import { RedirectToChatThread } from "@/features/common/navigation-helpers"
-import { FindAllChatDocumentsForCurrentUser } from "./chat-document-service"
-import { xMonthsAgo } from "@/features/common/date-helper"
 
-export const FindAllChatThreadForCurrentUser = async (): ServerActionResponseAsync<ChatThreadModel[]> => {
-  try {
-    const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
-    const query: SqlQuerySpec = {
-      query:
-        "SELECT * FROM root r WHERE r.type=@type AND r.isDeleted=@isDeleted AND r.userId=@userId AND r.tenantId=@tenantId AND r.createdAt >= @createdAt ORDER BY r.createdAt DESC",
-      parameters: [
-        { name: "@type", value: ChatRecordType.Thread },
-        { name: "@isDeleted", value: false },
-        { name: "@userId", value: userId },
-        { name: "@tenantId", value: tenantId },
-        { name: "@createdAt", value: xMonthsAgo(DEFAULT_MONTHS_AGO) },
-      ],
-    }
-    const container = await HistoryContainer()
-    const { resources } = await container.items
-      .query<ChatThreadModel>(query, {
-        partitionKey: [tenantId, userId],
-      })
-      .fetchAll()
-    return {
-      status: "OK",
-      response: resources,
-    }
-  } catch (error) {
-    return {
-      status: "ERROR",
-      errors: [{ message: `${error}` }],
-    }
-  }
+function threeMonthsAgo(): string {
+  const date = new Date()
+  date.setMonth(date.getMonth() - 3)
+  return date.toISOString()
 }
 
-export const FindChatThreadForCurrentUser = async (
-  chatThreadId: string
-): ServerActionResponseAsync<ChatThreadModel> => {
-  try {
-    const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
-    const query: SqlQuerySpec = {
-      query:
-        "SELECT * FROM root r WHERE r.id=@id AND r.type=@type AND r.isDeleted=@isDeleted AND r.userId=@userId AND r.tenantId=@tenantId AND r.createdAt >= @createdAt",
-      parameters: [
-        { name: "@id", value: chatThreadId },
-        { name: "@type", value: ChatRecordType.Thread },
-        { name: "@isDeleted", value: false },
-        { name: "@userId", value: userId },
-        { name: "@tenantId", value: tenantId },
-        { name: "@createdAt", value: xMonthsAgo(DEFAULT_MONTHS_AGO) },
-      ],
-    }
-    const container = await HistoryContainer()
-    const { resources } = await container.items
-      .query<ChatThreadModel>(query, {
-        partitionKey: [tenantId, userId],
-      })
-      .fetchAll()
+export const FindAllChatThreadForCurrentUser = async (): Promise<ChatThreadModel[]> => {
+  const container = await CosmosDBContainer.getInstance().getContainer()
+  const tenantId = await getTenantId()
+  const userId = await userHashedId()
 
-    if (!resources.length)
-      return {
-        status: "NOT_FOUND",
-        errors: [{ message: "Chat thread not found" }],
-      }
+  const partitionKey = [tenantId, userId]
 
-    return {
-      status: "OK",
-      response: resources[0],
-    }
-  } catch (error) {
-    return {
-      status: "ERROR",
-      errors: [{ message: `${error}` }],
-    }
+  const querySpec: SqlQuerySpec = {
+    query:
+      "SELECT * FROM root r WHERE r.type=@type AND r.isDeleted=@isDeleted AND r.userId=@userId AND r.tenantId=@tenantId AND r.createdAt >= @createdAt ORDER BY r.createdAt DESC",
+    parameters: [
+      {
+        name: "@type",
+        value: CHAT_THREAD_ATTRIBUTE,
+      },
+      {
+        name: "@isDeleted",
+        value: false,
+      },
+      {
+        name: "@userId",
+        value: userId,
+      },
+      {
+        name: "@tenantId",
+        value: tenantId,
+      },
+      {
+        name: "@createdAt",
+        value: threeMonthsAgo(),
+      },
+    ],
   }
+
+  const { resources } = await container.items
+    .query<ChatThreadModel>(querySpec, {
+      partitionKey,
+    })
+    .fetchAll()
+  return resources
 }
 
-export const UpdateChatThreadTitle = async (
+export const FindChatThreadByID = async (chatThreadId: string): Promise<ChatThreadModel[]> => {
+  const container = await CosmosDBContainer.getInstance().getContainer()
+  const tenantId = await getTenantId()
+  const userId = await userHashedId()
+
+  const partitionKey = [tenantId, userId]
+
+  const querySpec: SqlQuerySpec = {
+    query:
+      "SELECT * FROM root r WHERE r.chatThreadId=@chatThreadId AND r.type=@type AND r.isDeleted=@isDeleted AND r.userId=@userId AND r.tenantId=@tenantId AND r.createdAt >= @createdAt",
+    parameters: [
+      { name: "@chatThreadId", value: chatThreadId },
+      { name: "@type", value: CHAT_THREAD_ATTRIBUTE },
+      { name: "@isDeleted", value: false },
+      { name: "@userId", value: userId },
+      { name: "@tenantId", value: tenantId },
+      { name: "@createdAt", value: threeMonthsAgo() },
+    ],
+  }
+
+  const { resources } = await container.items
+    .query<ChatThreadModel>(querySpec, {
+      partitionKey,
+    })
+    .fetchAll()
+
+  return resources
+}
+
+export const RenameChatThreadByID = async (
   chatThreadId: string,
-  newTitle: string
-): ServerActionResponseAsync<ChatThreadModel> => {
-  try {
-    const response = await FindChatThreadForCurrentUser(chatThreadId)
-    if (response.status !== "OK") return response
-    const chatThread = response.response
-    chatThread.name = newTitle.substring(0, 30)
-    return await UpsertChatThread(chatThread)
-  } catch (error) {
-    return {
-      status: "ERROR",
-      errors: [{ message: `${error}` }],
-    }
-  }
-}
+  newTitle: string | Promise<string> | null
+): Promise<void> => {
+  const resolvedTitle = await Promise.resolve(newTitle)
+  const container = await CosmosDBContainer.getInstance().getContainer()
+  const threads = await FindChatThreadByID(chatThreadId)
 
-export const SoftDeleteChatThreadForCurrentUser = async (
-  chatThreadId: string
-): ServerActionResponseAsync<ChatThreadModel> => {
-  try {
-    const chatThreadResponse = await FindChatThreadForCurrentUser(chatThreadId)
-    if (chatThreadResponse.status !== "OK") return chatThreadResponse
-
-    const chatMessagesResponse = await FindAllChatMessagesForCurrentUser(chatThreadId)
-    if (chatMessagesResponse.status !== "OK") return chatMessagesResponse
-
-    const container = await HistoryContainer()
-
-    const chatMessagesPromises = chatMessagesResponse.response.map(
-      async chat => await container.items.upsert({ ...chat, isDeleted: true })
+  if (threads.length !== 0) {
+    await Promise.all(
+      threads.map(async thread => {
+        const itemToUpdate = { ...thread, name: resolvedTitle }
+        await container.items.upsert(itemToUpdate)
+      })
     )
-    await Promise.all(chatMessagesPromises)
+  }
+}
 
-    const chatDocumentsResponse = await FindAllChatDocumentsForCurrentUser(chatThreadId)
-    if (chatDocumentsResponse.status !== "OK") return chatDocumentsResponse
-    if (chatDocumentsResponse.response.length) {
-      const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
+export const SoftDeleteChatThreadByID = async (chatThreadId: string): Promise<void> => {
+  const tenantId = await getTenantId()
+  const userId = await userHashedId()
+  const container = await CosmosDBContainer.getInstance().getContainer()
+  const threads = await FindChatThreadByID(chatThreadId)
+
+  if (threads.length !== 0) {
+    const chats = await FindAllChats(chatThreadId)
+
+    chats.forEach(async chat => {
+      const itemToUpdate = {
+        ...chat,
+      }
+      itemToUpdate.isDeleted = true
+      await container.items.upsert(itemToUpdate)
+    })
+
+    const chatDocuments = await FindAllChatDocuments(chatThreadId)
+
+    if (chatDocuments.length !== 0) {
       await deleteDocuments(chatThreadId, userId, tenantId)
-      const chatDocumentsPromises = chatDocumentsResponse.response.map(
-        async chat => await container.items.upsert({ ...chat, isDeleted: true })
-      )
-      await Promise.all(chatDocumentsPromises)
     }
 
-    await container.items.upsert({ ...chatThreadResponse.response, isDeleted: true })
-    return {
-      status: "OK",
-      response: chatThreadResponse.response,
-    }
-  } catch (error) {
-    return {
-      status: "ERROR",
-      errors: [{ message: `${error}` }],
-    }
+    chatDocuments.forEach(async chatDocument => {
+      const itemToUpdate = {
+        ...chatDocument,
+      }
+      itemToUpdate.isDeleted = true
+      await container.items.upsert(itemToUpdate)
+    })
+
+    threads.forEach(async thread => {
+      const itemToUpdate = {
+        ...thread,
+      }
+      itemToUpdate.isDeleted = true
+      await container.items.upsert(itemToUpdate)
+    })
   }
 }
 
-export const UpsertChatThread = async (chatThread: ChatThreadModel): ServerActionResponseAsync<ChatThreadModel> => {
-  try {
-    if (chatThread.id) {
-      const response = await EnsureChatThreadOperation(chatThread.id)
-      if (response.status !== "OK") return response
-    }
-
-    const container = await HistoryContainer()
-    const { resource } = await container.items.upsert<ChatThreadModel>(chatThread)
-
-    if (resource) {
-      return {
-        status: "OK",
-        response: resource,
-      }
-    }
-
-    return {
-      status: "ERROR",
-      errors: [{ message: "Chat thread not found" }],
-    }
-  } catch (error) {
-    return {
-      status: "ERROR",
-      errors: [{ message: `${error}` }],
-    }
+export const EnsureChatThreadIsForCurrentUser = async (chatThreadId: string): Promise<ChatThreadModel> => {
+  const modelToSave = await FindChatThreadByID(chatThreadId)
+  if (modelToSave.length === 0) {
+    throw new Error("Chat thread not found")
   }
+
+  return modelToSave[0]
 }
 
-const EnsureChatThreadOperation = async (chatThreadID: string): ServerActionResponseAsync<ChatThreadModel> => {
-  const response = await FindChatThreadForCurrentUser(chatThreadID)
-  if (response.status !== "OK") return response
+export const UpsertChatThread = async (chatThread: ChatThreadModel): Promise<ItemResponse<ChatThreadModel>> => {
+  const container = await CosmosDBContainer.getInstance().getContainer()
+  const updatedChatThread = await container.items.upsert<ChatThreadModel>(chatThread)
 
-  const [currentUser, hashedId] = await Promise.all([getCurrentUser(), userHashedId()])
-  if (!currentUser.qchatAdmin && response.response.userId !== hashedId)
-    return {
-      status: "ERROR",
-      errors: [{ message: "Unauthorized access" }],
-    }
-  return response
+  if (updatedChatThread === undefined) {
+    throw new Error("Chat thread not found")
+  }
+
+  return updatedChatThread
 }
 
-export const CreateChatThread = async (): ServerActionResponseAsync<ChatThreadModel> => {
-  try {
-    const [userId, tenantId, session] = await Promise.all([userHashedId(), getTenantId(), userSession()])
-    if (!session)
-      return {
-        status: "ERROR",
-        errors: [{ message: "No active user session" }],
-      }
-
-    const id = uniqueId()
-    const modelToSave: ChatThreadModel = {
+export const updateChatThreadTitle = async (
+  chatThread: ChatThreadModel,
+  messages: ChatMessageModel[],
+  chatType: ChatType,
+  conversationStyle: ConversationStyle,
+  conversationSensitivity: ConversationSensitivity,
+  chatOverFileName: string,
+  _userMessage: string
+): Promise<ChatThreadModel> => {
+  if (messages.length === 0) {
+    const updatedChatThread = await UpsertChatThread({
+      ...chatThread,
+      chatType: chatType,
+      chatCategory: "Uncategorised",
+      chatOverFileName: chatOverFileName,
+      conversationStyle: conversationStyle,
+      conversationSensitivity: conversationSensitivity,
       name: "New Chat",
       previousChatName: "",
-      chatCategory: "Uncategorised",
-      useName: session.name,
-      userId,
-      id,
-      chatThreadId: id,
-      tenantId,
-      createdAt: new Date(),
-      isDeleted: false,
-      isDisabled: false,
-      contentSafetyWarning: "",
-      chatType: ChatType.Simple,
-      conversationStyle: ConversationStyle.Precise,
-      conversationSensitivity: ConversationSensitivity.Official,
-      type: ChatRecordType.Thread,
-      systemPrompt: "",
-      contextPrompt: "",
-      metaPrompt: "",
-      chatOverFileName: "",
-      prompts: [],
-      selectedPrompt: "",
-    }
+    })
 
-    const container = await HistoryContainer()
-    const { resource } = await container.items.upsert<ChatThreadModel>(modelToSave)
-    if (!resource)
-      return {
-        status: "ERROR",
-        errors: [{ message: "Chat thread not created" }],
-      }
-
-    return {
-      status: "OK",
-      response: resource,
-    }
-  } catch (error) {
-    return {
-      status: "ERROR",
-      errors: [{ message: `${error}` }],
-    }
+    return updatedChatThread.resource!
   }
+
+  return chatThread
 }
 
-export const InitChatSession = async (
+export const CreateChatThread = async (): Promise<(ChatThreadModel & Resource) | undefined> => {
+  const id = uniqueId()
+  const modelToSave: ChatThreadModel = {
+    name: "New Chat",
+    previousChatName: "",
+    chatCategory: "Uncategorised",
+    useName: (await userSession())!.name,
+    userId: await userHashedId(),
+    id: id,
+    chatThreadId: id,
+    tenantId: await getTenantId(),
+    createdAt: new Date(),
+    isDeleted: false,
+    isDisabled: false,
+    contentSafetyWarning: "",
+    chatType: ChatType.Simple,
+    conversationStyle: ConversationStyle.Precise,
+    conversationSensitivity: ConversationSensitivity.Official,
+    type: CHAT_THREAD_ATTRIBUTE,
+    systemPrompt: "",
+    contextPrompt: "",
+    metaPrompt: "",
+    chatOverFileName: "",
+    prompts: [],
+    selectedPrompt: "",
+    lastMessageAt: new Date(),
+  }
+
+  const container = await CosmosDBContainer.getInstance().getContainer()
+  const response = await container.items.create<ChatThreadModel>(modelToSave)
+  return response.resource
+}
+
+export const initAndGuardChatSession = async (
   props: PromptGPTProps
-): ServerActionResponseAsync<{
+): Promise<{
   chatThreadId: string
   updatedLastHumanMessage: ChatMessageModel
   chats: ChatMessageModel[]
   chatThread: ChatThreadModel
 }> => {
-  const { messages, id: chatThreadId, chatType, conversationStyle, conversationSensitivity, chatOverFileName } = props
+  const { messages, chatThreadId, chatType, conversationStyle, conversationSensitivity, chatOverFileName } = props
 
   const lastHumanMessage = messages[messages.length - 1]
 
-  const currentChatThreadResponse = await EnsureChatThreadOperation(chatThreadId)
-  if (currentChatThreadResponse.status !== "OK") return currentChatThreadResponse
+  const currentChatThread = await EnsureChatThreadIsForCurrentUser(chatThreadId)
+  const chats = await FindAllChats(chatThreadId)
 
-  const chatMessagesResponse = await FindAllChatMessagesForCurrentUser(chatThreadId)
-  if (chatMessagesResponse.status !== "OK") return chatMessagesResponse
-
-  const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
-
-  const updatedChatThreadResponse = await UpsertChatThread({
-    ...currentChatThreadResponse.response,
-    chatType: chatType,
-    chatCategory: "Uncategorised",
-    chatOverFileName: chatOverFileName,
-    conversationStyle: conversationStyle,
-    conversationSensitivity: conversationSensitivity,
-    name: "New Chat",
-    previousChatName: "",
-    prompts: [],
-    selectedPrompt: "",
-  })
-  if (updatedChatThreadResponse.status !== "OK") return updatedChatThreadResponse
+  const chatThread = await updateChatThreadTitle(
+    currentChatThread,
+    chats,
+    chatType,
+    conversationStyle,
+    conversationSensitivity,
+    chatOverFileName,
+    lastHumanMessage.content
+  )
 
   const updatedLastHumanMessage: ChatMessageModel = {
     ...lastHumanMessage,
     isDeleted: false,
-    chatThreadId,
-    userId: userId,
-    tenantId: tenantId,
+    chatThreadId: chatThreadId,
+    userId: currentChatThread.userId,
+    tenantId: currentChatThread.tenantId,
     context: "",
-    type: ChatRecordType.Message,
-    feedback: FeedbackType.None,
+    type: "CHAT_MESSAGE",
+    feedback: "",
     sentiment: ChatSentiment.Neutral,
     reason: "",
     systemPrompt: "",
@@ -306,125 +279,93 @@ export const InitChatSession = async (
   }
 
   return {
-    status: "OK",
-    response: {
-      chatThreadId,
-      updatedLastHumanMessage,
-      chats: chatMessagesResponse.response,
-      chatThread: currentChatThreadResponse.response,
-    },
+    chatThreadId,
+    updatedLastHumanMessage,
+    chats,
+    chatThread,
   }
 }
 
-export const FindChatThreadByTitleAndEmpty = async (
-  title: string
-): ServerActionResponseAsync<ChatThreadModel | undefined> => {
-  try {
-    const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
-    const query: SqlQuerySpec = {
-      query:
-        "SELECT * FROM root r WHERE r.type=@type AND r.userId=@userId AND r.name=@name AND r.isDeleted=@isDeleted AND r.tenantId=@tenantId AND r.createdAt >= @createdAt ORDER BY r.createdAt DESC",
-      parameters: [
-        { name: "@type", value: ChatRecordType.Thread },
-        { name: "@name", value: title },
-        { name: "@isDeleted", value: false },
-        { name: "@userId", value: userId },
-        { name: "@tenantId", value: tenantId },
-        { name: "@createdAt", value: xMonthsAgo(DEFAULT_MONTHS_AGO) },
-      ],
-    }
-    const container = await HistoryContainer()
-    const result = await container.items.query<ChatThreadModel>(query).fetchAll()
+export const FindChatThreadByTitleAndEmpty = async (title: string): Promise<ChatThreadModel | undefined> => {
+  const container = await CosmosDBContainer.getInstance().getContainer()
 
-    if (!result.resources.length)
-      return {
-        status: "OK",
-        response: undefined,
-      }
+  const querySpec = {
+    query:
+      "SELECT * FROM root r WHERE r.type=@type AND r.userId=@userId AND r.name=@name AND r.isDeleted=@isDeleted AND r.tenantId=@tenantId AND r.createdAt >= @createdAt ORDER BY r.createdAt DESC",
+    parameters: [
+      {
+        name: "@type",
+        value: CHAT_THREAD_ATTRIBUTE,
+      },
+      {
+        name: "@name",
+        value: title,
+      },
+      {
+        name: "@isDeleted",
+        value: false,
+      },
+      {
+        name: "@userId",
+        value: await userHashedId(),
+      },
+      {
+        name: "@tenantId",
+        value: await getTenantId(),
+      },
+      {
+        name: "@createdAt",
+        value: threeMonthsAgo(),
+      },
+    ],
+  }
+  const { resources } = await container.items.query<ChatThreadModel>(querySpec).fetchAll()
 
-    for (const chatThread of result.resources) {
-      const messageResponse = await FindAllChatMessagesForCurrentUser(chatThread.chatThreadId)
-      if (messageResponse.status !== "OK") return messageResponse
-      if (messageResponse.response.length === 0)
-        return {
-          status: "OK",
-          response: chatThread,
-        }
-    }
+  for (const chatThread of resources) {
+    const messages = await FindAllChats(chatThread.chatThreadId)
 
-    return {
-      status: "OK",
-      response: undefined,
-    }
-  } catch (error) {
-    return {
-      status: "ERROR",
-      errors: [{ message: `${error}` }],
+    if (messages.length === 0) {
+      return chatThread
     }
   }
+
+  return undefined
 }
 
-export const UpdateChatThreadCreatedAt = async (chatThreadId: string): ServerActionResponseAsync<ChatThreadModel> => {
-  try {
-    const threadResponse = await FindChatThreadForCurrentUser(chatThreadId)
-    if (threadResponse.status !== "OK") return threadResponse
+export const UpdateChatThreadCreatedAt = async (chatThreadId: string): Promise<ChatThreadModel> => {
+  const container = await CosmosDBContainer.getInstance().getContainer()
+  const threads = await FindChatThreadByID(chatThreadId)
 
-    const threadToUpdate = {
-      ...threadResponse.response,
-      createdAt: new Date(),
-      chatType: ChatType.Simple,
-      conversationStyle: ConversationStyle.Precise,
-      conversationSensitivity: ConversationSensitivity.Official,
-      chatOverFileName: "",
-      offenderId: "",
-    }
+  if (threads.length !== 0) {
+    const threadToUpdate = threads[0]
+    threadToUpdate.createdAt = new Date()
+    threadToUpdate.chatType = ChatType.Simple
+    threadToUpdate.conversationStyle = ConversationStyle.Precise
+    threadToUpdate.conversationSensitivity = ConversationSensitivity.Official
+    threadToUpdate.chatOverFileName = ""
+    threadToUpdate.offenderId = ""
 
-    const container = await HistoryContainer()
-    const { resource } = await container.items.upsert<ChatThreadModel>(threadToUpdate)
-    if (!resource)
-      return {
-        status: "NOT_FOUND",
-        errors: [{ message: "Chat thread could not be updated" }],
-      }
-
-    return {
-      status: "OK",
-      response: resource,
-    }
-  } catch (error) {
-    return {
-      status: "ERROR",
-      errors: [{ message: `${error}` }],
-    }
+    await container.items.upsert(threadToUpdate)
+    return threadToUpdate
+  } else {
+    throw new Error("Chat thread not found")
   }
 }
 
 export const AssociateOffenderWithChatThread = async (
   chatThreadId: string,
   offenderId: string | undefined
-): ServerActionResponseAsync<ChatThreadModel> => {
-  const threadResponse = await FindChatThreadForCurrentUser(chatThreadId)
-  if (threadResponse.status !== "OK") return threadResponse
-
-  const threadToUpdate = {
-    ...threadResponse.response,
-    offenderId: offenderId,
+): Promise<(ChatThreadModel & Resource) | undefined> => {
+  const container = await CosmosDBContainer.getInstance().getContainer()
+  const threads = await FindChatThreadByID(chatThreadId)
+  if (threads.length === 0) {
+    throw new Error("Chat thread not found")
   }
-  const container = await HistoryContainer()
-  const { resource } = await container.items.upsert<ChatThreadModel>(threadToUpdate)
-  if (!resource)
-    return {
-      status: "NOT_FOUND",
-      errors: [{ message: "Failed to associate offender with chat thread" }],
-    }
-  return {
-    status: "OK",
-    response: resource,
+  const threadToUpdate = threads[0]
+  threadToUpdate.offenderId = offenderId
+  const updatedThread = await container.items.upsert<ChatThreadModel>(threadToUpdate)
+  if (!updatedThread) {
+    throw new Error("Failed to associate offender with chat thread")
   }
-}
-
-export const CreateChatAndRedirect = async (): Promise<void> => {
-  const response = await CreateChatThread()
-  if (response.status !== "OK") return
-  RedirectToChatThread(response.response.id)
+  return updatedThread.resource
 }
