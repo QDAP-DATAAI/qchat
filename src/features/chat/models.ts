@@ -1,5 +1,10 @@
 import { Message } from "ai"
 
+export const CHAT_DOCUMENT_ATTRIBUTE = "CHAT_DOCUMENT"
+export const CHAT_THREAD_ATTRIBUTE = "CHAT_THREAD"
+export const MESSAGE_ATTRIBUTE = "CHAT_MESSAGE"
+export const CHAT_UTILITY_ATTRIBUTE = "CHAT_UTILITY"
+
 export enum ConversationStyle {
   Creative = "creative",
   Balanced = "balanced",
@@ -20,11 +25,9 @@ export enum ChatType {
 }
 
 export enum FeedbackType {
-  None = "",
   HarmfulUnsafe = "harmful / unsafe",
   Untrue = "untrue",
   Unhelpful = "unhelpful",
-  Inaccurate = "inaccurate",
 }
 
 export enum ChatRole {
@@ -40,13 +43,6 @@ export enum ChatSentiment {
   Negative = "negative",
 }
 
-export enum ChatRecordType {
-  Document = "CHAT_DOCUMENT",
-  Message = "CHAT_MESSAGE",
-  Thread = "CHAT_THREAD",
-  Utility = "CHAT_UTILITY",
-}
-
 export interface ChatMessageModel {
   id: string
   createdAt: Date
@@ -57,8 +53,8 @@ export interface ChatMessageModel {
   content: string
   role: ChatRole
   context: string
-  type: ChatRecordType.Message
-  feedback: FeedbackType
+  type: "CHAT_MESSAGE"
+  feedback: string
   sentiment: ChatSentiment
   reason: string
   systemPrompt: string
@@ -80,15 +76,16 @@ export interface ChatThreadModel {
   conversationSensitivity: ConversationSensitivity
   conversationStyle: ConversationStyle
   chatOverFileName: string
-  type: ChatRecordType.Thread
+  type: "CHAT_THREAD"
   offenderId?: string
   isDisabled: boolean
   systemPrompt?: string
   contextPrompt?: string
   metaPrompt?: string
   contentSafetyWarning?: string
-  prompts: []
-  selectedPrompt: string
+  prompts?: string[]
+  selectedPrompt?: string
+  lastMessageAt: Date
 }
 
 export interface PromptGPTBody {
@@ -108,6 +105,17 @@ export interface PromptGPTProps extends PromptGPTBody {
   messages: Message[]
 }
 
+// export function preparePromptGPTProps(
+//   props: Omit<PromptGPTProps, "messages"> & { messages: (Omit<Message, "id"> & { id?: string })[] }
+// ): PromptGPTProps {
+//   const messagesWithId: Message[] = props.messages.map(message => ({
+//     ...message,
+//     id: uniqueId(),
+//   }))
+
+//   return { ...props, messages: messagesWithId }
+// }
+
 export interface ChatDocumentModel {
   id: string
   name: string
@@ -116,7 +124,7 @@ export interface ChatDocumentModel {
   tenantId: string
   isDeleted: boolean
   createdAt: Date
-  type: ChatRecordType.Document
+  type: "CHAT_DOCUMENT"
 }
 
 export interface ChatUtilityModel {
@@ -129,5 +137,11 @@ export interface ChatUtilityModel {
   createdAt: Date
   content: string
   role: ChatRole
-  type: ChatRecordType.Utility
+  type: "CHAT_UTILITY"
+}
+
+export interface ServerActionResponse<T> {
+  success: boolean
+  error: string
+  response: T
 }
