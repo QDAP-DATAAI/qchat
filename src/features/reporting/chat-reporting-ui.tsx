@@ -2,29 +2,24 @@ import ChatRow from "@/components/chat/chat-row"
 import { Card } from "@/features/ui/card"
 import { FC } from "react"
 import { AI_NAME } from "../theme/theme-config"
-import { FindAllChatsInThread, FindChatThreadById } from "./reporting-service"
-import { ChatMessageModel, ChatRole } from "../chat/models"
+import { FindAllChatsInThread, FindChatThreadByID } from "./reporting-service"
+import { ChatMessageModel, ChatRole } from "../chat/chat-services/models"
 
 interface Props {
   chatThreadId: string
 }
 
 export const ChatReportingUI: FC<Props> = async props => {
-  const [chatThreads, chats] = await Promise.all([
-    FindChatThreadById(props.chatThreadId),
-    FindAllChatsInThread(props.chatThreadId),
-  ])
-  if (chatThreads.status !== "OK") return <div>Error</div>
-  if (chats.status !== "OK") return <div>Error</div>
-
-  const chatThread = chatThreads.response
+  const chatThreads = await FindChatThreadByID(props.chatThreadId)
+  const chats = await FindAllChatsInThread(props.chatThreadId)
+  const chatThread = chatThreads[0]
 
   return (
     <Card className="relative h-full">
       <div className="h-full overflow-y-auto rounded-md">
         <div className="flex justify-center p-4"></div>
-        <div className="pb-[80px]">
-          {chats.response?.map((message, index) => {
+        <div className=" pb-[80px] ">
+          {chats.map((message, index) => {
             return (
               <ChatRow
                 chatMessageId={message.id}

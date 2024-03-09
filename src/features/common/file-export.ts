@@ -263,7 +263,7 @@ export const convertMarkdownToWordDocument = async (
       style: "MyCustomHeading1",
     })
 
-    const processedContent = processCitationsInText(message.content)
+    const processedContent = await processCitationsInText(message.content)
     const content = await marked.parse(processedContent)
     const contentParagraphs = createParagraphFromHtml(content)
 

@@ -2,13 +2,13 @@
 
 import React, { FC, useState } from "react"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
-import { ChatRole, ChatSentiment, FeedbackType } from "@/features/chat/models"
+import { ChatRole, ChatSentiment } from "@/features/chat/chat-services/models"
+import { CreateUserFeedbackChatId } from "@/features/chat/chat-services/chat-service"
 import Typography from "../typography"
-import Modal from "@/features/ui/modal"
+import Modal from "../../features/ui/modal"
 import { Markdown } from "../markdown/markdown"
-import AssistantButtons from "@/features/ui/assistant-buttons"
+import AssistantButtons from "../../features/ui/assistant-buttons"
 import { AI_NAME } from "@/features/theme/theme-config"
-import { CreateUserFeedback } from "@/features/chat/chat-services/chat-message-service"
 
 interface ChatRowProps {
   chatMessageId: string
@@ -35,9 +35,9 @@ export const ChatRow: FC<ChatRowProps> = props => {
         setThumbsUpClicked(prevState => !prevState)
         setThumbsDownClicked(false)
         setIsIconChecked(false)
-        CreateUserFeedback(props.chatMessageId, FeedbackType.None, ChatSentiment.Positive, "", props.chatThreadId)
+        CreateUserFeedbackChatId(props.chatMessageId, "", ChatSentiment.Positive, "", props.chatThreadId)
           .then(res => console.log(res))
-          .catch(err => console.error(err))
+          .catch(err => console.log(err))
         break
       case "ThumbsDown":
         setThumbsDownClicked(prevState => !prevState)
@@ -81,21 +81,23 @@ export const ChatRow: FC<ChatRowProps> = props => {
     }
   }
 
-  function handleModalSubmit(_feedback: string, sentiment: string, _reason: string): void {
+  async function handleModalSubmit(_feedback: string, sentiment: string, _reason: string): Promise<void> {
     if (sentiment === ChatSentiment.Negative) {
       setFeedbackMessage("Negative feedback submitted.")
       setTimeout(() => setFeedbackMessage(""), 2000)
     }
   }
 
-  const handleModalClose = (): void => {
-    closeModal?.()
-    return
+  const handleModalClose = async (): Promise<void> => {
+    if (closeModal) {
+      closeModal()
+    }
+    return Promise.resolve()
   }
 
   const safetyWarning = props.contentSafetyWarning ? (
     <div
-      className="prose prose-slate max-w-none break-words rounded-md bg-alert text-center text-sm text-primary dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
+      className="md:text-md prose prose-slate bg-alert text-primary dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 max-w-none break-words rounded-md text-center text-sm md:text-base"
       tabIndex={0}
       aria-label="Content Safety Warning"
     >
@@ -105,16 +107,14 @@ export const ChatRow: FC<ChatRowProps> = props => {
 
   return (
     <article className="container mx-auto flex flex-col py-1 pb-4">
-      <section className="flex-col gap-4 overflow-hidden rounded-md bg-background p-4">
+      <section className="bg-background flex-col gap-4 overflow-hidden rounded-md p-4">
         <header className="flex w-full items-center justify-between">
-          <Typography variant="h3" className="flex-1 capitalize text-heading" tabIndex={0}>
+          <Typography variant="h3" className="text-heading flex-1 capitalize" tabIndex={0}>
             {props.name}
           </Typography>
-          {process.env.NODE_ENV === "development" && (
-            <Typography variant="h3" className="flex-1 capitalize text-heading" tabIndex={0}>
-              {props.chatMessageId}
-            </Typography>
-          )}
+          <Typography variant="h3" className="text-heading flex-1 capitalize" tabIndex={0}>
+            {props.chatMessageId}
+          </Typography>
           <Modal
             chatThreadId={props.chatThreadId}
             chatMessageId={props.chatMessageId}
@@ -124,7 +124,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
           />
         </header>
         <div
-          className="prose prose-slate max-w-none break-words text-sm text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
+          className="md:text-md prose prose-slate text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 max-w-none break-words text-sm md:text-base"
           tabIndex={0}
         >
           <Markdown content={props.message} />

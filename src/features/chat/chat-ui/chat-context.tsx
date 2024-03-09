@@ -11,12 +11,12 @@ import {
   ConversationStyle,
   ConversationSensitivity,
   PromptGPTBody,
-} from "@/features/chat/models"
+} from "../chat-services/models"
 import { transformCosmosToAIModel } from "../chat-services/utils"
 import { FileState, useFileState } from "./chat-file/use-file-state"
 import { SpeechToTextProps, useSpeechToText } from "./chat-speech/use-speech-to-text"
 import { TextToSpeechProps, useTextToSpeech } from "./chat-speech/use-text-to-speech"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 interface ChatContextProps extends UseChatHelpers {
   chatThreadId: string
@@ -34,6 +34,7 @@ interface ChatContextProps extends UseChatHelpers {
 }
 
 const ChatContext = createContext<ChatContextProps | null>(null)
+
 interface Prop {
   children: React.ReactNode
   chatThreadId: string
@@ -46,6 +47,7 @@ interface Prop {
 export const ChatProvider: FC<Prop> = props => {
   const { showError } = useGlobalMessageContext()
   const Router = useRouter()
+  const path = usePathname()
   const speechSynthesizer = useTextToSpeech()
   const speechRecognizer = useSpeechToText({
     onSpeech(value) {
@@ -75,12 +77,14 @@ export const ChatProvider: FC<Prop> = props => {
     id: props.chatThreadId,
     body: chatBody,
     initialMessages: transformCosmosToAIModel(props.chats),
-    onFinish: (lastMessage: Message) => {
+    onFinish: async (lastMessage: Message) => {
       if (isMicrophoneUsed) {
         textToSpeech(lastMessage.content)
         resetMicrophoneUsed()
       }
-      Router.refresh()
+      if (!path.includes("chat")) {
+        window.history.pushState({}, "", `/chat/${props.chatThreadId}`)
+      }
     },
   })
 
@@ -88,22 +92,51 @@ export const ChatProvider: FC<Prop> = props => {
   const openModal = (): void => setIsModalOpen(true)
   const closeModal = (): void => setIsModalOpen(false)
 
+  const validateChatBody = (newBody: PromptGPTBody): boolean => {
+    return newBody.chatThreadId !== undefined && newBody.chatType !== undefined
+  }
+
   const setChatBody = (body: PromptGPTBody): void => {
+    if (!validateChatBody(body)) {
+      showError("Invalid chat body")
+      Router.refresh()
+      return
+    }
+    if (JSON.stringify(body) === JSON.stringify(chatBody)) {
+      return
+    }
     setBody(body)
   }
 
-  const onChatTypeChange = (value: ChatType): void => {
-    fileState.setShowFileUpload(value)
-    fileState.setIsFileNull(true)
-    setChatBody({ ...chatBody, chatType: value })
+  const onChatTypeChange = (value: ChatType): boolean => {
+    if (value === chatBody.chatType) {
+      return false
+    }
+    try {
+      fileState.setShowFileUpload(value)
+      fileState.setIsFileNull(true)
+      setChatBody({ ...chatBody, chatType: value })
+    } catch (error) {
+      showError((error as Error).message)
+      return false
+    }
+    return true
   }
 
-  const onConversationStyleChange = (value: ConversationStyle): void => {
+  const onConversationStyleChange = (value: ConversationStyle): boolean => {
+    if (value === chatBody.conversationStyle) {
+      return false
+    }
     setChatBody({ ...chatBody, conversationStyle: value })
+    return true
   }
 
-  const onConversationSensitivityChange = (value: ConversationSensitivity): void => {
+  const onConversationSensitivityChange = (value: ConversationSensitivity): boolean => {
+    if (value === chatBody.conversationSensitivity) {
+      return false
+    }
     setChatBody({ ...chatBody, conversationSensitivity: value })
+    return true
   }
 
   function onError(error: Error): void {
@@ -138,7 +171,7 @@ export const ChatProvider: FC<Prop> = props => {
 export const useChatContext = (): ChatContextProps => {
   const context = useContext(ChatContext)
   if (!context) {
-    throw new Error("ChatContext is null")
+    throw new Error("Chat context must be used within a ChatProvider")
   }
   return context
 }
