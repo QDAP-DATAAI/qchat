@@ -7,9 +7,9 @@ import { useFileSelection } from "./use-file-selection"
 import { OffenderTranscriptForm } from "../chat-empty-state/chat-transcript-details"
 
 export const ChatFileUI: FC = () => {
-  const { id, fileState, chatBody, offenderId } = useChatContext()
+  const { chatThreadId, fileState, chatBody, offenderId } = useChatContext()
   const { isFileNull, setIsFileNull, uploadButtonLabel, isUploadingFile } = fileState
-  const { onSubmit } = useFileSelection({ id })
+  const { onSubmit } = useFileSelection({ chatThreadId })
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const getAcceptedFileType = (chatType: string): string => {
@@ -72,7 +72,7 @@ export const ChatFileUI: FC = () => {
       </p>
       {chatBody.chatType === "audio" && offenderId != null && (
         <div>
-          <OffenderTranscriptForm chatThreadId={id} />
+          <OffenderTranscriptForm chatThreadId={chatThreadId} />
         </div>
       )}
     </div>

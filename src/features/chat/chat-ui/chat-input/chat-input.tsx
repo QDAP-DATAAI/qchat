@@ -20,7 +20,7 @@ const ChatInput: FC<Props> = () => {
     [chatBody.chatType, chatBody.chatOverFileName]
   )
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Australia/Brisbane"
-  const getNameInline = async (): Promise<string> => {
+  const getNameInline = async () => {
     const session = await getSession()
     const name = session?.user?.name || "You"
     return name
@@ -84,7 +84,7 @@ const ChatInput: FC<Props> = () => {
           value={input}
           placeholder="Send a message"
           aria-label="Send a message"
-          className="md:rows-4 rows-2 min-h-fit resize-none bg-background py-4 pr-[80px] shadow-sm"
+          className="md:rows-4 rows-2 bg-background min-h-fit resize-none py-4 pr-[80px] shadow-sm"
           onChange={onChange}
           onKeyDown={onKeyDown}
         />
@@ -106,7 +106,14 @@ const ChatInput: FC<Props> = () => {
                   <Send aria-hidden="true" size={16} />
                 )}
               </Button>
-              {!isLoading && <ChatInputMenu onDocExport={exportDocument} messageCopy={messages} />}
+              {!isLoading && (
+                <ChatInputMenu
+                  onDocExport={exportDocument}
+                  handleSubmit={handleSubmit}
+                  setInput={setInput}
+                  messageCopy={messages}
+                />
+              )}
             </>
           ) : null}
         </div>

@@ -53,6 +53,7 @@ const PromptForm: React.FC = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
+    console.log(formData)
     try {
       const response = await fetch("/api/submit", {
         method: "POST",
@@ -66,10 +67,10 @@ const PromptForm: React.FC = () => {
         throw new Error("Network response was not ok")
       }
 
-      // TODO Handle successful form submission here, e.g., showing a success message
+      // Handle successful form submission here, e.g., showing a success message
       console.log("Form submitted successfully")
     } catch (error) {
-      // TODO Handle errors here, e.g., showing an error message
+      // Handle errors here, e.g., showing an error message
       console.error("Failed to submit form:", error)
     }
   }

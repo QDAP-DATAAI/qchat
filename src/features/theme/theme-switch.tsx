@@ -13,34 +13,33 @@ export function ThemeSwitch(): JSX.Element {
     setIsThemeLoading(!resolvedTheme)
   }, [resolvedTheme])
 
+  const handleTabChange = (value: string): void => {
+    setTheme(value)
+  }
+
+  if (isThemeLoading) {
+    return <span>Loading theme...</span>
+  }
+
   return (
     <Tabs defaultValue={resolvedTheme} aria-label="Theme Switch">
-      <TabsList className="flex h-10 w-[70px] items-center justify-center gap-1">
-        {" "}
-        {isThemeLoading ? (
-          <div className="flex size-full items-center justify-center">
-            <span className="flex size-[35px] items-center justify-center rounded-md opacity-50">...</span>{" "}
-          </div>
-        ) : (
-          <>
-            <TabsTrigger
-              value="dark"
-              onClick={() => setTheme("dark")}
-              className="size-[35px] rounded-md text-altButton hover:bg-altBackgroundShade hover:text-altButton focus:ring"
-              aria-label="Switch to dark mode"
-            >
-              <Moon size={18} />
-            </TabsTrigger>
-            <TabsTrigger
-              value="light"
-              onClick={() => setTheme("light")}
-              className="size-[35px] rounded-md text-altButton hover:bg-altBackgroundShade hover:text-altButton focus:ring"
-              aria-label="Switch to light mode"
-            >
-              <Sun size={18} />
-            </TabsTrigger>
-          </>
-        )}
+      <TabsList className="flex h-10 flex-row items-center justify-center gap-1">
+        <TabsTrigger
+          value="dark"
+          onClick={() => handleTabChange("dark")}
+          className="text-altButton hover:bg-altBackgroundShade hover:text-altButton size-[35px] rounded-md focus:ring"
+          aria-label="Switch to dark mode"
+        >
+          <Moon size={18} />
+        </TabsTrigger>
+        <TabsTrigger
+          value="light"
+          onClick={() => handleTabChange("light")}
+          className="text-altButton hover:bg-altBackgroundShade hover:text-altButton size-[35px] rounded-md focus:ring"
+          aria-label="Switch to light mode"
+        >
+          <Sun size={18} />
+        </TabsTrigger>
       </TabsList>
     </Tabs>
   )

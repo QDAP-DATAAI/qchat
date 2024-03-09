@@ -19,20 +19,16 @@ export const NewChat = (): JSX.Element => {
 
     try {
       const existingThread = await FindChatThreadByTitleAndEmpty(title)
-      if (existingThread.status !== "OK") {
-        showError("Failed to start a new chat. Please try again later.")
-        return
-      }
 
-      if (!existingThread.response) {
+      if (existingThread) {
+        await UpdateChatThreadCreatedAt(existingThread.chatThreadId)
+        router.push(`/chat/${existingThread.chatThreadId}`)
+      } else {
         const newChatThread = await CreateChatThread()
-        if (newChatThread.status !== "OK") throw newChatThread
-        router.push(`/chat/${newChatThread.response.chatThreadId}`)
-        return
+        if (newChatThread && newChatThread.chatThreadId) {
+          router.push(`/chat/${newChatThread.chatThreadId}`)
+        }
       }
-
-      await UpdateChatThreadCreatedAt(existingThread.response.chatThreadId)
-      router.push(`/chat/${existingThread.response.chatThreadId}`)
     } catch (_error) {
       showError("Failed to start a new chat. Please try again later.")
     }
@@ -49,7 +45,7 @@ export const NewChat = (): JSX.Element => {
       className="size-[40px] gap-2 rounded-md p-1"
       variant="default"
       onClick={startNewChat}
-      ariaLabel="Start a new chat"
+      aria-label="Start a new chat"
       onKeyDown={handleKeyDown}
     >
       <MessageSquarePlus size={40} strokeWidth={1.2} />

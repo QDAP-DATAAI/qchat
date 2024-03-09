@@ -1,6 +1,6 @@
 "use server"
 import "server-only"
-import { ChatThreadModel } from "../models"
+import { ChatThreadModel } from "./models"
 import { UpsertChatThread } from "./chat-thread-service"
 import { GenericChatAPI } from "./generic-chat-api"
 
@@ -22,8 +22,7 @@ async function generateChatName(chatMessage: string): Promise<string> {
     if (name) {
       return name.replace(/^"+|"+$/g, "")
     } else {
-      // TODO handle error
-      console.error("Error: Unexpected response structure from OpenAI API.")
+      console.log("Error: Unexpected response structure from OpenAI API.")
     }
 
     return name || "New Chat by Error"
@@ -33,7 +32,7 @@ async function generateChatName(chatMessage: string): Promise<string> {
   }
 }
 
-async function generateChatCategory(chatMessage: string): Promise<string> {
+export async function generateChatCategory(chatMessage: string): Promise<string> {
   const apiName = "generateChatCategory"
   const categories = [
     "Information Processing and Management",
@@ -41,7 +40,6 @@ async function generateChatCategory(chatMessage: string): Promise<string> {
     "Decision Support and Advisory",
     "Educational and Training Services",
     "Operational Efficiency and Automation",
-    "Finance and Banking",
     "Public Engagement and Services",
     "Innovation and Development",
     "Creative Assistance",
@@ -54,35 +52,29 @@ async function generateChatCategory(chatMessage: string): Promise<string> {
     const category = await GenericChatAPI(apiName, {
       messages: [
         {
-          role: "system",
-          content: `Please categorise this chat session: "${chatMessage}" into only one of the following specified categories based on the content of the query. The category selected must strictly be one of the following: ${categories.join(", ")}. Ensure the response aligns with these predefined categories to maintain consistency.`,
+          role: "user",
+          content: `Categorise this chat session inside double quotes ""${chatMessage}"" into only one of the following 
+                categories: ${categories.join(", ")} based on my query`,
         },
       ],
     })
 
-    if (category && categories.includes(category)) {
-      return category
-    } else {
-      return "Uncategorised"
-    }
+    return category || "Uncategorised"
   } catch (_e) {
     return "Uncategorised"
   }
 }
 
-export async function UpdateChatThreadIfUncategorised(
+export async function updateChatThreadIfUncategorised(
   chatThread: ChatThreadModel,
   content: string
 ): Promise<ChatThreadModel> {
   try {
     if (chatThread.chatCategory === "Uncategorised") {
-      const [chatCategory, name, previousChatName] = await Promise.all([
-        generateChatCategory(content),
-        generateChatName(content),
-        StoreOriginalChatName(chatThread.name),
-      ])
-      const response = await UpsertChatThread({ ...chatThread, chatCategory, name, previousChatName })
-      if (response.status !== "OK") throw new Error(response.errors.join(", "))
+      chatThread.chatCategory = await generateChatCategory(content)
+      chatThread.name = await generateChatName(content)
+      chatThread.previousChatName = await StoreOriginalChatName(chatThread.name)
+      await UpsertChatThread(chatThread)
     }
     return chatThread
   } catch (e) {
@@ -91,7 +83,7 @@ export async function UpdateChatThreadIfUncategorised(
   }
 }
 
-function StoreOriginalChatName(currentChatName: string): string {
+export async function StoreOriginalChatName(currentChatName: string): Promise<string> {
   let previousChatName: string = ""
   if (currentChatName !== previousChatName) {
     previousChatName = currentChatName

@@ -5,11 +5,8 @@ import { useGlobalMessageContext } from "@/features/globals/global-message-conte
 import { Button } from "@/features/ui/button"
 import { MenuItem } from "@/components/menu"
 import { FileText, MessageCircle, Trash, Pencil, AudioLines } from "lucide-react"
-import { ChatThreadModel } from "../models"
-import {
-  UpdateChatThreadTitle,
-  SoftDeleteChatThreadForCurrentUser,
-} from "@/features/chat/chat-services/chat-thread-service"
+import { ChatThreadModel } from "../chat-services/models"
+import { RenameChatThreadByID, SoftDeleteChatThreadByID } from "@/features/chat/chat-services/chat-thread-service"
 import Typography from "@/components/typography"
 
 interface Prop {
@@ -51,16 +48,16 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
 
   return (
     <div
-      className={`bg-opacity/50 fixed inset-0 z-50 flex items-center justify-center bg-black ${isOpen ? "block" : "hidden"}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 ${isOpen ? "block" : "hidden"}`}
     >
-      <div className="mx-auto w-full max-w-lg overflow-hidden rounded-lg bg-altBackground p-4">
+      <div className="bg-altBackground mx-auto w-full max-w-lg overflow-hidden rounded-lg p-4">
         <div className="mb-4">
           <Typography variant="h4" className="text-foreground">
             Edit Chat Name
           </Typography>
         </div>
         <div className="mb-4">
-          <label htmlFor="newChatName" className="block text-sm font-medium text-foreground">
+          <label htmlFor="newChatName" className="text-foreground block text-sm font-medium">
             New Chat Name
           </label>
           <input
@@ -70,11 +67,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
             onChange={e => setNewName(e.target.value)}
             maxLength={120}
             ref={inputRef}
-            className="mt-1 w-full rounded-md border-altBackground bg-background p-2 shadow-sm"
+            className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm"
             autoComplete="off"
           />
           {newName.length > 30 && newName.length <= 120 && (
-            <p className="mt-2 text-sm text-accent">Name exceeds 30 characters. Consider shortening it.</p>
+            <p className="text-accent mt-2 text-sm">Name exceeds 30 characters. Consider shortening it.</p>
           )}
           {newName.length > 120 && (
             <p className="mt-2 text-sm text-red-500">Name exceeds 120 characters. Please shorten your chat name.</p>
@@ -102,7 +99,7 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null)
 
   const sendData = async (threadID: string): Promise<void> => {
-    await SoftDeleteChatThreadForCurrentUser(threadID)
+    await SoftDeleteChatThreadByID(threadID)
     router.refresh()
     router.replace("/chat")
   }
@@ -118,7 +115,7 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
   const handleSaveModal = async (newName: string): Promise<void> => {
     if (newName.trim() !== "" && selectedThreadId) {
       try {
-        await UpdateChatThreadTitle(selectedThreadId, newName)
+        await RenameChatThreadByID(selectedThreadId, newName)
         window.location.reload()
       } catch (e) {
         showError("" + e)

@@ -18,7 +18,7 @@ interface SliderProps {
 export const CitationSlider: FC<SliderProps> = props => {
   const chatContext = useChatContext()
   const { userId, tenantId } = chatContext.chatBody
-  const chatThreadId = chatContext.id
+  const chatThreadId = chatContext.chatThreadId
   const [node, formAction] = useFormState(CitationAction, null)
 
   const handleButtonClick = (): void => {
