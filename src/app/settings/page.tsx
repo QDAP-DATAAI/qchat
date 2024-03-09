@@ -4,12 +4,12 @@ import { Card, CardHeader, CardTitle, CardDescription } from "@/features/ui/card
 
 export const dynamic = "force-dynamic"
 
-export default function Home(): JSX.Element {
+export default async function Home(): Promise<JSX.Element> {
   return (
     <div className="col-span-5 size-full">
       <div className="grid size-full grid-cols-2 grid-rows-2 justify-center">
         <Card className="col-span-1 w-full p-4">
-          <div className="flex h-full flex-col justify-between rounded-lg bg-altBackground text-foreground shadow-sm">
+          <div className="bg-altBackground text-foreground flex h-full flex-col justify-between rounded-lg shadow-sm">
             <CardHeader>
               <CardTitle className="my-2 text-center font-bold">Coming Soon</CardTitle>
             </CardHeader>
@@ -17,7 +17,7 @@ export default function Home(): JSX.Element {
           </div>
         </Card>
         <Card className="col-span-1 w-full p-4">
-          <div className="flex h-full flex-col justify-between rounded-lg bg-altBackground text-foreground shadow-sm">
+          <div className="bg-altBackground text-foreground flex h-full flex-col justify-between rounded-lg shadow-sm">
             <CardHeader>
               <CardTitle className="my-2 text-center font-bold">Coming Soon</CardTitle>
             </CardHeader>
@@ -25,7 +25,7 @@ export default function Home(): JSX.Element {
           </div>
         </Card>
         <Card className="col-span-1 w-full p-4">
-          <div className="flex h-full flex-col justify-between rounded-lg bg-altBackground text-foreground shadow-sm">
+          <div className="bg-altBackground text-foreground flex h-full flex-col justify-between rounded-lg shadow-sm">
             <CardHeader>
               <CardTitle className="my-2 text-center font-bold">Coming Soon</CardTitle>
             </CardHeader>
@@ -33,7 +33,7 @@ export default function Home(): JSX.Element {
           </div>
         </Card>
         <Card className="col-span-1 w-full p-4">
-          <div className="flex h-full flex-col justify-between rounded-lg bg-altBackground text-foreground shadow-sm">
+          <div className="bg-altBackground text-foreground flex h-full flex-col justify-between rounded-lg shadow-sm">
             <CardHeader>
               <CardTitle className="my-2 text-center font-bold">Coming Soon</CardTitle>
             </CardHeader>

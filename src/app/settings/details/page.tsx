@@ -2,17 +2,17 @@ import { Card } from "@/features/ui/card"
 
 export const dynamic = "force-dynamic"
 
-export default function Home(): JSX.Element {
+export default async function Home(): Promise<JSX.Element> {
   return (
     <Card className="col-span-6 flex h-full flex-1 items-center justify-center sm:col-span-6 md:col-span-5 lg:col-span-4 xl:col-span-5">
-      <div className="col-span-5 h-full bg-altBackground text-foreground shadow-sm">
+      <div className="bg-altBackground text-foreground col-span-5 h-full shadow-sm">
         <section
-          className="container mx-auto size-full max-w-3xl justify-center gap-9 bg-altBackground"
+          className="bg-altBackground container mx-auto size-full max-w-3xl justify-center gap-9"
           aria-labelledby="startChatTitle"
         >
           Your context prompt input goes here
           <div className="col-span-5 gap-8 py-8 sm:col-span-6">
-            <div className="prose prose-slate max-w-4xl break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0"></div>
+            <div className="prose prose-slate dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 max-w-4xl break-words"></div>
           </div>
         </section>
       </div>

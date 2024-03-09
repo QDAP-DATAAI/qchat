@@ -7,10 +7,10 @@ export const metadata = {
   description: AI_NAME,
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
+export default async function RootLayout({ children }: { children: React.ReactNode }): Promise<JSX.Element> {
   return (
     <>
-      <div className="flex flex-1 overflow-scroll bg-card/70">{children}</div>
+      <div className="bg-card/70 flex flex-1 overflow-scroll">{children}</div>
     </>
   )
 }

@@ -3,9 +3,9 @@ import { StartNewChat } from "@/features/chat/chat-ui/chat-empty-state/start-new
 
 export const dynamic = "force-dynamic"
 
-export default function Home(): JSX.Element {
+export default async function Home(): Promise<JSX.Element> {
   return (
-    <Card className="col-span-6 flex h-full flex-1 items-center justify-center bg-altBackground sm:col-span-6 md:col-span-5 lg:col-span-4 xl:col-span-5">
+    <Card className="bg-altBackground col-span-6 flex h-full flex-1 items-center justify-center sm:col-span-6 md:col-span-5 lg:col-span-4 xl:col-span-5">
       <StartNewChat />
     </Card>
   )

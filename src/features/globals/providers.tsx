@@ -9,8 +9,8 @@ import AppInsightsProvider from "@/features/insights/app-insights-provider"
 
 export const Providers = ({ children }: { children: React.ReactNode }): JSX.Element => {
   return (
-    <SessionProvider refetchInterval={15 * 60} basePath="/api/auth">
-      <AppInsightsProvider>
+    <AppInsightsProvider>
+      <SessionProvider refetchInterval={15 * 60} basePath="/api/auth">
         <GlobalMessageProvider>
           <MenuProvider>
             <MiniMenuProvider>

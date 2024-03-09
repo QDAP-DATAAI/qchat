@@ -23,7 +23,7 @@ export const MainMenu = (): JSX.Element => {
           </Link>
         </Button>
         {session?.user?.qchatAdmin && (
-          <Button asChild variant={"menuRound"}>
+          <Button asChild className="text-primary size-[40px] rounded-full p-2" variant={"outline"}>
             <Link href="/reporting" title="Reporting">
               <LayoutDashboard />
             </Link>

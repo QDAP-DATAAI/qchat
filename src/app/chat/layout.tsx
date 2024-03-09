@@ -9,10 +9,10 @@ export const metadata = {
   description: AI_NAME,
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
+export default async function RootLayout({ children }: { children: React.ReactNode }): Promise<JSX.Element> {
   return (
     <>
-      <div className="grid h-full grid-cols-6 overflow-hidden bg-card/100">
+      <div className="bg-card/100 grid h-full grid-cols-6 overflow-hidden">
         <ChatMenuContainer>
           <ChatMenu />
         </ChatMenuContainer>
