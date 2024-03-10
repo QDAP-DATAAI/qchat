@@ -84,7 +84,7 @@ const ChatInput: FC<Props> = () => {
           value={input}
           placeholder="Send a message"
           aria-label="Send a message"
-          className="md:rows-4 rows-2 bg-background min-h-fit resize-none py-4 pr-[80px] shadow-sm"
+          className="md:rows-4 rows-2 min-h-fit resize-none bg-background py-4 pr-[80px] shadow-sm"
           onChange={onChange}
           onKeyDown={onKeyDown}
         />
