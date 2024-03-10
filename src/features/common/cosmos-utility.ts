@@ -1,6 +1,6 @@
 import "server-only"
 import { getTenantId, userHashedId } from "@/features/auth/helpers"
-import { CosmosDBContainer } from "./cosmos"
+import { CosmosDBContainer } from "./services/cosmos"
 import { ChatRole, ChatUtilityModel } from "../chat/chat-services/models"
 import { uniqueId } from "@/features/common/util"
 import { handleCosmosError } from "./cosmos-error"

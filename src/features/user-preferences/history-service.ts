@@ -1,10 +1,12 @@
-import { ChatMessageModel, ChatRecordType, ChatThreadModel } from "@/features/chat/models"
-import { getTenantId, userHashedId } from "@/features/auth/helpers"
-import { ServerActionResponseAsync } from "@/features/common/server-action-response"
-import { DEFAULT_MONTHS_AGO } from "@/features/chat/constants"
-import { xMonthsAgo } from "@/features/common/date-helper"
-import { HistoryContainer } from "@/features/common/services/cosmos"
 import { SqlQuerySpec } from "@azure/cosmos"
+import {
+  CHAT_THREAD_ATTRIBUTE,
+  ChatMessageModel,
+  ChatThreadModel,
+  MESSAGE_ATTRIBUTE,
+} from "../chat/chat-services/models"
+import { getTenantId, userHashedId } from "@/features/auth/helpers"
+import { CosmosDBContainer } from "../common/services/cosmos"
 
 function threeMonthsAgo(): string {
   const date = new Date()
@@ -47,6 +49,13 @@ export const FindAllChatThreadsForReporting = async (
       },
     ],
   }
+
+  const { resources } = await container.items
+    .query<ChatThreadModel>(querySpec, {
+      maxItemCount: pageSize,
+    })
+    .fetchNext()
+  return { resources }
 }
 
 export const FindChatThreadByID = async (chatThreadID: string): Promise<ChatThreadModel[]> => {
@@ -73,6 +82,10 @@ export const FindChatThreadByID = async (chatThreadID: string): Promise<ChatThre
       },
     ],
   }
+
+  const { resources } = await container.items.query<ChatThreadModel>(querySpec).fetchAll()
+
+  return resources
 }
 
 export const FindAllChatsInThread = async (chatThreadID: string): Promise<ChatMessageModel[]> => {
@@ -100,4 +113,6 @@ export const FindAllChatsInThread = async (chatThreadID: string): Promise<ChatMe
       },
     ],
   }
+  const { resources } = await container.items.query<ChatMessageModel>(querySpec).fetchAll()
+  return resources
 }

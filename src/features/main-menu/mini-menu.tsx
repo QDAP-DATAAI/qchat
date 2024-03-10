@@ -7,7 +7,7 @@ import { useSession, signIn, signOut } from "next-auth/react"
 import { useMiniMenuContext } from "./mini-menu-context"
 import { Menu, X, LogIn, LogOut, Home } from "lucide-react"
 import { useTheme } from "next-themes"
-import { Theme } from "../theme/customise"
+import { Theme } from "../theme/theme-provider"
 
 const getSignInProvider = (): string => (process.env.NODE_ENV === "development" ? "QChatDevelopers" : "azure-ad")
 

@@ -50,14 +50,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 ${isOpen ? "block" : "hidden"}`}
     >
-      <div className="bg-altBackground mx-auto w-full max-w-lg overflow-hidden rounded-lg p-4">
+      <div className="mx-auto w-full max-w-lg overflow-hidden rounded-lg bg-altBackground p-4">
         <div className="mb-4">
           <Typography variant="h4" className="text-foreground">
             Edit Chat Name
           </Typography>
         </div>
         <div className="mb-4">
-          <label htmlFor="newChatName" className="text-foreground block text-sm font-medium">
+          <label htmlFor="newChatName" className="block text-sm font-medium text-foreground">
             New Chat Name
           </label>
           <input
@@ -67,11 +67,11 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
             onChange={e => setNewName(e.target.value)}
             maxLength={120}
             ref={inputRef}
-            className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm"
+            className="mt-1 w-full rounded-md border-altBackground bg-background p-2 shadow-sm"
             autoComplete="off"
           />
           {newName.length > 30 && newName.length <= 120 && (
-            <p className="text-accent mt-2 text-sm">Name exceeds 30 characters. Consider shortening it.</p>
+            <p className="mt-2 text-sm text-accent">Name exceeds 30 characters. Consider shortening it.</p>
           )}
           {newName.length > 120 && (
             <p className="mt-2 text-sm text-red-500">Name exceeds 120 characters. Please shorten your chat name.</p>

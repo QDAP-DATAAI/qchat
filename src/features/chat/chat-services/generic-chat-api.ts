@@ -1,11 +1,10 @@
 "use server"
 import "server-only"
 import { OpenAIInstance } from "@/features/common/services/open-ai"
+import { CosmosDBContainer } from "@/features/common/services/cosmos"
 import { getTenantId, userHashedId } from "@/features/auth/helpers"
 import { translator } from "./chat-translator-service"
 import { ItemDefinition } from "@azure/cosmos"
-import { HistoryContainer } from "@/features/common/services/cosmos"
-import { ChatRecordType } from "../models"
 
 export interface Message {
   role: "function" | "system" | "user" | "assistant"
@@ -17,7 +16,9 @@ interface GenericChatAPIProps {
 }
 
 async function logAPIUsage<T>(apiName: string, apiParams: unknown, apiResult: T): Promise<void> {
-  const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
+  const container = await CosmosDBContainer.getInstance().getContainer()
+  const tenantId = await getTenantId()
+  const userId = await userHashedId()
   const uniqueId = `api-${Date.now()}-${tenantId}-${userId}`
   const usage = (
     apiResult as {
@@ -39,9 +40,9 @@ async function logAPIUsage<T>(apiName: string, apiParams: unknown, apiResult: T)
     promptTokens: usage?.prompt_tokens,
     completionTokens: usage?.completion_tokens,
     totalTokens: usage?.total_tokens,
-    type: ChatRecordType.Utility,
+    type: "CHAT_UTILITY",
   }
-  const container = await HistoryContainer()
+
   await container.items.create(logEntry)
 }
 
@@ -55,11 +56,12 @@ export const GenericChatAPI = async (apiName: string, props: GenericChatAPIProps
     await logAPIUsage(apiName, { messages: props.messages }, messageResponse)
 
     const content = messageResponse.choices[0]?.message?.content
-    if (content === undefined || content === null) throw new Error("No content found in the response from OpenAI API.")
+    if (content === undefined || content === null) {
+      throw new Error("No content found in the response from OpenAI API.")
+    }
 
     const translatedContent = await translator(content)
-    if (translatedContent.status !== "OK") throw translatedContent
-    return translatedContent.response
+    return translatedContent
   } catch (e) {
     await logAPIUsage("GenericChatAPI", { messages: props.messages }, { error: (e as Error).message })
     throw e

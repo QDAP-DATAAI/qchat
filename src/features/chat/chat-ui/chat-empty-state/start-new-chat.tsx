@@ -1,18 +1,12 @@
-"use client"
-
 import Typography from "@/components/typography"
 import { Card } from "@/features/ui/card"
 import { AI_NAME } from "@/features/theme/theme-config"
-import { FC } from "react"
-import { NewChat } from "@/features/chat/chat-menu/new-chat"
-import { Button } from "@/features/ui/button"
-import { useRouter } from "next/navigation"
+import { NewChat } from "../../chat-menu/new-chat"
 
-export const StartNewChat: FC<object> = () => {
-  const router = useRouter()
+export const StartNewChat = (): JSX.Element => {
   return (
     <section
-      className="container mx-auto grid size-full max-w-3xl grid-cols-3 items-center justify-center gap-9 bg-altBackground"
+      className="max:h-5/6 container mx-auto grid w-full max-w-3xl grid-cols-3 items-center justify-center gap-9 bg-altBackground"
       aria-labelledby="startChatTitle"
     >
       <Card className="col-span-3 flex flex-col gap-5 bg-altBackgroundShade p-5">
@@ -32,11 +26,8 @@ export const StartNewChat: FC<object> = () => {
           </p>
           <p className="lg:hidden">Press the plus button below to get started.</p>
         </div>
-        <div className="-mx-5 -mb-5 inline-flex items-center justify-center border-t bg-muted p-5">
+        <div className="-mx-5 -mb-5 flex flex-col border-t bg-muted p-5">
           <NewChat aria-label="Start a new chat" />
-          <Button onClick={() => router.push("/terms")} variant="link" className="text-foreground">
-            By starting a new chat you agree to the {AI_NAME} Terms and Conditions, click here to view them.
-          </Button>
         </div>
       </Card>
     </section>
