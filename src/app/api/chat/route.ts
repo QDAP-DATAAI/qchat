@@ -1,6 +1,6 @@
 import { ChatAPIEntry } from "@/features/chat/chat-services/chat-api-entry"
 
-const delay = async (ms: number | undefined): Promise<void> => await new Promise(resolve => setTimeout(resolve, ms))
+const delay = async (ms: number | undefined): Promise<void> => new Promise(resolve => setTimeout(resolve, ms))
 
 const errorMessages: { [key: number]: string } = {
   400: "Oops! Something went wrong with your request.",
