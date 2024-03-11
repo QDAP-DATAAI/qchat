@@ -8,7 +8,7 @@ export const metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }): Promise<JSX.Element> {
   return (
     <>
-      <div className="bg-altBackground flex size-full items-center justify-center">{children}</div>
+      <div className="flex size-full items-center justify-center bg-altBackground">{children}</div>
     </>
   )
 }

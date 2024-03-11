@@ -1,6 +1,5 @@
 "use client"
 
-// Importing necessary libraries and components
 import React from "react"
 import Link from "next/link"
 import { useSession, signIn, signOut } from "next-auth/react"
@@ -25,7 +24,7 @@ const MiniMenuItem = ({
   onClick: () => void
 }): React.JSX.Element => (
   <div
-    className="hover:bg-accent hover:text-accent-foreground flex cursor-pointer items-center whitespace-nowrap px-6 py-2 text-sm"
+    className="flex cursor-pointer items-center whitespace-nowrap px-6 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
     onClick={onClick}
     role="button"
     tabIndex={0}
@@ -46,26 +45,23 @@ export const MiniMenu = (): React.JSX.Element => {
 
   const toggleTheme = (): void => setTheme(theme === Theme.Light ? Theme.Dark : Theme.Light)
 
-  const menuItems = [
-    { name: "Home", href: "/chat", icon: Home, ariaLabel: "Navigate to home page" },
-    // Future menu items can be added here
-  ]
+  const menuItems = [{ name: "Home", href: "/chat", icon: Home, ariaLabel: "Navigate to home page" }]
 
   return (
     <>
       <div
         onClick={toggleMenu}
-        className="... flex cursor-pointer p-4"
+        className="flex cursor-pointer p-4"
         aria-expanded={isMenuOpen ? "true" : "false"}
         aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         role="button"
         tabIndex={0}
       >
-        {isMenuOpen ? <X className="..." aria-hidden="true" /> : <Menu size={16} className="..." aria-hidden="true" />}
+        {isMenuOpen ? <X aria-hidden="true" /> : <Menu size={16} aria-hidden="true" />}
         Menu
       </div>
       {isMenuOpen && (
-        <div className="... fixed inset-0 z-[99999]" role="dialog" aria-modal="true">
+        <div className="fixed inset-0 z-[99999]" role="dialog" aria-modal="true">
           <div className="mt-16 p-2">
             {menuItems.map(item => (
               <MiniMenuItem
@@ -78,11 +74,11 @@ export const MiniMenu = (): React.JSX.Element => {
               />
             ))}
             {session ? (
-              <button onClick={async () => signOut({ callbackUrl: "/" })} className="...">
+              <button onClick={() => signOut({ callbackUrl: "/" })}>
                 <LogOut className="mr-2 size-4" /> Logout
               </button>
             ) : (
-              <button onClick={async () => signIn(getSignInProvider())} className="...">
+              <button onClick={() => signIn(getSignInProvider())}>
                 <LogIn className="mr-2 size-4" /> Login
               </button>
             )}

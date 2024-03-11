@@ -21,7 +21,10 @@ const UserProfile = (): ReactElement => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="flex flex-col items-stretch">
-          <Button className="relative size-[40px] justify-center gap-2 rounded-full p-1" variant={"outline"}>
+          <Button
+            className="font-primary relative size-[40px] justify-center gap-2 rounded-full p-1"
+            variant={"outline"}
+          >
             {session?.user?.image ? (
               <Avatar className="">
                 <AvatarImage src={session.user.image} alt={session.user.name ?? "You"} />
@@ -41,7 +44,7 @@ const UserProfile = (): ReactElement => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={async () => await signOut({ callbackUrl: "/" })}>
+        <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
           <LogOut className="mr-2 size-4" />
           <span>Log out</span>
         </DropdownMenuItem>

@@ -19,10 +19,9 @@ export const Reporting = async (props: ReportingProp): Promise<JSX.Element> => {
   const nextPage = Number(pageNumber) + 1
   const previousPage = Number(pageNumber) - 1
 
-  const chatThreads = await FindAllChatThreadsForReporting(pageSize, pageNumber)
-  if (chatThreads.status !== "OK") return <div>Error</div>
+  const { resources: chatThreads } = await FindAllChatThreadsForReporting(pageSize, pageNumber)
 
-  const hasMoreResults = chatThreads && chatThreads.response.length === pageSize
+  const hasMoreResults = chatThreads && chatThreads.length === pageSize
 
   return (
     <Card className="flex size-full overflow-y-auto pt-8">
@@ -46,7 +45,7 @@ export const Reporting = async (props: ReportingProp): Promise<JSX.Element> => {
               </TableHeader>
               <TableBody>
                 {chatThreads &&
-                  chatThreads.response.map(chatThread => (
+                  chatThreads.map(chatThread => (
                     <TableRow key={chatThread.id}>
                       <TableCell className="font-medium">
                         <Link href={"/reporting/" + chatThread.id}>{chatThread.name}</Link>
