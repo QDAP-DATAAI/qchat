@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
                 <NavBar />
               </nav>
               {/* <main className="main grid grid-cols-6 w-full h-5/6 bg-background"> */}
-              <main className="main bg-background h-5/6 w-full">
+              <main className="main h-5/6 w-full bg-background">
                 {children}
                 {/* <div className={cn("col-span-6 w-full gap-2 bg-primary h-full")}>
             
