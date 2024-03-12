@@ -1,9 +1,9 @@
 import "server-only"
 import { getTenantId, userHashedId } from "@/features/auth/helpers"
-import { CosmosDBContainer } from "./services/cosmos"
+import { CosmosDBCore } from "@/services/cosmos"
 import { ChatRole, ChatUtilityModel } from "../chat/chat-services/models"
-import { uniqueId } from "@/features/common/util"
-import { handleCosmosError } from "./cosmos-error"
+import { uniqueId } from "@/lib/utils"
+import { handleCosmosError } from "@/services/cosmos-error"
 
 interface UtilityFunctionParams {
   [key: string]: unknown
@@ -16,7 +16,8 @@ export const SaveUtilityFunctionUsage = async <ParamsType extends UtilityFunctio
   utilityFunctionResult: ResultType
 ): Promise<ChatUtilityModel> => {
   try {
-    const container = await CosmosDBContainer.getInstance().getContainer()
+    const container = await CosmosDBCore.getInstance().getContainer("History", ["/partitionKeyPath"]) // Adjust the partitionKeyPath as needed
+
     const [tenantId, userId] = await Promise.all([getTenantId(), userHashedId()])
 
     const chatUtilityMessage: ChatUtilityModel = {

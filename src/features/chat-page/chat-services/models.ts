@@ -1,4 +1,4 @@
-import { ChatCompletionSnapshot } from "openai/lib/ChatCompletionStream"
+import { ChatCompletionSnapshot } from "openai/resources/chat/completions"
 import { ChatCompletionMessage } from "openai/resources/chat/completions"
 
 export const CHAT_DOCUMENT_ATTRIBUTE = "CHAT_DOCUMENT"

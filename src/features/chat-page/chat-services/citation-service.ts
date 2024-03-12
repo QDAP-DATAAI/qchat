@@ -1,4 +1,4 @@
-import { userHashedId } from "@/features/auth-page/helpers"
+import { userHashedId } from "@/features/auth/helpers"
 import { ServerActionResponse } from "@/features/common/server-action-response"
 import { HistoryContainer } from "@/features/common/services/cosmos"
 import { uniqueId } from "@/features/common/util"
