@@ -9,26 +9,24 @@ import { Markdown } from "../markdown/markdown"
 import AssistantButtons from "@/features/ui/assistant-buttons"
 import { AI_NAME } from "@/features/theme/theme-config"
 import { CreateUserFeedback } from "@/features/chat/chat-services/chat-message-service"
+import { Message } from "ai/react/dist"
 
 export interface ChatRowProps {
   chatMessageId: string
   name: string
-  message: string
+  message: Message & { sentiment?: ChatSentiment; feedback?: FeedbackType; reason?: string }
   type: ChatRole
   chatThreadId: string
   contentSafetyWarning?: string
-  sentiment?: ChatSentiment
-  feedback?: FeedbackType
-  reason?: string
 }
 
 export const ChatRow: FC<ChatRowProps> = props => {
   const [isIconChecked, setIsIconChecked] = useState(false)
-  const [thumbsUpClicked, setThumbsUpClicked] = useState(props.sentiment == ChatSentiment.Positive)
-  const [thumbsDownClicked, setThumbsDownClicked] = useState(props.sentiment == ChatSentiment.Negative)
+  const [thumbsUpClicked, setThumbsUpClicked] = useState(props.message.sentiment == ChatSentiment.Positive)
+  const [thumbsDownClicked, setThumbsDownClicked] = useState(props.message.sentiment == ChatSentiment.Negative)
 
-  const [feedbackType, setFeedbackType] = useState(props.feedback)
-  const [feedbackReason, setFeedbackReason] = useState(props.reason)
+  const [feedbackType, setFeedbackType] = useState(props.message.feedback)
+  const [feedbackReason, setFeedbackReason] = useState(props.message.reason)
 
   const [feedbackMessage, setFeedbackMessage] = useState("")
   const [isFeedbackModalOpen, setFeedbackModalOpen] = useState(false)
@@ -152,7 +150,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
           className="prose prose-slate max-w-none break-words text-sm text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
           tabIndex={0}
         >
-          <Markdown content={props.message} />
+          <Markdown content={props.message.content} />
         </div>
         {safetyWarning}
         <div className="sr-only" aria-live="assertive">
