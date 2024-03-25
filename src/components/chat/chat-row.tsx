@@ -1,6 +1,6 @@
 "use client"
 
-import React, { FC, useState } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ChatRole, ChatSentiment, FeedbackType } from "@/features/chat/models"
 import Typography from "../typography"
@@ -10,7 +10,7 @@ import AssistantButtons from "@/features/ui/assistant-buttons"
 import { AI_NAME } from "@/features/theme/theme-config"
 import { CreateUserFeedback } from "@/features/chat/chat-services/chat-message-service"
 
-interface ChatRowProps {
+export interface ChatRowProps {
   chatMessageId: string
   name: string
   message: string
@@ -18,16 +18,21 @@ interface ChatRowProps {
   chatThreadId: string
   contentSafetyWarning?: string
   sentiment?: ChatSentiment
-  feedback?: string
+  feedback?: FeedbackType
   reason?: string
 }
 
 export const ChatRow: FC<ChatRowProps> = props => {
   const [isIconChecked, setIsIconChecked] = useState(false)
-  const [thumbsUpClicked, setThumbsUpClicked] = useState(false)
-  const [thumbsDownClicked, setThumbsDownClicked] = useState(false)
+  const [thumbsUpClicked, setThumbsUpClicked] = useState(props.sentiment == ChatSentiment.Positive)
+  const [thumbsDownClicked, setThumbsDownClicked] = useState(props.sentiment == ChatSentiment.Negative)
+
+  const [feedbackType, setFeedbackType] = useState(props.feedback)
+  const [feedbackReason, setFeedbackReason] = useState(props.reason)
+
   const [feedbackMessage, setFeedbackMessage] = useState("")
-  const { isModalOpen, openModal, closeModal } = useChatContext()
+  const [isFeedbackModalOpen, setFeedbackModalOpen] = useState(false)
+  const { openModal, closeModal } = useChatContext()
 
   const toggleButton = (buttonId: string): void => {
     switch (buttonId) {
@@ -72,25 +77,41 @@ export const ChatRow: FC<ChatRowProps> = props => {
     toggleButton("ThumbsUp")
     setFeedbackMessage("Positive feedback submitted.")
     setTimeout(() => setFeedbackMessage(""), 2000)
+
+    setFeedbackType(FeedbackType.None)
+    setFeedbackReason("")
   }
+
+  useEffect(() => {
+    if (isFeedbackModalOpen) openModal?.()
+    else closeModal?.()
+  }, [isFeedbackModalOpen])
 
   const handleThumbsDownClick = (): void => {
-    toggleButton("ThumbsDown")
-    if (openModal) {
-      openModal()
-    }
+    setFeedbackModalOpen(true)
   }
 
-  function handleModalSubmit(_feedback: string, sentiment: string, _reason: string): void {
-    if (sentiment === ChatSentiment.Negative) {
-      setFeedbackMessage("Negative feedback submitted.")
-      setTimeout(() => setFeedbackMessage(""), 2000)
-    }
+  function handleModalSubmit() {
+    CreateUserFeedback(
+      props.chatMessageId,
+      feedbackType || FeedbackType.None,
+      ChatSentiment.Negative,
+      feedbackReason || "",
+      props.chatThreadId
+    )
+      .then(res => console.log(res))
+      .catch(err => console.error(err))
+
+    if (!thumbsDownClicked) toggleButton("ThumbsDown")
+
+    setFeedbackMessage("Negative feedback submitted.")
+    setTimeout(() => setFeedbackMessage(""), 2000)
+
+    setFeedbackModalOpen(false)
   }
 
-  const handleModalClose = (): void => {
-    closeModal?.()
-    return
+  const handleModalClose = () => {
+    setFeedbackModalOpen(false)
   }
 
   const safetyWarning = props.contentSafetyWarning ? (
@@ -118,7 +139,11 @@ export const ChatRow: FC<ChatRowProps> = props => {
           <Modal
             chatThreadId={props.chatThreadId}
             chatMessageId={props.chatMessageId}
-            open={isModalOpen || false}
+            feedbackType={feedbackType}
+            onFeedbackTypeChange={setFeedbackType}
+            feedbackReason={feedbackReason}
+            onFeedbackReasonChange={setFeedbackReason}
+            open={isFeedbackModalOpen}
             onClose={handleModalClose}
             onSubmit={handleModalSubmit}
           />
