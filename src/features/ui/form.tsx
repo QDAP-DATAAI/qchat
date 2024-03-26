@@ -1,74 +1,82 @@
-"use client"
-
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import * as Form from "@radix-ui/react-form"
-import { Button } from "@/features/ui/button"
+import { useSession } from "next-auth/react"
+import { useUserData } from "@/components/hooks/user-data"
 
-interface PromptFormData {
-  fullName: string
-  jobTitle: string
-  teamOrBusinessUnit: string
-  departmentOrOrganisation: string
-  additionalInfo: string
-}
+export const PromptForm: React.FC = () => {
+  const { data: session } = useSession()
+  const { userData, loading, error } = useUserData()
+  const [contextPrompt, setContextPrompt] = useState("")
 
-type FormFieldProps = {
-  label: string
-  name: keyof PromptFormData
-  type?: string
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-}
-
-const FormField: React.FC<FormFieldProps> = ({ label, name, type = "text", onChange }) => (
-  <Form.Field name={name}>
-    <Form.Label htmlFor={name}>{label}</Form.Label>
-    <input type={type} id={name} name={name} required onChange={onChange} placeholder={label} title={label} />
-    <Form.Message />
-  </Form.Field>
-)
-
-const PromptForm: React.FC = () => {
-  const [_formData, setFormData] = useState<PromptFormData>({
-    fullName: "",
-    jobTitle: "",
-    teamOrBusinessUnit: "",
-    departmentOrOrganisation: "",
-    additionalInfo: "",
-  })
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault()
-    // Here you can handle the form submission, e.g., sending the data to an API
+    // Here, implement your logic to handle the submission, such as updating the user's record
+    console.log(`Submitting: ${contextPrompt}`)
+    // Remember to handle the submission result properly (e.g., user feedback)
   }
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
-    const { name, value } = event.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+  useEffect(() => {
+    if (userData && userData.name) {
+      setContextPrompt(userData.name) // Or any other user data property you'd like to preset in the form
+    }
+  }, [userData])
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div>Error: {error.message}</div>
 
   return (
-    <Form.Root onSubmit={handleSubmit}>
-      <FormField label="Full Name" name="fullName" onChange={handleChange} />
-      <FormField label="Job Title" name="jobTitle" onChange={handleChange} />
-      <FormField label="Team or Business Unit Name" name="teamOrBusinessUnit" onChange={handleChange} />
-      <FormField label="Department or Organisation Name" name="departmentOrOrganisation" onChange={handleChange} />
-
-      <Form.Field name="additionalInfo">
-        <Form.Label htmlFor="additionalInfo">Additional Information</Form.Label>
-        <textarea
-          id="additionalInfo"
-          name="additionalInfo"
-          required
-          onChange={handleChange}
-          placeholder="Enter additional information"
-          title="Additional Information"
+    <Form.Root className="w-full" onSubmit={handleSubmit}>
+      <div className="mb-[10px]">
+        <Form.Label htmlFor="userName" className="text-foreground block text-sm font-medium">
+          Name
+        </Form.Label>
+        <input
+          id="userName"
+          type="text"
+          value={session?.user?.name || "Not Specified"}
+          disabled
+          className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm"
+          title="User's name"
+          placeholder="Name"
         />
-        <Form.Message />
-      </Form.Field>
+      </div>
 
-      <Form.ValidityState>{validity => <div>Form Validity: {validity ? "valid" : "invalid"}</div>}</Form.ValidityState>
+      <div className="mb-[10px]">
+        <Form.Label htmlFor="userEmail" className="text-foreground block text-sm font-medium">
+          Email
+        </Form.Label>
+        <input
+          id="userEmail"
+          type="email"
+          value={session?.user?.email || "Not Specified"}
+          disabled
+          className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm"
+          title="User's email"
+          placeholder="Email"
+        />
+      </div>
 
-      <Button type="submit">Submit</Button>
+      <div className="mb-[10px]">
+        <Form.Label htmlFor="contextPrompt" className="text-foreground block text-sm font-medium">
+          Context Prompt
+        </Form.Label>
+        <input
+          id="contextPrompt"
+          type="text"
+          value={contextPrompt}
+          onChange={e => setContextPrompt(e.target.value)}
+          className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm"
+          title="Context prompt for the user"
+          placeholder="Enter context prompt"
+          required
+        />
+      </div>
+
+      <Form.Submit asChild>
+        <button type="submit" className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm">
+          Update
+        </button>
+      </Form.Submit>
     </Form.Root>
   )
 }
