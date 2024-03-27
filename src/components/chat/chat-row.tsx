@@ -12,7 +12,7 @@ import { CreateUserFeedback } from "@/features/chat/chat-services/chat-message-s
 import { Message } from "ai/react/dist"
 import { showError } from "@/features/globals/global-message-store"
 
-export interface ChatRowProps {
+interface ChatRowProps {
   chatMessageId: string
   name: string
   message: Message & { sentiment?: ChatSentiment; feedback?: FeedbackType; reason?: string }
@@ -20,6 +20,8 @@ export interface ChatRowProps {
   chatThreadId: string
   contentSafetyWarning?: string
 }
+
+const TEMPORARY_ID_LENGTH = 7 // TODO: if chatMessageId length is 7, it's the temp id; investigate for a better solution
 
 export const ChatRow: FC<ChatRowProps> = props => {
   const [isIconChecked, setIsIconChecked] = useState(false)
@@ -158,8 +160,8 @@ export const ChatRow: FC<ChatRowProps> = props => {
         <div className="sr-only" aria-live="assertive">
           {feedbackMessage}
         </div>
-        {props.type === "assistant" && props.chatMessageId.length !== 7 && (
-          <AssistantButtons //if chatMessageId length is 7, it's the temp id
+        {props.type === "assistant" && props.chatMessageId.length !== TEMPORARY_ID_LENGTH && (
+          <AssistantButtons
             isIconChecked={isIconChecked}
             thumbsUpClicked={thumbsUpClicked}
             thumbsDownClicked={thumbsDownClicked}
