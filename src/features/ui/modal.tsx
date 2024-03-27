@@ -47,7 +47,11 @@ export default function Modal(props: ModalProps): ReturnType<FC> {
           onFeedbackTypeChange={props.onFeedbackTypeChange}
         />
         <div className="mt-4 flex justify-center gap-2">
-          <Button variant="default" onClick={props.onSubmit}>
+          <Button
+            variant="default"
+            onClick={props.onSubmit}
+            disabled={(props.feedbackReason || "").trim().length === 0}
+          >
             Submit
           </Button>
           <Button variant="secondary" onClick={props.onClose}>

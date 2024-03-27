@@ -94,7 +94,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
       props.chatMessageId,
       feedbackType || FeedbackType.None,
       ChatSentiment.Negative,
-      feedbackReason || "",
+      (feedbackReason || "").trim(),
       props.chatThreadId
     )
       .then(res => console.log(res))
@@ -156,8 +156,8 @@ export const ChatRow: FC<ChatRowProps> = props => {
         <div className="sr-only" aria-live="assertive">
           {feedbackMessage}
         </div>
-        {props.type === "assistant" && (
-          <AssistantButtons
+        {props.type === "assistant" && props.chatMessageId.length !== 7 && (
+          <AssistantButtons //if chatMessageId length is 7, it's the temp id
             isIconChecked={isIconChecked}
             thumbsUpClicked={thumbsUpClicked}
             thumbsDownClicked={thumbsDownClicked}

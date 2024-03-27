@@ -16,7 +16,7 @@ const FeedbackButtons: React.FC<FeedbackButtonsProps> = ({ selectedType, onFeedb
         value={selectedType}
         onValueChange={type =>
           onFeedbackTypeChange(
-            Object.values(FeedbackType).includes(type as any) ? (type as FeedbackType) : FeedbackType.None
+            Object.values(FeedbackType).includes(type as FeedbackType) ? (type as FeedbackType) : FeedbackType.None
           )
         }
       >

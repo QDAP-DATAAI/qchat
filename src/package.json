@@ -65,7 +65,7 @@
     "@uiw/react-codemirror": "^4.21.24",
     "@upstash/ratelimit": "^1.0.1",
     "@vercel/otel": "^1.6.0",
-    "ai": "2.2.20",
+    "ai": "3.0.13",
     "ajv": "^8.12.0",
     "applicationinsights": "^2.9.5",
     "class-variance-authority": "^0.7.0",
