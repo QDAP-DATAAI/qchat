@@ -10,6 +10,7 @@ import AssistantButtons from "@/features/ui/assistant-buttons"
 import { AI_NAME } from "@/features/theme/theme-config"
 import { CreateUserFeedback } from "@/features/chat/chat-services/chat-message-service"
 import { Message } from "ai/react/dist"
+import { showError } from "@/features/globals/global-message-store"
 
 export interface ChatRowProps {
   chatMessageId: string
@@ -89,16 +90,19 @@ export const ChatRow: FC<ChatRowProps> = props => {
     setFeedbackModalOpen(true)
   }
 
-  function handleModalSubmit() {
-    CreateUserFeedback(
+  async function handleModalSubmit() {
+    const resp = await CreateUserFeedback(
       props.chatMessageId,
       feedbackType || FeedbackType.None,
       ChatSentiment.Negative,
       (feedbackReason || "").trim(),
       props.chatThreadId
     )
-      .then(res => console.log(res))
-      .catch(err => console.error(err))
+
+    if (resp.status !== "OK") {
+      showError("Failed to submit feedback.")
+      return
+    }
 
     if (!thumbsDownClicked) toggleButton("ThumbsDown")
 

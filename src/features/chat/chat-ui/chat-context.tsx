@@ -117,9 +117,7 @@ export const ChatProvider: FC<Prop> = props => {
         ...response,
         messages: response.messages.map(message => ({
           ...message,
-          id: response.data
-            ? (response.data as DataItem[]).find(d => d.message === message.content)?.id || message.id
-            : message.id,
+          id: (response.data as DataItem[])?.find(d => d.message === message.content)?.id || message.id,
         })),
         setChatBody,
         chatBody,

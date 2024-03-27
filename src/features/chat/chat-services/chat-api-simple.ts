@@ -6,6 +6,7 @@ import { AddChatMessage, FindTopChatMessagesForCurrentUser } from "./chat-messag
 import { PromptGPTProps, ChatRole } from "../models"
 import { UpdateChatThreadIfUncategorised } from "./chat-utility"
 import { translator } from "./chat-translator-service"
+import { Completion } from "openai/resources/completions"
 
 async function buildUserContextPrompt(): Promise<string> {
   const session = await userSession()
@@ -61,8 +62,7 @@ export const ChatAPISimple = async (props: PromptGPTProps): Promise<Response> =>
 
     const data = new experimental_StreamData()
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const stream = OpenAIStream(response as any, {
+    const stream = OpenAIStream(response as AsyncIterable<Completion>, {
       async onCompletion(completion: string) {
         let addedMessage
 
