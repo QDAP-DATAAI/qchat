@@ -50,15 +50,6 @@ export const getContextPrompt = async (): Promise<string> => {
 //   }
 // }
 
-export const getTenantId = async (): Promise<string> => {
-  const user = await userSession()
-  if (user) {
-    return user.tenantId
-  }
-
-  throw new Error("Tenant not found")
-}
-
 export type UserModel = {
   name: string
   image: string

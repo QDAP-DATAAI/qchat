@@ -36,8 +36,8 @@ const UserProfile = (): ReactElement => {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{session?.user?.name ?? "Anonymous"}</p>
-            <p className="text-muted-foreground text-xs leading-none">{session?.user?.email ?? "No email provided"}</p>
-            <p className="text-muted-foreground text-xs leading-none">{session?.user?.qchatAdmin ? "Admin" : ""}</p>
+            <p className="text-xs leading-none text-muted-foreground">{session?.user?.email ?? "No email provided"}</p>
+            <p className="text-xs leading-none text-muted-foreground">{session?.user?.qchatAdmin ? "Admin" : ""}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

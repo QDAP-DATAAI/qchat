@@ -74,21 +74,6 @@ const ChatInput: FC<Props> = () => {
     return null
   }
 
-  const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter" && !event.shiftKey && !isModalOpen) {
-      event.preventDefault()
-      if (!isLoading) {
-        // Ensure we don't attempt to submit when data is loading or in an improper state.
-        handleSubmit(event as unknown as FormEvent<HTMLFormElement>)
-        setInput("")
-      }
-    }
-  }
-
-  if (isModalOpen) {
-    return null
-  }
-
   return (
     <form onSubmit={submit} className="absolute bottom-0 flex w-full items-center">
       <div className="container relative mx-auto flex max-w-4xl items-center gap-2 py-2">
@@ -99,7 +84,7 @@ const ChatInput: FC<Props> = () => {
           value={input}
           placeholder="Send a message"
           aria-label="Send a message"
-          className="md:rows-4 rows-2 bg-background min-h-fit resize-none py-4 pr-[80px] shadow-sm"
+          className="md:rows-4 rows-2 min-h-fit resize-none bg-background py-4 pr-[80px] shadow-sm"
           onChange={onChange}
           onKeyDown={onKeyDown}
         />

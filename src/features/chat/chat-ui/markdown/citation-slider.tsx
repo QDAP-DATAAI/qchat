@@ -52,12 +52,12 @@ export const CitationSlider: FC<SliderProps> = props => {
           <SheetHeader>
             <SheetTitle id={"Section" + props.order}>Citation for Section {props.order}</SheetTitle>
           </SheetHeader>
-          <div className="text-muted-foreground text-sm">{node}</div>
+          <div className="text-sm text-muted-foreground">{node}</div>
           <br></br>
           <SheetHeader>
             <SheetTitle id="citationSheetTitle">Understanding Citations</SheetTitle>
           </SheetHeader>
-          <div className="text-muted-foreground text-sm">
+          <div className="text-sm text-muted-foreground">
             <br></br>
             <p>
               The citation presented is a specific snippet from your document, selected by QChat through

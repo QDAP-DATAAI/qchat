@@ -9,14 +9,14 @@ import { AI_NAME } from "@/features/theme/theme-config"
 const Sidebar: React.FC = () => {
   return (
     <div className="grid h-full grid-cols-12 items-center gap-2 md:grid-cols-6">
-      <div className="border-accent col-span-2 hidden border-r-2 md:col-span-2 md:block md:scale-75">
+      <div className="col-span-2 hidden border-r-2 border-accent md:col-span-2 md:block md:scale-75">
         <QgovSvg />
       </div>
       <div className="col-span-4 flex flex-col md:col-span-3">
         <Typography variant="h1" className="text-siteTitle">
           {AI_NAME}
         </Typography>
-        <Typography variant="h2" className="text-textMuted hidden whitespace-nowrap pb-0 sm:block">
+        <Typography variant="h2" className="hidden whitespace-nowrap pb-0 text-textMuted sm:block">
           The Queensland Government AI Assistant
         </Typography>
       </div>
@@ -28,7 +28,7 @@ const Sidebar: React.FC = () => {
 export const Header: React.FC = () => {
   return (
     <header className="xs:h-[32px] flex w-full flex-col sm:h-[98px]">
-      <div className="bg-darkbackground h-[32px] text-white">
+      <div className="h-[32px] bg-darkbackground text-white">
         <div className="mx-auto flex h-full items-center justify-between px-8 py-2">
           <div className="block md:hidden lg:hidden">
             <QgovMiniSvg />
@@ -46,7 +46,7 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="bg-altBackground block py-2 sm:h-[66px]">
+      <div className="block bg-altBackground py-2 sm:h-[66px]">
         <div className="container mx-auto flex items-center">
           <Sidebar />
         </div>

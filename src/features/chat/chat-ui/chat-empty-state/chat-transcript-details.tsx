@@ -33,15 +33,15 @@ export const OffenderTranscriptForm = ({ chatThreadId }: OffenderTranscriptFormP
   return (
     <div className="bg-background p-5">
       {isIdSaved ? (
-        <div className="text-muted-foreground text-sm">Offender ID {offenderId} saved.</div>
+        <div className="text-sm text-muted-foreground">Offender ID {offenderId} saved.</div>
       ) : (
         <form onSubmit={handleSubmit}>
           <div className="flex grid-cols-3 flex-wrap items-center gap-[15px]">
-            <Label.Root htmlFor="offenderID" className="text-muted-foreground text-sm leading-[35px]">
+            <Label.Root htmlFor="offenderID" className="text-sm leading-[35px] text-muted-foreground">
               Offender&apos;s Identification Number:
             </Label.Root>
             <input
-              className="bg-inputBackground shadow-blackA6 text-muted-foreground selection:bg-accent selection:text-foreground focus:ring-primary inline-flex h-[35px] w-[200px] appearance-none items-center justify-center rounded-[4px] px-[10px] text-sm leading-none shadow-[0_0_0_1px] outline-none focus:ring-2 focus:ring-offset-2"
+              className="bg-inputBackground shadow-blackA6 inline-flex h-[35px] w-[200px] appearance-none items-center justify-center rounded-[4px] px-[10px] text-sm leading-none text-muted-foreground shadow-[0_0_0_1px] outline-none selection:bg-accent selection:text-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2"
               type="text"
               id="offenderID"
               name="offenderID"
@@ -58,7 +58,7 @@ export const OffenderTranscriptForm = ({ chatThreadId }: OffenderTranscriptFormP
             </Button>
           </div>
           {message && (
-            <div aria-live="polite" className="text-muted-foreground text-sm">
+            <div aria-live="polite" className="text-sm text-muted-foreground">
               {message}
             </div>
           )}

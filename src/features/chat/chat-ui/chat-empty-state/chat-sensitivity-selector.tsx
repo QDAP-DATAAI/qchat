@@ -54,7 +54,7 @@ export const ChatSensitivitySelector: FC<Prop> = ({ disable }) => {
             </Tabs>
           </div>
         </Tooltip.Trigger>
-        <Tooltip.Content side="top" className="bg-primary-foreground text-foreground rounded-md p-2 text-sm shadow-lg">
+        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-sm text-foreground shadow-lg">
           <p>
             <strong>Official:</strong> Verified and formal conversations.
           </p>

@@ -131,28 +131,7 @@ module.exports = {
       transitionTimingFunction: {
         "custom-ease": "cubic-bezier(0.87, 0, 0.13, 1)",
       },
-      fontFamily: {
-        sans: ["Noto Sans", '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Helvetica', 'Arial', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'],
-      },
-      fontSize: {
-        'xs': '.6rem',
-        'sm': '.8rem',
-        'base': '1rem',
-        'lg': '1.125rem',
-        'xl': '1.25rem',
-        '2xl': '1.3rem',
-        '3xl': '1.5rem',
-      },
-      fontweight: {
-        "light": "300",
-        "normal": "400",
-        "semibold": "600",
-        "bold": "700",
-      },
-      transitionTimingFunction: {
-        'custom-ease': 'cubic-bezier(0.87, 0, 0.13, 1)',
-      },
-      }
     },
+  },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 }

@@ -74,34 +74,34 @@ const ChatInputMenu: React.FC<ChatInputMenuProps> = ({ onDocExport }) => {
           id="chat-input-options"
           role="menu"
           aria-label="Chat input options"
-          className="bg-background text-popover-foreground min-w-[220px] rounded-md p-[5px] shadow-lg"
+          className="min-w-[220px] rounded-md bg-background p-[5px] text-popover-foreground shadow-lg"
           sideOffset={5}
         >
           <DropdownMenu.Item
             asChild
             onSelect={fairClickHandler}
-            className="DropdownMenuItem bg-background text-foreground hover:bg-secondary hover:text-secondary-foreground cursor-pointer rounded-md"
+            className="DropdownMenuItem cursor-pointer rounded-md bg-background text-foreground hover:bg-secondary hover:text-secondary-foreground"
           >
             <div tabIndex={0} ref={firstMenuItemRef} style={{ display: "flex", alignItems: "center", padding: "5px" }}>
               <Bird size={20} className="mr-2" aria-hidden="true" />
               Complete a Fast AI Risk Assessment
             </div>
           </DropdownMenu.Item>
-          <DropdownMenu.Separator className="bg-secondary my-2 h-px" />
+          <DropdownMenu.Separator className="my-2 h-px bg-secondary" />
           <DropdownMenu.Item asChild onSelect={onDocExport} className="dropdown-menu-item">
             <div
               tabIndex={0}
-              className="hover:bg-secondary hover:text-secondary-foreground flex cursor-pointer items-center rounded-md p-2"
+              className="flex cursor-pointer items-center rounded-md p-2 hover:bg-secondary hover:text-secondary-foreground"
             >
               <File size={20} className="mr-2" aria-hidden="true" />
               Export your Chat to File
             </div>
           </DropdownMenu.Item>
-          <DropdownMenu.Separator className="bg-secondary my-2 h-px" />
+          <DropdownMenu.Separator className="my-2 h-px bg-secondary" />
           <DropdownMenu.Item asChild onSelect={copyToClipboard} className="dropdown-menu-item">
             <div
               tabIndex={0}
-              className="hover:bg-secondary hover:text-secondary-foreground flex cursor-pointer items-center rounded-md p-2"
+              className="flex cursor-pointer items-center rounded-md p-2 hover:bg-secondary hover:text-secondary-foreground"
             >
               <Clipboard size={20} className="mr-2" aria-hidden="true" />
               Copy Chat to Clipboard

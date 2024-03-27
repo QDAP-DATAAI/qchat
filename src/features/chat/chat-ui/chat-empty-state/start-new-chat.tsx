@@ -12,11 +12,11 @@ export const StartNewChat: FC<object> = () => {
   const router = useRouter()
   return (
     <section
-      className="bg-altBackground container mx-auto grid size-full max-w-3xl grid-cols-3 items-center justify-center gap-9"
+      className="container mx-auto grid size-full max-w-3xl grid-cols-3 items-center justify-center gap-9 bg-altBackground"
       aria-labelledby="startChatTitle"
     >
-      <Card className="bg-altBackgroundShade col-span-3 flex flex-col gap-5 p-5">
-        <Typography variant="h4" className="text-siteTitle text-2xl" id="startChatTitle">
+      <Card className="col-span-3 flex flex-col gap-5 bg-altBackgroundShade p-5">
+        <Typography variant="h4" className="text-2xl text-siteTitle" id="startChatTitle">
           {AI_NAME}
           <br />
           The Queensland Government AI Assistant
@@ -32,7 +32,7 @@ export const StartNewChat: FC<object> = () => {
           </p>
           <p className="lg:hidden">Press the plus button below to get started.</p>
         </div>
-        <div className="bg-muted -mx-5 -mb-5 inline-flex items-center justify-center border-t p-5">
+        <div className="-mx-5 -mb-5 inline-flex items-center justify-center border-t bg-muted p-5">
           <NewChat aria-label="Start a new chat" />
           <Button onClick={() => router.push("/terms")} variant="link" className="text-foreground">
             By starting a new chat you agree to the {AI_NAME} Terms and Conditions, click here to view them.

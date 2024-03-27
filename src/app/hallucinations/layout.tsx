@@ -8,5 +8,5 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
-  return <div className="bg-card/70 flex flex-1 overflow-scroll">{children}</div>
+  return <div className="flex flex-1 overflow-scroll bg-card/70">{children}</div>
 }

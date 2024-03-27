@@ -95,43 +95,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
 
   const safetyWarning = props.contentSafetyWarning ? (
     <div
-      className="prose prose-slate bg-alert text-primary dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 max-w-none break-words rounded-md text-center text-sm md:text-base"
-      tabIndex={0}
-      aria-label="Content Safety Warning"
-    >
-      {props.contentSafetyWarning}
-    </div>
-  ) : null
-
-  const handleThumbsUpClick = () => {
-    toggleButton("ThumbsUp")
-    setFeedbackMessage("Positive feedback submitted.")
-    setTimeout(() => setFeedbackMessage(""), 2000)
-  }
-
-  const handleThumbsDownClick = () => {
-    toggleButton("ThumbsDown")
-    if (openModal) {
-      openModal()
-    }
-  }
-
-  async function handleModalSubmit(feedback: string, sentiment: string, reason: string): Promise<void> {
-    if (sentiment === ChatSentiment.Negative) {
-      setFeedbackMessage("Negative feedback submitted.")
-      setTimeout(() => setFeedbackMessage(""), 2000)
-    }
-  }
-
-  const handleModalClose = () => {
-    if (closeModal) {
-      closeModal()
-    }
-  }
-
-  const safetyWarning = props.contentSafetyWarning ? (
-    <div
-      className="prose prose-slate dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 text-primary md:text-md bg-alert max-w-none break-words rounded-md text-center text-sm md:text-base"
+      className="prose prose-slate max-w-none break-words rounded-md bg-alert text-center text-sm text-primary dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
       tabIndex={0}
       aria-label="Content Safety Warning"
     >
@@ -141,13 +105,13 @@ export const ChatRow: FC<ChatRowProps> = props => {
 
   return (
     <article className="container mx-auto flex flex-col py-1 pb-4">
-      <section className="bg-background flex-col gap-4 overflow-hidden rounded-md p-4">
+      <section className="flex-col gap-4 overflow-hidden rounded-md bg-background p-4">
         <header className="flex w-full items-center justify-between">
-          <Typography variant="h3" className="text-heading flex-1 capitalize" tabIndex={0}>
+          <Typography variant="h3" className="flex-1 capitalize text-heading" tabIndex={0}>
             {props.name}
           </Typography>
           {process.env.NODE_ENV === "development" && (
-            <Typography variant="h3" className="text-heading flex-1 capitalize" tabIndex={0}>
+            <Typography variant="h3" className="flex-1 capitalize text-heading" tabIndex={0}>
               {props.chatMessageId}
             </Typography>
           )}
@@ -160,7 +124,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
           />
         </header>
         <div
-          className="prose prose-slate text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 max-w-none break-words text-sm md:text-base"
+          className="prose prose-slate max-w-none break-words text-sm text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
           tabIndex={0}
         >
           <Markdown content={props.message} />
