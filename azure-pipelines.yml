@@ -4,7 +4,31 @@ trigger: none
 variables:
   - name: poolName
     value: "QGGPT_Pool"
+
 stages:
+  - stage: Build
+    displayName: "🛠️ - Build check"
+    jobs:
+      - job: BuildCheckJob
+        displayName: "Build Check Job"
+        pool:
+          name: $(poolName)
+        steps:
+        - checkout: self
+          clean: "true"
+        
+        - task: NodeTool@0
+          inputs:
+            versionSpec: '21.x'
+          displayName: 'Install Node.js'
+        - script: npm install
+          displayName: 'Install dependencies'
+          workingDirectory: $(Build.SourcesDirectory)
+        - script: npm run build
+          displayName: 'Build the app'
+          workingDirectory: $(Build.SourcesDirectory)
+
+
   - stage: PublishArtifact
     displayName: "📦 - Publish Artifact"
     jobs:
