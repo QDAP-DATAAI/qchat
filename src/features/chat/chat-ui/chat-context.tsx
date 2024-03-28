@@ -115,10 +115,14 @@ export const ChatProvider: FC<Prop> = props => {
     <ChatContext.Provider
       value={{
         ...response,
-        messages: response.messages.map(message => ({
-          ...message,
-          id: (response.data as DataItem[])?.find(d => d.message === message.content)?.id || message.id,
-        })),
+        messages: response.messages.map(message => {
+          const dataItem = (response.data as DataItem[])?.find(d => d.message === message.content)
+
+          return {
+            ...message,
+            id: dataItem?.id || message.id,
+          }
+        }),
         setChatBody,
         chatBody,
         onChatTypeChange,
