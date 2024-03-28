@@ -23,11 +23,10 @@ stages:
           displayName: 'Install Node.js'
         - script: npm install
           displayName: 'Install dependencies'
-          workingDirectory: $(Build.SourcesDirectory)
+          workingDirectory: $(Build.SourcesDirectory)/src
         - script: npm run build
           displayName: 'Build the app'
-          workingDirectory: $(Build.SourcesDirectory)
-
+          workingDirectory: $(Build.SourcesDirectory)/src
 
   - stage: PublishArtifact
     displayName: "📦 - Publish Artifact"
