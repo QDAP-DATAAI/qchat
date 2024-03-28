@@ -50,10 +50,10 @@ async function generateChatCategory(chatMessage: string, previousAttempt: string
     "Emotional and Mental Support",
   ]
 
-  let prompt = `Based on the content of the following message: "${chatMessage}", please categorize it into only one of the specified categories. The response must strictly be one of these exact phrases:\n${categories.join("\n")}\nExample response: "Information Processing and Management"`
+  let prompt = `Based on the content of the following message: "${chatMessage}", please categorise it into only one of the specified categories. The response must strictly be one of these exact phrases:\n${categories.join("\n")}\nExample response: "Information Processing and Management"`
 
   if (previousAttempt !== null) {
-    prompt = `The previous attempt to categorize the following message was not successful. The response "${previousAttempt}" did not match any of the expected categories. Please review the message again and categorize it correctly using only one of the specified categories. The expected response must be one of these exact phrases:\n${categories.join("\n")}\nMessage: "${chatMessage}"\nExample response: "Information Processing and Management"`
+    prompt = `The previous attempt to categorise the following message was not successful. The response "${previousAttempt}" did not match any of the expected categories. Please review the message again and categorise it correctly using only one of the specified categories. The expected response must be one of these exact phrases:\n${categories.join("\n")}\nMessage: "${chatMessage}"\nExample response: "Information Processing and Management"`
   }
 
   try {
