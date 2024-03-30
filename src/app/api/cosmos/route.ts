@@ -1,35 +1,43 @@
-import { UserContainer } from "@/features/common/services/cosmos"
+import { NextRequest, NextResponse } from "next/server"
+import * as yup from "yup"
+import { GetUserByUpn, UpdateUser } from "@/features/user-management/user-service"
 
-// Utilize TypeScript for request and response types (if applicable).
-// This might require installing types for Express.js if using it.
-export async function upsertUserHandler(req: Request): Promise<Response> {
-  // Restrict the method to POST to accept user data.
-  if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 })
-  }
+const userUpdateSchema = yup
+  .object({
+    upn: yup.string().required(),
+    tenantId: yup.string().required(),
+    contextPrompt: yup.string().optional(),
+  })
+  .noUnknown(true, "Attempted to update invalid fields")
 
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    // Parse and validate the incoming user data.
-    // Consider using a library like Joi or Yup for structured validation.
-    const userData = await req.json()
-    // Perform input validation here. Placeholder for actual validation logic.
-    // if (!isValidUser(userData)) { return new Response("Invalid user data", { status: 400 }); }
-
-    const container = await UserContainer()
-    const { resource } = await container.items.upsert(userData)
-
-    return new Response(JSON.stringify(resource), {
-      headers: { "Content-Type": "application/json" },
-      status: 201,
+    const requestBody = await request.json()
+    const validatedData = await userUpdateSchema.validate(requestBody, {
+      abortEarly: false,
+      stripUnknown: true,
     })
+
+    const { upn, tenantId, contextPrompt } = validatedData
+
+    const existingUserResult = await GetUserByUpn(tenantId, upn)
+    if (existingUserResult.status !== "OK") {
+      return new NextResponse(JSON.stringify({ error: "User not found" }), { status: 404 })
+    }
+
+    const updates = { contextPrompt }
+    const updatedUserResult = await UpdateUser(tenantId, existingUserResult.response.userId, {
+      ...existingUserResult.response,
+      ...updates,
+    })
+    if (updatedUserResult.status === "OK") {
+      return new NextResponse(JSON.stringify(updatedUserResult.response), { status: 200 })
+    } else {
+      return new NextResponse(JSON.stringify({ error: "Failed to update user" }), { status: 400 })
+    }
   } catch (error) {
     console.error("Failed to update user:", error)
-
-    // Customize error handling based on the error properties.
-    // Assuming 'code' exists on the error object and maps to HTTP status codes.
-    const status = typeof (error as { code?: number }).code === "number" ? (error as { code?: number }).code : 500
-    const message = status === 400 ? "Invalid user data" : "Failed to update user"
-
-    return new Response(message, { status: status })
+    const errorMessage = error instanceof yup.ValidationError ? { errors: error.errors } : "Internal Server Error"
+    return new NextResponse(JSON.stringify(errorMessage), { status: error instanceof yup.ValidationError ? 400 : 500 })
   }
 }

@@ -1,76 +1,99 @@
+"use client"
+
 import React, { useState, useEffect } from "react"
 import * as Form from "@radix-ui/react-form"
 import { useSession } from "next-auth/react"
-import { useUserData } from "@/components/hooks/user-data"
 
-export const PromptForm: React.FC = () => {
+interface PromptFormProps {}
+
+export const PromptForm: React.FC<PromptFormProps> = () => {
   const { data: session } = useSession()
-  const { userData, loading, error } = useUserData()
   const [contextPrompt, setContextPrompt] = useState("")
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault()
-    // Here, implement your logic to handle the submission, such as updating the user's record
-    console.log(`Submitting: ${contextPrompt}`)
-    // Remember to handle the submission result properly (e.g., user feedback)
-  }
+  const [serverErrors, setServerErrors] = useState({
+    contextPrompt: false,
+  })
 
   useEffect(() => {
-    if (userData && userData.name) {
-      setContextPrompt(userData.name) // Or any other user data property you'd like to preset in the form
+    if (session?.user?.contextPrompt) {
+      setContextPrompt(session.user.contextPrompt)
     }
-  }, [userData])
+  }, [session])
 
-  if (loading) return <div>Loading...</div>
-  if (error) return <div>Error: {error.message}</div>
+  const handleSubmit = async (formData: FormData): Promise<void> => {
+    if (!session?.user) {
+      console.error("No session data available")
+      return
+    }
+
+    const values = Object.fromEntries(formData) as { contextPrompt: string }
+
+    const endpoint = "/api/cosmos"
+    const payload = {
+      upn: session.user.upn,
+      tenantId: session.user.tenantId,
+      contextPrompt: values.contextPrompt,
+    }
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update user data.")
+      }
+      setServerErrors({ contextPrompt: false })
+    } catch (error) {
+      console.error("Failed to submit the form:", error)
+      setServerErrors({ contextPrompt: true })
+    }
+  }
 
   return (
-    <Form.Root className="w-full" onSubmit={handleSubmit}>
+    <Form.Root
+      className="w-full"
+      onSubmit={e => {
+        e.preventDefault()
+        const formData = new FormData(e.currentTarget)
+        void handleSubmit(formData)
+      }}
+    >
       <div className="mb-[10px]">
-        <Form.Label htmlFor="userName" className="text-foreground block text-sm font-medium">
-          Name
-        </Form.Label>
-        <input
-          id="userName"
-          type="text"
-          value={session?.user?.name || "Not Specified"}
-          disabled
-          className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm"
-          title="User's name"
-          placeholder="Name"
-        />
+        <div className="text-foreground block text-sm font-medium">Name</div>
+        <div className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm">
+          {session?.user?.name || "Not Specified"}
+        </div>
       </div>
-
+      <p>
+        UserId: {session?.user?.userId}, Tenant: {session?.user?.tenantId}
+      </p>
       <div className="mb-[10px]">
-        <Form.Label htmlFor="userEmail" className="text-foreground block text-sm font-medium">
-          Email
-        </Form.Label>
-        <input
-          id="userEmail"
-          type="email"
-          value={session?.user?.email || "Not Specified"}
-          disabled
-          className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm"
-          title="User's email"
-          placeholder="Email"
-        />
+        <div className="text-foreground block text-sm font-medium">Email</div>
+        <div className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm">
+          {session?.user?.email || "Not Specified"}
+        </div>
       </div>
-
-      <div className="mb-[10px]">
+      <Form.Field className="mb-[10px]" name="contextPrompt" serverInvalid={serverErrors.contextPrompt}>
         <Form.Label htmlFor="contextPrompt" className="text-foreground block text-sm font-medium">
           Context Prompt
         </Form.Label>
-        <input
-          id="contextPrompt"
-          type="text"
-          value={contextPrompt}
-          onChange={e => setContextPrompt(e.target.value)}
-          className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm"
-          title="Context prompt for the user"
-          placeholder="Enter context prompt"
-          required
-        />
-      </div>
+        <Form.Control asChild>
+          <input
+            id="contextPrompt"
+            type="text"
+            defaultValue={contextPrompt}
+            className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm"
+            title="Context prompt for the user"
+            placeholder="Enter context prompt"
+            required
+          />
+        </Form.Control>
+        {serverErrors.contextPrompt && <Form.Message>Error updating context prompt. Please try again.</Form.Message>}
+      </Form.Field>
 
       <Form.Submit asChild>
         <button type="submit" className="border-altBackground bg-background mt-1 w-full rounded-md p-2 shadow-sm">

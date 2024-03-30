@@ -1,3 +1,4 @@
+// Import React hooks in a consolidated manner
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
 import { GetUserByUpn } from "@/features/user-management/user-service"
@@ -21,10 +22,15 @@ export function useUserData(): UseUserDataReturnType {
         setLoading(true)
         try {
           const response = await GetUserByUpn(session.user.tenantId, session.user.upn)
-          if (response.status === "OK" && "response" in response) {
+
+          // Check if the response is a success response
+          if (response.status === "OK") {
             setUserData(response.response)
           } else {
-            throw new Error(response.errors?.[0]?.message || "Failed to fetch user data")
+            // Since it's not a success response, it must be an error response
+            // This is safe because of the exhaustive check on `status`
+            const errorMessage = response.errors?.[0]?.message || "Failed to fetch user data"
+            throw new Error(errorMessage)
           }
         } catch (err) {
           setError(err instanceof Error ? err : new Error("An error occurred while fetching user data"))
