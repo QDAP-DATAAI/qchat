@@ -33,7 +33,7 @@ async function generateChatName(chatMessage: string): Promise<string> {
   }
 }
 
-async function generateChatCategory(chatMessage: string): Promise<string> {
+async function generateChatCategory(chatMessage: string, previousAttempt: string | null = null): Promise<string> {
   const apiName = "generateChatCategory"
   const categories = [
     "Information Processing and Management",
@@ -50,22 +50,29 @@ async function generateChatCategory(chatMessage: string): Promise<string> {
     "Emotional and Mental Support",
   ]
 
-  try {
-    const category = await GenericChatAPI(apiName, {
-      messages: [
-        {
-          role: "system",
-          content: `Please categorise this chat session: "${chatMessage}" into only one of the following specified categories based on the content of the query. The category selected must strictly be one of the following: ${categories.join(", ")}. Ensure the response aligns with these predefined categories to maintain consistency.`,
-        },
-      ],
-    })
+  let prompt = `Based on the content of the following message: "${chatMessage}", please categorise it into only one of the specified categories. The response must strictly be one of these exact phrases:\n${categories.join("\n")}\nExample response: "Information Processing and Management"`
 
-    if (category && categories.includes(category)) {
-      return category
-    } else {
-      return "Uncategorised"
+  if (previousAttempt !== null) {
+    prompt = `The previous attempt to categorise the following message was not successful. The response "${previousAttempt}" did not match any of the expected categories. Please review the message again and categorise it correctly using only one of the specified categories. The expected response must be one of these exact phrases:\n${categories.join("\n")}\nMessage: "${chatMessage}"\nExample response: "Information Processing and Management"`
+  }
+
+  try {
+    const rawCategory = await GenericChatAPI(apiName, { messages: [{ role: "system", content: prompt }] })
+
+    if (rawCategory) {
+      const category = rawCategory.replace(/^"|"$/g, "")
+      if (categories.includes(category)) {
+        return category
+      }
     }
+
+    if (previousAttempt === null) {
+      return await generateChatCategory(chatMessage, rawCategory)
+    }
+
+    return "Uncategorised"
   } catch (_e) {
+    console.log(`Error generating chat category: ${_e}`)
     return "Uncategorised"
   }
 }
@@ -81,12 +88,18 @@ export async function UpdateChatThreadIfUncategorised(
         generateChatName(content),
         StoreOriginalChatName(chatThread.name),
       ])
+
       const response = await UpsertChatThread({ ...chatThread, chatCategory, name, previousChatName })
-      if (response.status !== "OK") throw new Error(response.errors.join(", "))
+
+      if (response.status !== "OK") {
+        throw new Error(response.errors.join(", "))
+      }
+    } else {
+      console.log("Chat thread already has a category, skipping category generation.")
     }
     return chatThread
   } catch (e) {
-    console.error("Failed to update chat thread due to an error:", e)
+    console.error("Failed to update chat thread due to an error:", e) // Log caught error
     throw e
   }
 }
@@ -94,6 +107,7 @@ export async function UpdateChatThreadIfUncategorised(
 function StoreOriginalChatName(currentChatName: string): string {
   let previousChatName: string = ""
   if (currentChatName !== previousChatName) {
+    console.log(`Storing previous chat name: ${currentChatName}`)
     previousChatName = currentChatName
   }
   return previousChatName
