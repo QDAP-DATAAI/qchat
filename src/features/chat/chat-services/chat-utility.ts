@@ -94,21 +94,13 @@ export async function UpdateChatThreadIfUncategorised(
         StoreOriginalChatName(chatThread.name),
       ])
 
-      console.log(`New chat category for thread ${chatThread.id}: ${chatCategory}`) // Log the new category
-      console.log(`New chat name for thread ${chatThread.id}: ${name}`) // Log the new name
-      console.log(`Previous chat name for thread ${chatThread.id}: ${previousChatName}`) // Log the stored previous name
-
       const response = await UpsertChatThread({ ...chatThread, chatCategory, name, previousChatName })
-      console.log(`Upsert response for thread ${chatThread.id}:`, response) // Log the upsert response
 
       if (response.status !== "OK") {
-        console.error(`Failed to upsert chat thread ${chatThread.id}. Errors: ${response.errors.join(", ")}`) // Log if upsert failed
         throw new Error(response.errors.join(", "))
       }
     } else {
-      console.log(
-        `Chat thread ${chatThread.id} is already categorised as ${chatThread.chatCategory}. No action needed.`
-      ) // Log if no action needed
+      console.log("Chat thread already has a category, skipping category generation.")
     }
     return chatThread
   } catch (e) {
