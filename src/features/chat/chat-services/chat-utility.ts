@@ -81,13 +81,8 @@ export async function UpdateChatThreadIfUncategorised(
   chatThread: ChatThreadModel,
   content: string
 ): Promise<ChatThreadModel> {
-  console.log("Updating chat thread if uncategorised for thread:", chatThread.id) // Log the start of the process
   try {
     if (chatThread.chatCategory === "Uncategorised") {
-      console.log(
-        `Chat thread ${chatThread.id} is uncategorised. Generating new category, name, and storing original name.`
-      ) // Log the condition check
-
       const [chatCategory, name, previousChatName] = await Promise.all([
         generateChatCategory(content),
         generateChatName(content),
