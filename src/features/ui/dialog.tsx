@@ -31,7 +31,6 @@ export const Dailog = (): React.JSX.Element => (
           </label>
           <input
             className="shadow-violet7 focus:shadow-violet8 text-primary inline-flex h-[35px] w-full flex-1 items-center justify-center rounded-[4px] px-[10px] text-[15px] leading-none shadow-[0_0_0_1px] outline-none focus:shadow-[0_0_0_2px]"
-
             id="username"
             defaultValue="@peduarte"
           />
