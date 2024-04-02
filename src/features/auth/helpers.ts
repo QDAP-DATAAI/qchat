@@ -52,7 +52,7 @@ export type UserModel = {
   tenantId: string
   qchatAdmin: boolean
   userId: string
-  contextPrompt?: string
+  contextPrompt: string
 }
 
 export const hashValue = (value: string): string => {

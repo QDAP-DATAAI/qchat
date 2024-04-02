@@ -1,7 +1,6 @@
 "use client"
 
-import { CloudUpload, HomeIcon, BookMarked, SpellCheck2 } from "lucide-react"
-import { useSession } from "next-auth/react"
+import { CloudUpload, HomeIcon, BookMarked, SpellCheck2, UserCog } from "lucide-react"
 import React from "react"
 
 import Typography from "@/components/typography"
@@ -39,6 +38,7 @@ export const NavBar: React.FC = () => {
 
   const links: LinkItem[] = [
     { name: "Home", href: "/", icon: HomeIcon },
+    { name: "Settings", href: "/settings", icon: UserCog, condition: status => status === "authenticated" },
     { name: "Prompt Guide", href: "/prompt-guide", icon: BookMarked, condition: status => status === "authenticated" },
     { name: "What's new", href: "/whats-new", icon: CloudUpload, condition: status => status === "authenticated" },
     {

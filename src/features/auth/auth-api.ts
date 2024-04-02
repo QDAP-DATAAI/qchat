@@ -3,8 +3,7 @@ import { JWT } from "next-auth/jwt"
 import { Provider } from "next-auth/providers"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
-import { UserSignInHandler } from "./sign-in"
-import { SignInErrorType } from "./sign-in"
+import { UserSignInHandler, SignInErrorType, getUserContextPrompt } from "./sign-in"
 
 export interface AuthToken extends JWT {
   qchatAdmin?: boolean
@@ -97,12 +96,15 @@ export const options: NextAuthOptions = {
       }
     },
     jwt({ token, user }) {
+      const contextPrompt = getUserContextPrompt(user)
+      console.log("contextPrompt", contextPrompt)
       const authToken = token as AuthToken
       if (user) {
         authToken.qchatAdmin = user.qchatAdmin ?? false
         authToken.tenantId = user.tenantId ?? ""
         authToken.upn = user.upn ?? ""
         authToken.userId = user.userId ?? ""
+        authToken.contextPrompt = contextPrompt
       }
       return authToken
     },
@@ -112,6 +114,7 @@ export const options: NextAuthOptions = {
       session.user.tenantId = authToken.tenantId ? String(authToken.tenantId) : ""
       session.user.upn = authToken.upn ? String(authToken.upn) : ""
       session.user.userId = authToken.userId ? String(authToken.userId) : ""
+      session.user.contextPrompt = authToken.contextPrompt ? String(authToken.contextPrompt) : ""
       return session
     },
   },

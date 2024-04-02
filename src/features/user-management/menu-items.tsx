@@ -8,15 +8,15 @@ import { MenuItem } from "@/components/menu"
 import { showError } from "@/features/globals/global-message-store"
 
 export const UserSettings = (): JSX.Element => {
-  const [upn, setUPN] = useState<string | null>(null)
+  const [userId, setuserId] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchSession = async (): Promise<void> => {
       try {
         const session = await getSession()
 
-        if (session?.user?.upn) {
-          setUPN(session.user.upn)
+        if (session?.user?.userId) {
+          setuserId(session.user.userId)
         }
       } catch (error) {
         showError("Failed to get session:" + error)
@@ -28,8 +28,8 @@ export const UserSettings = (): JSX.Element => {
 
   return (
     <>
-      {upn && (
-        <MenuItem href={`/settings/${upn}/details`}>
+      {userId && (
+        <MenuItem href={`/settings/${userId}`}>
           <FileText size={16} /> <span>Personal Details</span>
         </MenuItem>
       )}

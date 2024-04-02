@@ -101,6 +101,19 @@ export class UserSignInHandler {
   }
 }
 
+export async function getUserContextPrompt(user: User | AdapterUser): Promise<string> {
+  try {
+    const userResponse = await GetUserByUpn(user.tenantId, user.upn ?? "")
+    if (userResponse.status === "OK") {
+      return userResponse.response.contextPrompt || ""
+    }
+    return ""
+  } catch (error) {
+    console.error("Error getting user context prompt:", error)
+    return ""
+  }
+}
+
 const updateFailedLogin = (existingUser: UserRecord): UserRecord => ({
   ...existingUser,
   failed_login_attempts: existingUser.failed_login_attempts + 1,
