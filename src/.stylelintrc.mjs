@@ -19,11 +19,6 @@ const ONLY_ALLOW_CAMEL_CASE_SELECTORS = [
   { message: s => `Expected '${s}' to be in camelCase` },
 ]
 
-const ALLOW_QLD_CUSTOM_PROPERTIES = [
-  "^--QLD-(?:[a-z]+-)*[a-z]+$",
-  { message: s => `Expected '${s}' to be something else` },
-]
-
 export default {
   extends: ["stylelint-config-standard"],
   plugins: ["stylelint-order", "stylelint-selector-bem-pattern"],
