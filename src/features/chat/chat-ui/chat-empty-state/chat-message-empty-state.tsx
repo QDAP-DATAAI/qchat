@@ -49,13 +49,12 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
         {showFileUpload === "data" || showFileUpload === "audio" ? (
           <ChatFileUI />
         ) : (
-          <div className="flex flex-col gap-1"></div>
+          <div className="flex flex-col gap-1">
+            <br />
+            <p className="text-sm">Try a suggested starter prompt...</p>
+            <PromptButton onPromptSelected={handlePromptSelected} selectedPrompt={input} />
+          </div>
         )}
-        <div className="flex flex-col gap-1">
-          <br />
-          <p className="text-sm">Try a suggested starter prompt...</p>
-          <PromptButton onPromptSelected={handlePromptSelected} selectedPrompt={input} />
-        </div>
       </Card>
     </div>
   )
