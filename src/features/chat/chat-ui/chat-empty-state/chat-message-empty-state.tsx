@@ -1,15 +1,15 @@
 import { FC } from "react"
 
-import { FindChatThreadForCurrentUser, UpsertChatThread } from "@/features/chat/chat-services/chat-thread-service"
-import { useChatContext } from "@/features/chat/chat-ui/chat-context"
-import { ChatFileUI } from "@/features/chat/chat-ui/chat-file/chat-file-ui"
-import { Card } from "@/features/ui/card"
-
 import { EasterEgg } from "./chat-easter-egg"
 import { ChatSensitivitySelector } from "./chat-sensitivity-selector"
 import { ChatStyleSelector } from "./chat-style-selector"
 import { ChatTypeSelector } from "./chat-type-selector"
 import { PromptButton } from "./prompt-buttons-UI"
+
+import { FindChatThreadForCurrentUser, UpsertChatThread } from "@/features/chat/chat-services/chat-thread-service"
+import { useChatContext } from "@/features/chat/chat-ui/chat-context"
+import { ChatFileUI } from "@/features/chat/chat-ui/chat-file/chat-file-ui"
+import { Card } from "@/features/ui/card"
 
 interface Prop {}
 
@@ -49,12 +49,13 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
         {showFileUpload === "data" || showFileUpload === "audio" ? (
           <ChatFileUI />
         ) : (
-          <div className="flex flex-col gap-1">
-            <br />
-            <p className="text-sm">Try a suggested starter prompt...</p>
-            <PromptButton onPromptSelected={handlePromptSelected} selectedPrompt={input} />
-          </div>
+          <div className="flex flex-col gap-1"></div>
         )}
+        <div className="flex flex-col gap-1">
+          <br />
+          <p className="text-sm">Try a suggested starter prompt...</p>
+          <PromptButton onPromptSelected={handlePromptSelected} selectedPrompt={input} />
+        </div>
       </Card>
     </div>
   )
