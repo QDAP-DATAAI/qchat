@@ -3,6 +3,9 @@ import { Noto_Sans } from "next/font/google"
 
 import "./globals.css"
 
+import { Footer } from "./footer"
+import { Header } from "./header"
+
 import { GlobalConfigProvider } from "@/features/globals/global-client-config-context"
 import { Providers } from "@/features/globals/providers"
 import { AI_NAME } from "@/features/theme/theme-config"
@@ -11,9 +14,6 @@ import { NavBar } from "@/features/ui/navbar"
 import { Toaster } from "@/features/ui/toaster"
 import { cn } from "@/lib/utils"
 
-import { Footer } from "./footer"
-import { Header } from "./header"
-
 import { GoogleAnalytics } from "@next/third-parties/google"
 
 const notoSans = Noto_Sans({ subsets: ["latin"] })
@@ -21,7 +21,17 @@ const notoSans = Noto_Sans({ subsets: ["latin"] })
 export const metadata: Metadata = {
   metadataBase: new URL("https://qchat.ai.qld.gov.au"),
   title: AI_NAME,
+  applicationName: AI_NAME,
+  authors: [{ name: "Queensland Government AI Unit", url: "https://www.qld.gov.au" }],
   description: AI_NAME + " the Queensland Government's AI Chatbot",
+  generator: "Queensland Government AI Unit",
+  keywords: ["Queensland", "Government", "AI", "Chatbot", "GenerativeAI", "VirtualAssistant", AI_NAME],
+  referrer: "no-referrer",
+  themeColor: "#09549f",
+  viewport: "width=device-width, initial-scale=1",
+  creator: "Queensland Government AI Unit",
+  publisher: "Queensland Government AI Unit",
+  robots: "no-index, follow",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/apple-icon.png",
