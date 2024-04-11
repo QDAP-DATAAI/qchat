@@ -1,6 +1,7 @@
 "use client"
 
 import { Message } from "ai/react/dist"
+import { OctagonAlert } from "lucide-react"
 import React, { FC, useState } from "react"
 
 import { Markdown } from "@/components/markdown/markdown"
@@ -126,12 +127,14 @@ export const ChatRow: FC<ChatRowProps> = props => {
 
   const safetyWarning = props.message.contentFilterResult ? (
     <div
-      className="prose prose-slate mt-2 max-w-none break-words rounded-md bg-alert p-2 text-center text-sm text-primary dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
+      className="mt-2 flex max-w-none items-center justify-center space-x-2 rounded-md bg-alert p-2 text-sm text-primary md:text-base"
       tabIndex={0}
       aria-label="Content Safety Warning"
     >
+      <OctagonAlert />
       This message has triggered our content safety warnings, please rephrase your message, start a new chat or reach
       out to support if you have concerns.
+      <OctagonAlert />
     </div>
   ) : null
 

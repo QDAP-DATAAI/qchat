@@ -26,8 +26,6 @@ export const metadata: Metadata = {
   generator: "Queensland Government AI Unit",
   keywords: ["Queensland", "Government", "AI", "Chatbot", "GenerativeAI", "VirtualAssistant", AI_NAME],
   referrer: "no-referrer",
-  themeColor: "#09549f",
-  viewport: "width=device-width, initial-scale=1",
   creator: "Queensland Government AI Unit",
   publisher: "Queensland Government AI Unit",
   robots: "no-index, follow",
