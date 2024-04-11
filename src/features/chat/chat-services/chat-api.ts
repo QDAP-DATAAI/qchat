@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import { JSONValue, Message, OpenAIStream, StreamingTextResponse, experimental_StreamData } from "ai"
 import { APIError } from "openai"
 import { ChatCompletionChunk, ChatCompletionMessageParam } from "openai/resources"
