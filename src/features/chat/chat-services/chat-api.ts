@@ -3,11 +3,6 @@ import { APIError } from "openai"
 import { ChatCompletionChunk, ChatCompletionMessageParam } from "openai/resources"
 import { Completion } from "openai/resources/completions"
 
-import { ChatRole, CreateCompletionMessage, ChatThreadModel, ChatMessageModel } from "@/features/chat/models"
-import { mapOpenAIChatMessages } from "@/features/common/mapping-helper"
-import { ServerActionResponse } from "@/features/common/server-action-response"
-import { OpenAIInstance } from "@/features/common/services/open-ai"
-
 import {
   UpsertChatMessage,
   FindTopChatMessagesForCurrentUser,
@@ -15,6 +10,11 @@ import {
 } from "./chat-message-service"
 import { UpsertChatThread } from "./chat-thread-service"
 import { UpdateChatThreadIfUncategorised } from "./chat-utility"
+
+import { ChatRole, CreateCompletionMessage, ChatThreadModel, ChatMessageModel } from "@/features/chat/models"
+import { mapOpenAIChatMessages } from "@/features/common/mapping-helper"
+import { ServerActionResponse } from "@/features/common/server-action-response"
+import { OpenAIInstance } from "@/features/common/services/open-ai"
 
 export const ChatAPI = async (
   systemPrompt: string,
@@ -41,7 +41,7 @@ export const ChatAPI = async (
   if (addMessageResponse.status !== "OK") throw addMessageResponse
 
   const data = new experimental_StreamData()
-
+  //TODO: Fix Liniting indent problem
   let response
   try {
     response =
