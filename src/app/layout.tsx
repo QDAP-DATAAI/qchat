@@ -1,3 +1,4 @@
+import { GoogleAnalytics } from "@next/third-parties/google"
 import type { Metadata } from "next"
 import { Noto_Sans } from "next/font/google"
 
@@ -13,8 +14,6 @@ import { ThemeProvider } from "@/features/theme/theme-provider"
 import { NavBar } from "@/features/ui/navbar"
 import { Toaster } from "@/features/ui/toaster"
 import { cn } from "@/lib/utils"
-
-import { GoogleAnalytics } from "@next/third-parties/google"
 
 const notoSans = Noto_Sans({ subsets: ["latin"] })
 
