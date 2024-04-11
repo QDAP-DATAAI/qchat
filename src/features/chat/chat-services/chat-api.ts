@@ -3,6 +3,11 @@ import { APIError } from "openai"
 import { ChatCompletionChunk, ChatCompletionMessageParam } from "openai/resources"
 import { Completion } from "openai/resources/completions"
 
+import { ChatRole, CreateCompletionMessage, ChatThreadModel, ChatMessageModel } from "@/features/chat/models"
+import { mapOpenAIChatMessages } from "@/features/common/mapping-helper"
+import { ServerActionResponse } from "@/features/common/server-action-response"
+import { OpenAIInstance } from "@/features/common/services/open-ai"
+
 import {
   UpsertChatMessage,
   FindTopChatMessagesForCurrentUser,
@@ -10,11 +15,6 @@ import {
 } from "./chat-message-service"
 import { UpsertChatThread } from "./chat-thread-service"
 import { UpdateChatThreadIfUncategorised } from "./chat-utility"
-
-import { ChatRole, CreateCompletionMessage, ChatThreadModel, ChatMessageModel } from "@/features/chat/models"
-import { mapOpenAIChatMessages } from "@/features/common/mapping-helper"
-import { ServerActionResponse } from "@/features/common/server-action-response"
-import { OpenAIInstance } from "@/features/common/services/open-ai"
 
 export const ChatAPI = async (
   systemPrompt: string,
@@ -47,8 +47,7 @@ export const ChatAPI = async (
     response =
       contentFilterTriggerCount >= maxContentFilterTriggerCountAllowed
         ? makeContentFilterResponse(true)
-        : await openAI.chat.completions.create(
-          {
+        : await openAI.chat.completions.create({
             messages: [
               {
                 role: ChatRole.System,
@@ -59,8 +58,7 @@ export const ChatAPI = async (
             ],
             model: process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
             stream: true,
-          }
-        )
+          })
   } catch (exception) {
     if (exception instanceof APIError && exception.status === 400 && exception.code === "content_filter") {
       const contentFilterResult = exception.error as unknown
