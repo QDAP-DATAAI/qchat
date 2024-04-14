@@ -58,6 +58,6 @@ COPY package.json package-lock.json* ./
 USER nextjs
 
 ENV PORT 443
-ENV HOSTNAME WEBAPPNAME
+ENV HOSTNAME 0.0.0.0
 
 CMD ["node", "server.js"]
