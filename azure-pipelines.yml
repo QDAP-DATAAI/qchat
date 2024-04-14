@@ -5,6 +5,8 @@ trigger:
     include:
       - main
 
+pr: none
+
 variables:
   - name: poolName
     value: "QGGPT_Pool"
