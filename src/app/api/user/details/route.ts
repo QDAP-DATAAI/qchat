@@ -30,14 +30,12 @@ export async function POST(request: NextRequest, _response: NextResponse): Promi
     if (existingUserResult.status !== "OK") {
       return new Response(JSON.stringify({ error: "User not found" }), { status: 404 })
     }
-    if (contextPrompt === existingUserResult.response.preferences?.contextPrompt) {
+    if (contextPrompt === existingUserResult.response?.preferences?.contextPrompt) {
       return new Response("Context prompt already set", { status: 200 })
     }
     const updatedUserResult = await UpdateUser(tenantId, existingUserResult.response.userId, {
       ...existingUserResult.response,
-      preferences: {
-        contextPrompt,
-      },
+      preferences: { contextPrompt },
     })
     if (updatedUserResult.status === "OK") {
       return new Response(JSON.stringify(updatedUserResult.response), { status: 200 })
@@ -62,8 +60,14 @@ export async function GET(): Promise<Response> {
     return new Response(JSON.stringify({ error: "User not found" }), { status: 404 })
   }
 
-  return new Response(JSON.stringify({ status: "OK", data: existingUserResult.response.preferences }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  })
+  return new Response(
+    JSON.stringify({
+      status: "OK",
+      data: existingUserResult.response.preferences || { contextPrompt: "" },
+    }),
+    {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    }
+  )
 }

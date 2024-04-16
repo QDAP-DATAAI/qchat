@@ -1,6 +1,6 @@
+import { SettingsMenu } from "@/features/settings-menu/settings-menu"
 import { AI_NAME } from "@/features/theme/theme-config"
 import { Card } from "@/features/ui/card"
-import { UserSettingsMenu } from "@/features/user-management/user-menu"
 
 export const dynamic = "force-dynamic"
 
@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
   return (
     <>
       <div className="grid size-full grid-cols-6 overflow-hidden bg-card">
-        <UserSettingsMenu />
+        <SettingsMenu />
         <div className="col-span-5 size-full">
           <Card className="col-span-6 flex h-full flex-1 items-center justify-center sm:col-span-6 md:col-span-5 lg:col-span-4 xl:col-span-5">
             <div className="col-span-5 h-full bg-altBackground text-foreground shadow-sm">

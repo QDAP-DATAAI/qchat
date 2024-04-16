@@ -30,5 +30,5 @@ export type UserPreferences = {
 
 export type UserRecord = UserIdentity &
   UserActivity & {
-    preferences: UserPreferences
+    preferences?: UserPreferences
   }

@@ -17,24 +17,16 @@ const requireAuth: string[] = [
   "/whats-new",
 ]
 
-const requireAdmin: string[] = ["/reporting", "/settings/tenant"]
+const requireAdmin: string[] = ["/reporting", "/settings"]
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
-  if (process.env.NODE_ENV === "development") {
-    return NextResponse.next()
-  }
-
   const pathname = request.nextUrl.pathname
 
   if (requireAuth.some(path => pathname.startsWith(path))) {
     const token = await getToken({ req: request })
 
-    if (!token) {
-      return NextResponse.redirect(new URL(LOGIN_PAGE, request.url))
-    }
-
     const now = Math.floor(Date.now() / 1000)
-    if (token.exp && typeof token.exp === "number" && token.exp < now) {
+    if (!token || (token.exp && typeof token.exp === "number" && token.exp < now)) {
       return NextResponse.redirect(new URL(LOGIN_PAGE, request.url))
     }
 
@@ -42,7 +34,6 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       return NextResponse.rewrite(new URL(UNAUTHORISED_PAGE, request.url))
     }
   }
-
   return NextResponse.next()
 }
 

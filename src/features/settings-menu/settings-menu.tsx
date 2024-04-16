@@ -6,7 +6,7 @@ import { Menu, MenuContent, MenuHeader } from "@/components/menu"
 
 import { SettingsMenuItems } from "./settings-menu-items"
 
-export const UserSettingsMenu: React.FC = () => {
+export const SettingsMenu: React.FC = () => {
   return (
     <Menu className="col-span-1 hidden h-full w-auto overflow-auto bg-background p-2 sm:block md:block">
       <MenuHeader className="justify-end" />

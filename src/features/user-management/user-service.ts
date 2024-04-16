@@ -77,7 +77,7 @@ export const UpdateUser = async (
     // update user preferences history
     for (const k in user.preferences) {
       const key = k as keyof UserPreferences
-      if (key === "history" || oldUser.preferences[key] === user.preferences[key]) continue
+      if (key === "history" || oldUser.preferences?.[key] === user.preferences[key]) continue
       user.preferences.history = [
         ...(user.preferences.history || []),
         {
