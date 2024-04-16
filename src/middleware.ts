@@ -5,7 +5,6 @@ const LOGIN_PAGE = "/login"
 const UNAUTHORISED_PAGE = "/unauthorised"
 
 const requireAuth: string[] = [
-  "/admin",
   "/api",
   "/chat",
   "/hallucinations",
@@ -14,12 +13,11 @@ const requireAuth: string[] = [
   "/prompt-guide",
   "/reporting",
   "/settings",
-  "/tenant",
   "/terms",
   "/whats-new",
 ]
 
-const requireAdmin: string[] = ["/admin", "/reporting", "/settings", "/tenant"]
+const requireAdmin: string[] = ["/reporting", "/settings/tenant"]
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   if (process.env.NODE_ENV === "development") {
