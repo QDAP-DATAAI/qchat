@@ -48,18 +48,14 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   matcher: [
-    "/admin/:path*",
     "/api/chat/:path*",
-    "/api/cosmos/:path*",
-    "/api/images/:path*",
+    "/api/tenant/:path*",
+    "/api/user/:path*",
     "/chat/:path*",
     "/hallucinations/:path*",
-    "/persona/:path*",
     "/prompt-guide/:path*",
-    "/prompt/:path*",
     "/reporting/:path*",
     "/settings/:path*",
-    "/tenant/:path*",
     "/terms/:path*",
     "/unauthorised/:path*",
     "/whats-new/:path*",

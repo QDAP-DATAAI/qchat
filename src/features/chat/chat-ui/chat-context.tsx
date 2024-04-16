@@ -12,8 +12,8 @@ import {
   ChatType,
   ConversationStyle,
   ConversationSensitivity,
-  QchatPromptBody,
-  QchatPromptMessage,
+  PromptBody,
+  PromptMessage,
   ChatRole,
   ChatMessageModel,
 } from "@/features/chat/models"
@@ -26,8 +26,8 @@ import { TextToSpeechProps, useTextToSpeech } from "./chat-speech/use-text-to-sp
 
 interface ChatContextProps extends UseChatHelpers {
   id: string
-  setChatBody: (body: QchatPromptBody) => void
-  chatBody: QchatPromptBody
+  setChatBody: (body: PromptBody) => void
+  chatBody: PromptBody
   fileState: FileState
   onChatTypeChange: (value: ChatType) => void
   onConversationStyleChange: (value: ConversationStyle) => void
@@ -38,7 +38,7 @@ interface ChatContextProps extends UseChatHelpers {
   closeModal?: () => void
   offenderId?: string
   chatThreadLocked: boolean
-  messages: QchatPromptMessage[]
+  messages: PromptMessage[]
 }
 
 const ChatContext = createContext<ChatContextProps | null>(null)
@@ -63,7 +63,7 @@ export const ChatProvider: FC<Prop> = props => {
 
   const fileState = useFileState()
 
-  const [chatBody, setBody] = useState<QchatPromptBody>({
+  const [chatBody, setBody] = useState<PromptBody>({
     id: props.chatThread.id,
     chatType: props.chatThread.chatType,
     conversationStyle: props.chatThread.conversationStyle,
@@ -110,7 +110,7 @@ export const ChatProvider: FC<Prop> = props => {
   const openModal = (): void => setIsModalOpen(true)
   const closeModal = (): void => setIsModalOpen(false)
 
-  const setChatBody = (body: QchatPromptBody): void => {
+  const setChatBody = (body: PromptBody): void => {
     setBody(body)
   }
 
@@ -156,11 +156,11 @@ export const ChatProvider: FC<Prop> = props => {
       value={{
         ...response,
         messages: response.messages
-          .map(m => ({ id: m.id, content: m.content, role: m.role }) as QchatPromptMessage)
+          .map(m => ({ id: m.id, content: m.content, role: m.role }) as PromptMessage)
           .map(message => {
             const dataItem = (response.data as (JSONValue & Message)[])?.find(
               data => data.id === message.id
-            ) as QchatPromptMessage
+            ) as PromptMessage
             return {
               ...message,
               ...dataItem,

@@ -97,7 +97,7 @@ export interface ChatThreadModel {
   contentFilterTriggerCount?: number
 }
 
-export interface QchatPromptBody {
+export interface PromptBody {
   id: string
   chatType: ChatType
   conversationStyle: ConversationStyle
@@ -109,14 +109,14 @@ export interface QchatPromptBody {
   chatThreadName?: string
 }
 
-export interface QchatPromptMessage {
+export interface PromptMessage {
   id: string
   content: string
   role: ChatRole
 }
 
-export interface QchatPromptProps extends QchatPromptBody {
-  messages: QchatPromptMessage[]
+export interface PromptProps extends PromptBody {
+  messages: PromptMessage[]
   data: { completionId: string }
 }
 

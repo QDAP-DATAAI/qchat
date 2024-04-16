@@ -1,13 +1,7 @@
 import * as yup from "yup"
 
 import { ChatApi } from "@/features/chat/chat-services/chat-api"
-import {
-  ChatRole,
-  ChatType,
-  ConversationSensitivity,
-  ConversationStyle,
-  QchatPromptProps,
-} from "@/features/chat/models"
+import { ChatRole, ChatType, ConversationSensitivity, ConversationStyle, PromptProps } from "@/features/chat/models"
 
 const delay = async (ms: number): Promise<void> => await new Promise(resolve => setTimeout(resolve, ms))
 
@@ -23,7 +17,7 @@ const defaultErrorMessage = "Our apologies, we're facing some internal issues cu
 const MAX_RETRIES = 2
 const RETRY_DELAY = 5000
 const schema = yup
-  .object<QchatPromptProps>({
+  .object<PromptProps>({
     id: yup.string().required(),
     chatType: yup.mixed<ChatType>().oneOf(Object.values(ChatType)).required(),
     conversationStyle: yup.mixed<ConversationStyle>().oneOf(Object.values(ConversationStyle)).required(),
@@ -55,7 +49,7 @@ export async function POST(req: Request): Promise<Response> {
     const validatedRequest = (await schema.validate(body, {
       abortEarly: false,
       stripUnknown: true,
-    })) as QchatPromptProps
+    })) as PromptProps
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {

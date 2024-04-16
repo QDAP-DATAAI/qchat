@@ -10,8 +10,8 @@ import {
   ChatSentiment,
   ChatThreadModel,
   FeedbackType,
-  QchatPromptMessage,
-  QchatPromptProps,
+  PromptMessage,
+  PromptProps,
 } from "@/features/chat/models"
 import { mapOpenAIChatMessages } from "@/features/common/mapping-helper"
 import { OpenAIInstance } from "@/features/common/services/open-ai"
@@ -25,7 +25,7 @@ import { UpdateChatThreadIfUncategorised } from "./chat-utility"
 const dataChatTypes = ["data", "mssql", "audio"]
 export const MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED = 3
 
-export const ChatApi = async (props: QchatPromptProps): Promise<Response> => {
+export const ChatApi = async (props: PromptProps): Promise<Response> => {
   try {
     const threadSession = await InitThreadSession(props)
     if (threadSession.status !== "OK") throw threadSession
@@ -52,7 +52,7 @@ export const ChatApi = async (props: QchatPromptProps): Promise<Response> => {
       metaPrompt = res.systemMessage
 
       // TODO: https://dis-qgcdg.atlassian.net/browse/QGGPT-437
-      translate = async (input: string): Promise<string> => await Promise.resolve(input)
+      translate = async (_input: string): Promise<string> => await Promise.resolve("")
     }
 
     if ((chatThread.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED) {
@@ -163,7 +163,7 @@ async function getChatResponse(
   systemPrompt: ChatCompletionMessageParam,
   userMessage: ChatCompletionMessageParam,
   history: ChatMessageModel[],
-  addMessage: QchatPromptMessage,
+  addMessage: PromptMessage,
   data: StreamData
 ): Promise<{
   response: AsyncGenerator<ChatCompletionChunk> | Stream<ChatCompletionChunk>

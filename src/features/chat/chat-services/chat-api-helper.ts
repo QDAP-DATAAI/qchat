@@ -2,7 +2,7 @@ import { ChatCompletionMessageParam } from "openai/resources"
 
 import { getTenantAndUser } from "@/features/auth/helpers"
 import { getTenantId, userHashedId } from "@/features/auth/helpers"
-import { ChatRole, QchatPromptMessage } from "@/features/chat/models"
+import { ChatRole, PromptMessage } from "@/features/chat/models"
 import { AI_NAME } from "@/features/theme/theme-config"
 
 import { DocumentSearchModel } from "./azure-cog-search/azure-cog-vector-store"
@@ -58,7 +58,7 @@ const findRelevantDocuments = async (
 }
 
 export const buildSimpleChatMessages = async (
-  lastChatMessage: QchatPromptMessage
+  lastChatMessage: PromptMessage
 ): Promise<{
   systemMessage: ChatCompletionMessageParam
   userMessage: ChatCompletionMessageParam
@@ -76,7 +76,7 @@ export const buildSimpleChatMessages = async (
 }
 
 export const buildDataChatMessages = async (
-  lastChatMessage: QchatPromptMessage,
+  lastChatMessage: PromptMessage,
   chatThreadId: string
 ): Promise<{
   systemMessage: ChatCompletionMessageParam

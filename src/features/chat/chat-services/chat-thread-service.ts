@@ -12,7 +12,7 @@ import {
   ChatType,
   ConversationSensitivity,
   ConversationStyle,
-  QchatPromptProps,
+  PromptProps,
 } from "@/features/chat/models"
 import { xMonthsAgo } from "@/features/common/date-helper"
 import { RedirectToChatThread } from "@/features/common/navigation-helpers"
@@ -254,9 +254,7 @@ export type InitChatSessionResponse = {
   chatThread: ChatThreadModel
 }
 
-export const InitThreadSession = async (
-  props: QchatPromptProps
-): ServerActionResponseAsync<InitChatSessionResponse> => {
+export const InitThreadSession = async (props: PromptProps): ServerActionResponseAsync<InitChatSessionResponse> => {
   const { id: chatThreadId, chatType, conversationStyle, conversationSensitivity, chatOverFileName } = props
 
   const currentChatThreadResponse = await EnsureChatThreadOperation(chatThreadId)
