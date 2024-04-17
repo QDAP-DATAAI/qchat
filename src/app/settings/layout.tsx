@@ -12,7 +12,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
   return (
     <>
-      <div className="grid size-full grid-cols-6 overflow-hidden bg-card">
+      <div className="grid size-full grid-cols-6 overflow-hidden">
         <SettingsMenu />
         <div className="col-span-5 size-full">
           <Card className="col-span-6 flex h-full flex-1 items-center justify-center sm:col-span-6 md:col-span-5 lg:col-span-4 xl:col-span-5">

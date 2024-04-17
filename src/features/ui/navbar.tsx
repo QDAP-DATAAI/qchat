@@ -1,6 +1,7 @@
 "use client"
 
 import { CloudUpload, HomeIcon, BookMarked, SpellCheck2, UserRoundCog } from "lucide-react"
+import { Session } from "next-auth"
 import { useSession } from "next-auth/react"
 import React from "react"
 
@@ -11,19 +12,19 @@ interface LinkItem {
   name: string
   href: string
   icon?: React.ElementType
-  condition?: (sessionStatus: string) => boolean
+  condition?: (session: Session | null) => boolean
 }
 
 const links: LinkItem[] = [
   { name: "Home", href: "/", icon: HomeIcon },
-  { name: "Settings", href: "/settings", icon: UserRoundCog, condition: status => status === "authenticated" },
-  { name: "Prompt Guide", href: "/prompt-guide", icon: BookMarked, condition: status => status === "authenticated" },
-  { name: "What's new", href: "/whats-new", icon: CloudUpload, condition: status => status === "authenticated" },
+  { name: "Settings", href: "/settings", icon: UserRoundCog, condition: session => !!session?.user?.qchatAdmin },
+  { name: "Prompt Guide", href: "/prompt-guide", icon: BookMarked, condition: session => !!session?.user },
+  { name: "What's new", href: "/whats-new", icon: CloudUpload, condition: session => !!session?.user },
   {
     name: "Factual Errors",
     href: "/hallucinations",
     icon: SpellCheck2,
-    condition: status => status === "authenticated",
+    condition: session => !!session?.user,
   },
   // Further links can be added with or without conditions
 ]
@@ -31,9 +32,9 @@ const links: LinkItem[] = [
 const placeholders = links.map(link => ({ name: link.name }))
 
 export const NavBar: React.FC = () => {
-  const { status } = useSession()
+  const { data: session, status } = useSession()
 
-  const visibleLinks = links.filter(link => !link.condition || link.condition(status))
+  const visibleLinks = links.filter(link => !link.condition || link.condition(session))
 
   return (
     <nav aria-label="Main navigation" className="m:h-[44px] border-b-4 border-accent bg-backgroundShade">
