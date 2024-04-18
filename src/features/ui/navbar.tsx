@@ -17,7 +17,12 @@ interface LinkItem {
 
 const links: LinkItem[] = [
   { name: "Home", href: "/", icon: HomeIcon },
-  { name: "Settings", href: "/settings", icon: UserRoundCog, condition: session => !!session?.user?.qchatAdmin },
+  {
+    name: "Settings",
+    href: "/settings/tenant",
+    icon: UserRoundCog,
+    condition: session => !!session?.user?.qchatAdmin,
+  },
   { name: "Prompt Guide", href: "/prompt-guide", icon: BookMarked, condition: session => !!session?.user },
   { name: "What's new", href: "/whats-new", icon: CloudUpload, condition: session => !!session?.user },
   {

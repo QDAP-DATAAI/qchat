@@ -4,10 +4,10 @@ import { MenuItem } from "@/components/menu"
 import { isTenantAdmin } from "@/features/auth/helpers"
 
 const menuItems = [
-  { url: "/settings/tenant", icon: <Settings size={16} />, text: "Tenant Details", adminRequired: true },
   { url: "/settings/details", icon: <UserRoundCog size={16} />, text: "Personal Details" },
-  { url: "/settings/history", icon: <FileClock size={16} />, text: "Chat History" },
-  { url: "/settings/help", icon: <CircleHelp size={16} />, text: "Help & Support" },
+  { url: "/settings/tenant", icon: <Settings size={16} />, text: "Tenant Details", adminRequired: true },
+  { url: "/settings/details", icon: <FileClock size={16} />, text: "Chat History - Coming Soon" },
+  { url: "/settings/details", icon: <CircleHelp size={16} />, text: "Help & Support - Coming Soon" },
 ]
 
 export const SettingsMenuItems = async (): Promise<JSX.Element> => {
