@@ -1,3 +1,5 @@
+import { Message } from "ai"
+
 export enum ConversationStyle {
   Creative = "creative",
   Balanced = "balanced",
@@ -109,10 +111,11 @@ export interface PromptBody {
   chatThreadName?: string
 }
 
-export interface PromptMessage {
-  id: string
-  content: string
-  role: ChatRole
+export interface PromptMessage extends Message {
+  contentFilterResult?: unknown
+  sentiment?: ChatSentiment
+  feedback?: FeedbackType
+  reason?: string
 }
 
 export interface PromptProps extends PromptBody {
