@@ -21,8 +21,8 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
       setInput(prompt)
       const threadResponse = await FindChatThreadForCurrentUser(id)
       if (threadResponse.status !== "OK") throw threadResponse
-      const upseted = await UpsertChatThread({ ...threadResponse.response, selectedPrompt: prompt })
-      if (upseted.status !== "OK") throw upseted
+      const upserted = await UpsertChatThread({ ...threadResponse.response, selectedPrompt: prompt })
+      if (upserted.status !== "OK") throw upserted
     } catch (error) {
       showError("Prompt button not selected" + error)
     }

@@ -78,7 +78,7 @@ export interface ChatThreadModel {
   id: string
   name: string
   previousChatName: string
-  chatCategory: string
+  chatCategory: (typeof CATEGORIES)[number] | "Uncategorised" | "None"
   createdAt: Date
   userId: string
   tenantId: string
@@ -143,3 +143,18 @@ export interface ChatUtilityModel {
   role: ChatRole
   type: ChatRecordType.Utility
 }
+
+export const CATEGORIES = [
+  "Information Processing and Management",
+  "Communication and Interaction",
+  "Decision Support and Advisory",
+  "Educational and Training Services",
+  "Operational Efficiency and Automation",
+  "Finance and Banking",
+  "Public Engagement and Services",
+  "Innovation and Development",
+  "Creative Assistance",
+  "Lifestyle and Personal Productivity",
+  "Entertainment and Engagement",
+  "Emotional and Mental Support",
+] as const
