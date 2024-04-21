@@ -42,6 +42,7 @@ export const config = {
     "/api/chat/:path*",
     "/api/tenant/:path*",
     "/api/user/:path*",
+    "/api/prompt/:path*",
     "/chat/:path*",
     "/hallucinations/:path*",
     "/prompt-guide/:path*",
