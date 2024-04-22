@@ -65,7 +65,7 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
   }
 
   return (
-    <Form.Root className="grid size-full w-full grid-cols-1 gap-4 pt-5 md:grid-cols-2" onSubmit={handleSubmit}>
+    <Form.Root className="grid size-full w-full grid-cols-1 gap-8 pt-5 md:grid-cols-2" onSubmit={handleSubmit}>
       <div className="mb-4">
         <Typography variant="h4" className="font-bold underline underline-offset-2">
           Department Information

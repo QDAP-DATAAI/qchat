@@ -57,37 +57,6 @@ This approach helps us interact with you in the most effective and considerate m
       .finally(() => setIsLoading(false))
   }, [session])
 
-  // const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-  //   e.preventDefault()
-  //   if (!session?.user) return
-  //   const newContextPrompt = new FormData(e.currentTarget).get("contextPrompt") as string
-
-  //   setIsSubmitting(true)
-  //   setServerErrors({ contextPrompt: false })
-
-  //   const temp = contextPrompt
-  //   setContextPrompt(newContextPrompt)
-
-  //   const response = await fetch("/api/user/details", {
-  //     method: "POST",
-  //     body: JSON.stringify({
-  //       contextPrompt: newContextPrompt,
-  //       upn: session.user.upn,
-  //       tenantId: session.user.tenantId,
-  //     }),
-  //   })
-
-  //   if (!response.ok) {
-  //     showError("Context prompt could not be updated. Please try again later.")
-  //     setContextPrompt(temp)
-  //   } else {
-  //     showSuccess({ title: "Success", description: "Context prompt updated successfully!" })
-  //     ;(e.target as HTMLFormElement)?.reset()
-  //   }
-
-  //   setIsSubmitting(false)
-  // }
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     if (!session?.user) return
@@ -122,7 +91,7 @@ This approach helps us interact with you in the most effective and considerate m
   }
 
   return (
-    <Form.Root className="grid size-full min-w-[400px] grid-cols-1 gap-4 pt-5 md:grid-cols-2" onSubmit={handleSubmit}>
+    <Form.Root className="grid size-full min-w-[400px] grid-cols-1 gap-8 pt-5 md:grid-cols-2" onSubmit={handleSubmit}>
       <div className="mb-4 md:col-span-1">
         <Typography variant="h4" className="pt-4 font-bold text-siteTitle">
           Your Details
