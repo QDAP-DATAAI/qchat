@@ -17,7 +17,7 @@ const requireAuth: string[] = [
   "/whats-new",
 ]
 
-const requireAdmin: string[] = ["/reporting"]
+const requireAdmin: string[] = ["/reporting", "/settings"]
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const pathname = request.nextUrl.pathname
@@ -42,7 +42,6 @@ export const config = {
     "/api/chat/:path*",
     "/api/tenant/:path*",
     "/api/user/:path*",
-    "/api/prompt/:path*",
     "/chat/:path*",
     "/hallucinations/:path*",
     "/prompt-guide/:path*",

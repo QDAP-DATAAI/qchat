@@ -130,25 +130,23 @@ This approach helps us interact with you in the most effective and considerate m
         <div className="m-2">
           <Typography variant="h5" className="flex items-center">
             Name:
-            {isLoading ? (
+            {isLoading && (
               <div className="ml-2">
                 <CardSkeleton />
               </div>
-            ) : (
-              <span className="ml-2">{session?.user?.name}</span>
             )}
+            {!isLoading && <span className="ml-2">{session?.user?.name}</span>}
           </Typography>
         </div>
         <div className="m-2">
           <Typography variant="h5" className="flex items-center">
-            Email:
-            {isLoading ? (
+            Name:
+            {isLoading && (
               <div className="ml-2">
                 <CardSkeleton />
               </div>
-            ) : (
-              <span className="ml-2">{session?.user?.email}</span>
             )}
+            {!isLoading && <span className="ml-2">{session?.user?.email}</span>}
           </Typography>
         </div>
         <div className="mb-4">
