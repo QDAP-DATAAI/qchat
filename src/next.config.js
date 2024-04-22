@@ -103,6 +103,16 @@ const nextConfig = {
         destination: "https://dis-qgcdg.atlassian.net/servicedesk/customer/portal/2",
         permanent: true,
       },
+      {
+        source: "/settings/help",
+        destination: "/settings/details",
+        permanent: false,
+      },
+      {
+        source: "/settings/history",
+        destination: "/settings/details",
+        permanent: false,
+      },
     ]
   },
   headers() {

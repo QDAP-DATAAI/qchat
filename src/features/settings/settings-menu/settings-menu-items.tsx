@@ -5,8 +5,8 @@ import { isTenantAdmin } from "@/features/auth/helpers"
 
 const menuItems = [
   { url: "/settings/details", icon: <UserRoundCog size={16} />, text: "Your details" },
-  { url: "/settings/details", icon: <FileClock size={16} />, text: "Chat history - Coming soon" },
-  { url: "/settings/details", icon: <CircleHelp size={16} />, text: "Help & Support - Coming soon" },
+  { url: "/settings/history", icon: <FileClock size={16} />, text: "Chat history - Coming soon" },
+  { url: "/settings/help", icon: <CircleHelp size={16} />, text: "Help & Support - Coming soon" },
   { url: "/settings/tenant", icon: <Building2 size={16} />, text: "Department details", adminRequired: true },
 ]
 
