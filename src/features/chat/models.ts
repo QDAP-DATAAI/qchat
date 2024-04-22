@@ -94,7 +94,7 @@ export interface ChatThreadModel {
   type: ChatRecordType.Thread
   offenderId?: string
   isDisabled: boolean
-  prompts: []
+  prompts: string[]
   selectedPrompt: string
   contentFilterTriggerCount?: number
 }

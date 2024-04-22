@@ -43,3 +43,5 @@ export const PromptButtons = async (): Promise<string[]> => {
     return defaultPrompts
   }
 }
+
+//TODO store all generated prompts in the chat thread

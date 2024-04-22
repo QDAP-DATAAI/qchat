@@ -4,7 +4,7 @@ import { PromptButtons } from "@/features/chat/chat-services/prompt-buttons"
 import { Button } from "@/features/ui/button"
 
 interface Prop {
-  onPromptSelected: (prompt: string) => void
+  onPromptSelected: (prompt: string, prompts: string[]) => void
   selectedPrompt?: string
 }
 
@@ -18,8 +18,8 @@ export const PromptButton: React.FC<Prop> = ({ onPromptSelected, selectedPrompt 
       .catch(_err => setPrompts([]))
   }, [])
 
-  const handlePromptClick = (prompt: string): void => {
-    onPromptSelected(prompt)
+  const handlePromptClick = (prompt: string, prompts: string[]): void => {
+    onPromptSelected(prompt, prompts)
   }
 
   return (
@@ -28,7 +28,7 @@ export const PromptButton: React.FC<Prop> = ({ onPromptSelected, selectedPrompt 
         {prompts.map((prompt, index) => (
           <li key={index} className="mb-2 rounded bg-background text-foreground">
             <Button
-              onClick={() => handlePromptClick(prompt)}
+              onClick={() => handlePromptClick(prompt, prompts)}
               className={`w-full rounded p-2 text-center text-buttonText ${selectedPrompt === prompt ? "bg-button" : "text-buttonText"}`}
               disabled={selectedPrompt === prompt}
               aria-pressed={selectedPrompt === prompt}

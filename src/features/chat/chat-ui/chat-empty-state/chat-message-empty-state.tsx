@@ -16,12 +16,16 @@ interface Prop {}
 
 export const ChatMessageEmptyState: FC<Prop> = () => {
   const { setInput, id, input } = useChatContext()
-  const handlePromptSelected = async (prompt: string): Promise<void> => {
+  const handlePromptSelected = async (prompt: string, prompts: string[]): Promise<void> => {
     try {
       setInput(prompt)
       const threadResponse = await FindChatThreadForCurrentUser(id)
       if (threadResponse.status !== "OK") throw threadResponse
-      const upserted = await UpsertChatThread({ ...threadResponse.response, selectedPrompt: prompt })
+      const upserted = await UpsertChatThread({
+        ...threadResponse.response,
+        selectedPrompt: prompt,
+        prompts: prompts,
+      })
       if (upserted.status !== "OK") throw upserted
     } catch (error) {
       showError("Prompt button not selected" + error)
