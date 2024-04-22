@@ -14,7 +14,10 @@ export const PromptButton: React.FC<Prop> = ({ onPromptSelected, selectedPrompt 
     const fetchPrompts = async (): Promise<string[]> => await PromptButtons()
 
     fetchPrompts()
-      .then(data => setPrompts(data))
+      .then(data => {
+        setPrompts(data)
+        //Todo store all generated prompts in the chat thread
+      })
       .catch(_err => setPrompts([]))
   }, [])
 
