@@ -1,4 +1,3 @@
-import { flesch } from "flesch"
 import { syllable } from "syllable"
 
 function countWords(text: string): number {
