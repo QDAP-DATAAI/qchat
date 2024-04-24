@@ -10,6 +10,9 @@ Below are the updates for the Queensland Government QChat Virtual Assistant.
 
 - **New User and Department Context Settings:** Behind the scenes we're preparing QChat to take your own personal User Context Prompt - where you can provide information for QChat to use in every conversation. We can't wait to release this functionality for you shorlty.
 
+- **Introducing the Readability Score:** It evaluates your text on a scale of 0 to 100, with higher scores indicating easier comprehension. For instance: Scores 90-100 fit 11-year-olds, 60-70 suit 13-15 year-olds, and 0-30 are for university grads.
+  Aim for a score between 60 to 70 to match the understanding level of standard files, you can click [here](https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/364149/PSC-inclusive-communications-campaign.pdf) for more information.
+
 ## 👨🏻‍💻 Version 1.3.8 Updates - 15 APR 2024
 
 - **Minor Software Changes:** This update has some security enhancements to keep QChat secure and ready to assist you!

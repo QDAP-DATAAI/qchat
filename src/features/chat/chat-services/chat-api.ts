@@ -21,6 +21,7 @@ import { FindTopChatMessagesForCurrentUser, UpsertChatMessage } from "./chat-mes
 import { InitThreadSession, UpsertChatThread } from "./chat-thread-service"
 import { translator } from "./chat-translator-service"
 import { UpdateChatThreadIfUncategorised } from "./chat-utility"
+import { calculateFleschScore } from "./chat-flesch"
 
 const dataChatTypes = ["data", "mssql", "audio"]
 export const MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED = 3
@@ -89,6 +90,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       tenantPrompt: contextPrompts.tenantPrompt,
       userPrompt: contextPrompts.userPrompt,
       contentFilterResult,
+      userFleschScore: calculateFleschScore(updatedLastHumanMessage.content) ?? -1,
     })
     if (chatMessageResponse.status !== "OK") throw chatMessageResponse
 
@@ -109,6 +111,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
           feedback: FeedbackType.None,
           sentiment: ChatSentiment.Neutral,
           reason: "",
+          systemFleshScore: calculateFleschScore(translatedCompletion ? translatedCompletion : completion) ?? -1,
         })
         if (addedMessage?.status !== "OK") throw addedMessage.errors
 

@@ -67,6 +67,7 @@ export interface UserChatMessageModel extends ChatMessageModel {
   tenantPrompt: string
   userPrompt: string
   contentFilterResult?: unknown
+  userFleschScore?: number
 }
 export interface AssistantChatMessageModel extends ChatMessageModel {
   originalCompletion: string
@@ -74,6 +75,7 @@ export interface AssistantChatMessageModel extends ChatMessageModel {
   feedback: FeedbackType
   sentiment: ChatSentiment
   reason: string
+  systemFleshScore?: number
 }
 
 export interface ChatThreadModel {
