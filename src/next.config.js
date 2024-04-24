@@ -63,9 +63,9 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 const nextConfig = {
   output: "standalone",
-  // compiler: {
-  //   removeConsole: process.env.NODE_ENV !== "development",
-  // },
+  compiler: {
+    removeConsole: process.env.NODE_ENV !== "development",
+  },
   logging: {
     fetches: {
       fullUrl: true,
