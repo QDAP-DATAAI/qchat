@@ -54,6 +54,10 @@ export const ChatFileUI: FC = () => {
           required
           disabled={isUploadingFile}
           accept={acceptedFileType}
+          data-file-types={acceptedFileType}
+          data-max-size="10"
+          data-max-files="3"
+          multiple={true}
           aria-describedby="file-upload-description"
           onChange={e => {
             const files = e.currentTarget.files
@@ -77,7 +81,7 @@ export const ChatFileUI: FC = () => {
           ) : (
             <>
               <ArrowUpCircle aria-hidden="true" size={20} />
-              Upload
+              Select Files
             </>
           )}
         </Button>
