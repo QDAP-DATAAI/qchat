@@ -8,9 +8,9 @@ Below are the updates for the Queensland Government QChat Virtual Assistant.
 
 ## 👨🏻‍💻 Version 1.4.1 Updates - 26 APR 2024
 
-- **Display Flesch-Kincaid Grade Level Feature:** We've introduced a new feature for understand readability scores. This score reflects the education grade level a person would need to be in to understand the text. For example, a score of 8 means that an eighth grader can understand the document (typically around 13-14 years old) . For most documents, please aim for a Flesch-Kincaid Grade Level score that corresponds to a reading age of 12 or below. Adding five to the Flesch-Kincaid Grade Level score provides the approximate reading age of your document. You can click [here](https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/364149/PSC-inclusive-communications-campaign.pdf) for more information.
+- **Display Flesch-Kincaid Grade Level Feature:** A new feature was introduced to calculate the readability scores, which reflects the education grade level required to comprehend the text. For example, a score of 8 means that an eighth grader can understand the document (typically around 13-14 years old). For most documents, please aim for a Flesch-Kincaid Grade Level score that corresponds to a reading age of 12 or below. Adding five to the Flesch-Kincaid Grade Level score provides the approximate reading age of your document. You can click [here](https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/364149/PSC-inclusive-communications-campaign.pdf) for more information.
 
-## 👨🏻‍💻 Version 1.4.0 Updates - 24 APR 2024
+## 👨🏻‍💻 Version 1.4.0 Updates - 25 APR 2024
 
 - **New User and Department Context Settings:** Behind the scenes we're preparing QChat to take your own personal User Context Prompt - where you can provide information for QChat to use in every conversation. We can't wait to release this functionality for you shorlty.
 
