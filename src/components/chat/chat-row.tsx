@@ -5,6 +5,7 @@ import React, { FC, useState } from "react"
 
 import { Markdown } from "@/components/markdown/markdown"
 import Typography from "@/components/typography"
+import { calculateFleschKincaidScore } from "@/features/chat/chat-services/chat-flesch"
 import { CreateUserFeedback } from "@/features/chat/chat-services/chat-message-service"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ChatRole, ChatSentiment, FeedbackType, PromptMessage } from "@/features/chat/models"
@@ -12,7 +13,6 @@ import { showError } from "@/features/globals/global-message-store"
 import { AI_NAME } from "@/features/theme/theme-config"
 import { AssistantButtons, FleschButton } from "@/features/ui/assistant-buttons"
 import Modal from "@/features/ui/modal"
-import { calculateFleschScore } from "@/features/chat/chat-services/chat-flesch"
 
 interface ChatRowProps {
   chatMessageId: string
@@ -64,8 +64,6 @@ export const ChatRow: FC<ChatRowProps> = props => {
         break
     }
   }
-
-  const handleFleschIconClick = () => {}
 
   const handleCopyButton = (): void => {
     toggleButton("CopyButton")
@@ -123,7 +121,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
     closeModal?.()
   }
 
-  const fleshScore = calculateFleschScore(props.message.content) ?? 0
+  const fleshScore = calculateFleschKincaidScore(props.message.content)
 
   const safetyWarning = props.message.contentFilterResult ? (
     <div
@@ -153,13 +151,13 @@ export const ChatRow: FC<ChatRowProps> = props => {
           <Typography variant="h3" className="mt-0 flex-1 text-heading" tabIndex={0}>
             {props.name}
           </Typography>
-          <Typography variant="h3" className="mt-0 flex-1 text-center text-heading" tabIndex={0}>
-            {props.chatMessageId}
-          </Typography>
+          {process.env.NODE_ENV === "development" && (
+            <Typography variant="h4" className="mt-0 flex-1 text-center text-heading" tabIndex={0}>
+              {props.chatMessageId}
+            </Typography>
+          )}
           <div className="flex items-center">
-            {props.showAssistantButtons && (
-              <FleschButton handleFleschIconClick={handleFleschIconClick} fleschScore={fleshScore} />
-            )}
+            {props.showAssistantButtons && <FleschButton fleschScore={fleshScore} />}
           </div>
           <Modal
             chatThreadId={props.chatThreadId}

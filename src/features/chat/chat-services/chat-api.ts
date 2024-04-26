@@ -17,11 +17,11 @@ import { mapOpenAIChatMessages } from "@/features/common/mapping-helper"
 import { OpenAIInstance } from "@/features/common/services/open-ai"
 
 import { buildDataChatMessages, buildSimpleChatMessages, getContextPrompts } from "./chat-api-helper"
+import { calculateFleschKincaidScore } from "./chat-flesch"
 import { FindTopChatMessagesForCurrentUser, UpsertChatMessage } from "./chat-message-service"
 import { InitThreadSession, UpsertChatThread } from "./chat-thread-service"
 import { translator } from "./chat-translator-service"
 import { UpdateChatThreadIfUncategorised } from "./chat-utility"
-import { calculateFleschScore } from "./chat-flesch"
 
 const dataChatTypes = ["data", "mssql", "audio"]
 export const MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED = 3
@@ -90,7 +90,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       tenantPrompt: contextPrompts.tenantPrompt,
       userPrompt: contextPrompts.userPrompt,
       contentFilterResult,
-      userFleschScore: calculateFleschScore(updatedLastHumanMessage.content) ?? -1,
+      fleschKincaidScore: calculateFleschKincaidScore(updatedLastHumanMessage.content),
     })
     if (chatMessageResponse.status !== "OK") throw chatMessageResponse
 
@@ -111,7 +111,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
           feedback: FeedbackType.None,
           sentiment: ChatSentiment.Neutral,
           reason: "",
-          systemFleshScore: calculateFleschScore(translatedCompletion ? translatedCompletion : completion) ?? -1,
+          fleschKincaidScore: calculateFleschKincaidScore(translatedCompletion ? translatedCompletion : completion),
         })
         if (addedMessage?.status !== "OK") throw addedMessage.errors
 
