@@ -6,14 +6,15 @@ Below are the updates for the Queensland Government QChat Virtual Assistant.
 
 - If you are a technical or business staff member working on AI Projects, you can click [here](https://forms.office.com/r/YZzMFLexPK) to request to join the Queensland Government AI Community of Practice. This platform is designed to facilitate knowledge sharing and collaboration among AI professionals within the government.
 
+## 👨🏻‍💻 Version 1.4.1 Updates - 26 APR 2024
+
+- **Display Flesch-Kincaid Grade Level Feature:** We've introduced a new feature for understand readability scores. This score reflects the education grade level a person would need to be in to understand the text. For example, a score of 8 means that an eighth grader can understand the document (typically around 13-14 years old) . For most documents, please aim for a Flesch-Kincaid Grade Level score that corresponds to a reading age of 12 or below. Adding five to the Flesch-Kincaid Grade Level score provides the approximate reading age of your document. You can click [here](https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/364149/PSC-inclusive-communications-campaign.pdf) for more information.
+
 ## 👨🏻‍💻 Version 1.4.0 Updates - 24 APR 2024
 
 - **New User and Department Context Settings:** Behind the scenes we're preparing QChat to take your own personal User Context Prompt - where you can provide information for QChat to use in every conversation. We can't wait to release this functionality for you shorlty.
 
 - **Call Transcription Updates:** We've introduced a new interface for our call transcription test cases, now you will be able to toggle between asking QChat questions about the call transcriptions and reviewing or downloading the call transcript.
-
-- **Introducing the Readability Score:** It evaluates your text on a scale of 0 to 100, with higher scores indicating easier comprehension. For instance: Scores 90-100 fit 11-year-olds, 60-70 suit 13-15 year-olds, and 0-30 are for university grads.
-  Aim for a score between 60 to 70 to match the understanding level of standard files, you can click [here](https://www.forgov.qld.gov.au/__data/assets/pdf_file/0027/364149/PSC-inclusive-communications-campaign.pdf) for more information.
 
 ## 👨🏻‍💻 Version 1.3.8 Updates - 15 APR 2024
 
