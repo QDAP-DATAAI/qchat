@@ -1,4 +1,6 @@
 export const AI_NAME = "QChat"
+export const AI_TAGLINE = "The Queensland Government AI Assistant"
+export const AI_AUTHOR = "Queensland Government AI Unit"
 
 export const AI_DESCRIPTION = "Azure Chat is a friendly AI assistant."
 export const CHAT_DEFAULT_PERSONA = AI_NAME + " default"

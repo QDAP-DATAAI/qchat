@@ -2,7 +2,7 @@ import React from "react"
 
 import Typography from "@/components/typography"
 import { MiniMenu } from "@/features/main-menu/mini-menu"
-import { AI_NAME } from "@/features/theme/theme-config"
+import { AI_NAME, AI_TAGLINE } from "@/features/theme/theme-config"
 import { QgovSvg } from "@/features/ui/qldgovlogo"
 import { QgovMiniSvg } from "@/features/ui/qldgovminilogo"
 import { UserComponent } from "@/features/ui/user-login-logout"
@@ -18,7 +18,7 @@ const Sidebar: React.FC = () => {
           {AI_NAME}
         </Typography>
         <Typography variant="h2" className="hidden whitespace-nowrap pb-0 text-textMuted sm:block">
-          The Queensland Government AI Assistant
+          {AI_TAGLINE}
         </Typography>
       </div>
       <div className="col-span-6 hidden md:col-span-1 md:block"></div>
@@ -35,8 +35,12 @@ export const Header: React.FC = () => {
             <QgovMiniSvg />
           </div>
           <div className="container mx-auto hidden h-[32px] w-full grid-cols-3 items-center md:grid">
-            <Typography variant="span" aria-label="Site domain: qchat.ai.qld.gov.au" className="col-span-2">
-              qchat.ai.qld.gov.au
+            <Typography
+              variant="span"
+              aria-label={"Site domain:" + process.env.NEXT_PUBLIC_APP_URL}
+              className="col-span-2"
+            >
+              {process.env.NEXT_PUBLIC_APP_URL}
             </Typography>
             <div className="justify-self-end">
               <UserComponent />
