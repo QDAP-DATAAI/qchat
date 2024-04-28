@@ -6,7 +6,7 @@ import "./globals.css"
 
 import { GlobalConfigProvider } from "@/features/globals/global-client-config-context"
 import { Providers } from "@/features/globals/providers"
-import { AI_AUTHOR, AI_NAME, AI_TAGLINE } from "@/features/theme/theme-config"
+import { AI_AUTHOR, AI_NAME, AI_TAGLINE, APP_URL } from "@/features/theme/theme-config"
 import { ThemeProvider } from "@/features/theme/theme-provider"
 import { NavBar } from "@/features/ui/navbar"
 import { Toaster } from "@/features/ui/toaster"
@@ -18,10 +18,10 @@ import { Header } from "./header"
 const notoSans = Noto_Sans({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://" + process.env.NEXT_PUBLIC_APP_URL + "/"),
+  metadataBase: new URL("https://" + APP_URL + "/"),
   title: AI_NAME,
   applicationName: AI_NAME,
-  authors: [{ name: AI_AUTHOR, url: "https://" + process.env.NEXT_PUBLIC_APP_URL }],
+  authors: [{ name: AI_AUTHOR, url: "https://" + APP_URL }],
   description: AI_NAME + " " + AI_TAGLINE,
   generator: AI_AUTHOR,
   keywords: ["AI", "Chatbot", "GenerativeAI", "VirtualAssistant", AI_NAME, AI_AUTHOR],

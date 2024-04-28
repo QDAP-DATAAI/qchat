@@ -52,7 +52,7 @@ const ErrorPage: React.FC = () => {
         <CardContent className="grid items-center justify-center gap-4">
           {displaySupportButton && (
             <Button variant="link" className="max-w-[300px]" onClick={handleSupportRedirect}>
-              Contact QChat Support
+              Contact {AI_NAME} Support
             </Button>
           )}
           <Button variant="link" className="max-w-[300px]" onClick={handleForGovRedirect}>

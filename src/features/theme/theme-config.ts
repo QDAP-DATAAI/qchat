@@ -10,3 +10,4 @@ You have access to the following functions:
 1. create_img: You must only use the function create_img if the user asks you to create an image.`
 
 export const NEW_CHAT_NAME = "New chat"
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://qchat.ai.qld.gov.au"
