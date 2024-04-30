@@ -1,6 +1,8 @@
 import { Mail, CircleHelp, HeartHandshake } from "lucide-react"
 import React from "react"
 
+import { SUPPORT_EMAIL } from "@/app-global"
+
 import Typography from "@/components/typography"
 import { APP_URL } from "@/features/theme/theme-config"
 
@@ -27,7 +29,7 @@ export const Footer: React.FC = () => {
         </div>
         <div>
           <a
-            href="mailto:qchat@chde.qld.gov.au"
+            href={"mailto:" + { SUPPORT_EMAIL }}
             className="flex items-center"
             target="_blank"
             rel="noopener noreferrer"
