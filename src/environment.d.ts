@@ -26,7 +26,6 @@ declare global {
       AZURE_SEARCH_API_VERSION: string
       AZURE_SEARCH_INDEX_NAME: string
       AZURE_SEARCH_NAME: string
-      MAX_DOCUMENT_SIZE: string
       NEXTAUTH_SECRET: string
       NEXTAUTH_URL: string
       NEXTAUTH_URL_INTERNAL: string

@@ -3,7 +3,7 @@
 import { SqlQuerySpec } from "@azure/cosmos"
 
 import { getTenantId, userHashedId } from "@/features/auth/helpers"
-import { DEFAULT_MONTHS_AGO } from "@/features/chat/constants"
+import { DEFAULT_MONTHS_AGO, MAX_DOCUMENT_SIZE } from "@/features/chat/constants"
 import { ChatDocumentModel, ChatRecordType } from "@/features/chat/models"
 import { xMonthsAgo } from "@/features/common/date-helper"
 import { ServerActionResponseAsync } from "@/features/common/server-action-response"
@@ -15,8 +15,6 @@ import { speechToTextRecognizeOnce } from "./chat-audio-helper"
 import { arrayBufferToBase64, customBeginAnalyzeDocument } from "./chat-document-helper"
 import { chunkDocumentWithOverlap } from "./text-chunk"
 import { isNotNullOrEmpty } from "./utils"
-
-const MAX_DOCUMENT_SIZE = process.env.MAX_DOCUMENT_SIZE as unknown as number
 
 const LoadFile = async (formData: FormData, chatType: string): Promise<string[]> => {
   try {
