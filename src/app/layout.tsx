@@ -18,10 +18,10 @@ import { Header } from "./header"
 const notoSans = Noto_Sans({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://" + APP_URL + "/"),
+  metadataBase: new URL(APP_URL),
   title: AI_NAME,
   applicationName: AI_NAME,
-  authors: [{ name: AI_AUTHOR, url: "https://" + APP_URL }],
+  authors: [{ name: AI_AUTHOR, url: APP_URL }],
   description: AI_NAME + " " + AI_TAGLINE,
   generator: AI_AUTHOR,
   keywords: ["AI", "Chatbot", "GenerativeAI", "VirtualAssistant", AI_NAME, AI_AUTHOR],

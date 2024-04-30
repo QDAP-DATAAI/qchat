@@ -44,7 +44,7 @@ const LoadFile = async (formData: FormData, chatType: string): Promise<string[]>
 const ensureSearchIsConfigured = (): boolean => {
   const isSearchConfigured =
     isNotNullOrEmpty(process.env.AZURE_SEARCH_NAME) &&
-    isNotNullOrEmpty(process.env.AZURE_SEARCH_API_KEY) &&
+    isNotNullOrEmpty(process.env.APIM_KEY) &&
     isNotNullOrEmpty(process.env.AZURE_SEARCH_INDEX_NAME) &&
     isNotNullOrEmpty(process.env.AZURE_SEARCH_API_VERSION)
 
@@ -54,8 +54,7 @@ const ensureSearchIsConfigured = (): boolean => {
   }
 
   const isDocumentIntelligenceConfigured =
-    isNotNullOrEmpty(process.env.AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT) &&
-    isNotNullOrEmpty(process.env.AZURE_DOCUMENT_INTELLIGENCE_KEY)
+    isNotNullOrEmpty(process.env.APIM_BASE) && isNotNullOrEmpty(process.env.APIM_KEY)
 
   if (!isDocumentIntelligenceConfigured) {
     console.error("Azure document intelligence environment variables are not configured.")

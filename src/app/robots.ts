@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       disallow: "/",
     },
-    sitemap: "https://" + process.env.NEXT_PUBLIC_APP_URL + "/sitemap.xml",
+    sitemap: process.env.NEXTAUTH_URL_INTERNAL + "/sitemap.xml",
   }
 }

@@ -9,8 +9,8 @@ export const Footer: React.FC = () => {
     <footer className="h-[30px] min-w-[400px] border-t-4 border-accent bg-background py-5" role="contentinfo">
       <div className="container mx-auto flex size-full items-center justify-between  px-8">
         <div>
-          <a href={"https://" + APP_URL} className="flex items-center" target="_blank" rel="noopener noreferrer">
-            <Typography variant="h4">{process.env.NEXT_PUBLIC_APP_URL}</Typography>
+          <a href={APP_URL} className="flex items-center" target="_blank" rel="noopener noreferrer">
+            <Typography variant="h4">{APP_URL}</Typography>
           </a>
         </div>
         <div>
