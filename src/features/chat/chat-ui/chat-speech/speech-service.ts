@@ -13,6 +13,7 @@ export const GetSpeechToken = async (): Promise<SpeechTokenResponse> => {
   if (
     process.env.REGION_NAME === undefined ||
     process.env.APIM_KEY === undefined ||
+    process.env.APIM_BASE_WSS === undefined ||
     process.env.APIM_BASE === undefined
   ) {
     return {
@@ -39,7 +40,7 @@ export const GetSpeechToken = async (): Promise<SpeechTokenResponse> => {
       errorMessage: response.statusText || "Error fetching token",
       token: "",
       region: process.env.REGION_NAME,
-      sttUrl: process.env.APIM_BASE + "/handshake/v1.0",
+      sttUrl: process.env.APIM_BASE_WSS,
       apimKey: process.env.APIM_KEY,
     }
   }
@@ -49,7 +50,7 @@ export const GetSpeechToken = async (): Promise<SpeechTokenResponse> => {
     errorMessage: "",
     token: await response.text(),
     region: process.env.REGION_NAME,
-    sttUrl: process.env.APIM_BASE + "/handshake/v1.0",
+    sttUrl: process.env.APIM_BASE_WSS,
     apimKey: process.env.APIM_KEY,
   }
 }

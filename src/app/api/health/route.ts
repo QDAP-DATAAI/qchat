@@ -1,6 +1,6 @@
 export async function GET(_req: Request): Promise<Response> {
   try {
-    const healthCheckUrl = process.env.NEXTAUTH_URL_INTERNAL + "/api/health"
+    const healthCheckUrl = process.env.NEXTAUTH_URL_INTERNAL + "api/health"
     if (!healthCheckUrl) {
       throw new Error("Health check URL is not defined")
     }
