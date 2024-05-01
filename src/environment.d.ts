@@ -2,6 +2,7 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       ADMIN_EMAIL_ADDRESS: string
+      ANALYZE: string
       APIM_BASE: string
       APIM_BASE_WSS: string
       APIM_KEY: string
