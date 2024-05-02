@@ -44,7 +44,7 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
         <SectionTabs selectedTab={selectedTab} onSelectedTabChange={setSelectedTab} />
       ) : undefined}
 
-      <div className="flex flex-1 flex-col justify-end pb-[90px]">
+      <div className="flex flex-1 flex-col justify-end pb-[130px]">
         {selectedTab === "chat"
           ? messages.map((message, index) => (
               <ChatRow
