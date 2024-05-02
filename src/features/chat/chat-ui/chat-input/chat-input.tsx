@@ -84,9 +84,10 @@ const ChatInput: FC<Props> = () => {
           value={input}
           placeholder="Send a message"
           aria-label="Send a message"
-          className="rows-4 bg-background py-4 pr-[80px] shadow-sm"
+          className="bg-background py-4 pr-[80px] shadow-sm"
           onChange={onChange}
           onKeyDown={onKeyDown}
+          rows={4}
         />
         <div className="absolute bottom-0 right-0 mb-4 mr-2 flex h-full items-end px-8">
           {!isDataChat || (isDataChat && fileChatVisible) ? (
