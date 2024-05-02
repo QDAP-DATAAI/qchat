@@ -2,7 +2,7 @@ import React from "react"
 
 import Typography from "@/components/typography"
 import { MiniMenu } from "@/features/main-menu/mini-menu"
-import { AI_NAME, AI_TAGLINE, APP_URL } from "@/features/theme/theme-config"
+import { AI_NAME, AI_TAGLINE, APP_VANITY_URL } from "@/features/theme/theme-config"
 import { QgovSvg } from "@/features/ui/qldgovlogo"
 import { QgovMiniSvg } from "@/features/ui/qldgovminilogo"
 import { UserComponent } from "@/features/ui/user-login-logout"
@@ -37,8 +37,8 @@ export const Header: React.FC = () => {
             <QgovMiniSvg />
           </div>
           <div className="container mx-auto hidden h-[32px] w-full grid-cols-3 items-center md:grid">
-            <Typography variant="span" aria-label={"Site domain:" + APP_URL} className="col-span-2">
-              {APP_URL}
+            <Typography variant="span" aria-label={"Site domain:" + APP_VANITY_URL} className="col-span-2">
+              {APP_VANITY_URL}
             </Typography>
             <div className="justify-self-end">
               <UserComponent />
