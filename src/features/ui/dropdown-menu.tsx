@@ -37,7 +37,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none focus:bg-accent data-[state=open]:bg-accent",
+      "flex cursor-default select-none items-center rounded-sm px-2 py-1.5 outline-none focus:bg-accent data-[state=open]:bg-accent",
       inset && "pl-8",
       className
     )}
@@ -89,10 +89,7 @@ const DropdownMenuItem = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={cn(
-      "group flex w-full items-center rounded-md px-2 py-2 text-sm text-gray-700 hover:bg-gray-100",
-      className
-    )}
+    className={cn("group flex w-full items-center rounded-md px-2 py-2 text-gray-700 hover:bg-gray-100", className)}
     {...props}
     role="menuitem"
   />
@@ -106,10 +103,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
 >(({ className, children, checked, ...props }, ref) => (
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
-    className={cn(
-      "group flex w-full items-center rounded-md px-2 py-2 text-sm text-gray-700 hover:bg-gray-100",
-      className
-    )}
+    className={cn("group flex w-full items-center rounded-md px-2 py-2 text-gray-700 hover:bg-gray-100", className)}
     checked={checked}
     {...props}
     role="menuitemcheckbox"
@@ -127,10 +121,7 @@ const DropdownMenuRadioItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
-    className={cn(
-      "group flex w-full items-center rounded-md px-2 py-2 text-sm text-gray-700 hover:bg-gray-100",
-      className
-    )}
+    className={cn("group flex w-full items-center rounded-md px-2 py-2 text-gray-700 hover:bg-gray-100", className)}
     {...props}
     role="menuitemradio"
   >
@@ -149,7 +140,7 @@ const DropdownMenuLabel = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
-    className={cn("px-2 py-1.5 text-sm font-semibold", inset && "pl-8", className)}
+    className={cn("px-2 py-1.5 font-semibold", inset && "pl-8", className)}
     {...props}
   />
 ))

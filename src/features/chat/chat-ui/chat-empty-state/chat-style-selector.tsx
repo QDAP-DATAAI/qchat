@@ -3,6 +3,7 @@ import { Brush, CircleDot, Scale } from "lucide-react"
 import React from "react"
 import { FC } from "react"
 
+import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ConversationStyle } from "@/features/chat/models"
 import { Tabs, TabsList, TabsTrigger } from "@/features/ui/tabs"
@@ -59,17 +60,19 @@ export const ChatStyleSelector: FC<Prop> = props => {
             </Tabs>
           </div>
         </Tooltip.Trigger>
-        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-sm text-foreground shadow-lg">
-          <p>This controls the &quot;temperature&quot; of the model, with the values for each being 0.1, 0.5 and 1</p>
-          <p>
+        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-foreground shadow-lg">
+          <Typography variant="p">
+            This controls the &quot;temperature&quot; of the model, with the values for each being 0.1, 0.5 and 1
+          </Typography>
+          <Typography variant="p">
             <strong>Precise:</strong> Focused and detail-oriented conversations.
-          </p>
-          <p>
+          </Typography>
+          <Typography variant="p">
             <strong>Balanced:</strong> A mix of precision and creativity.
-          </p>
-          <p>
+          </Typography>
+          <Typography variant="p">
             <strong>Creative:</strong> Open-ended and imaginative discussions.
-          </p>
+          </Typography>
           <Tooltip.Arrow className="fill-primary-foreground" />
         </Tooltip.Content>
       </Tooltip.Root>

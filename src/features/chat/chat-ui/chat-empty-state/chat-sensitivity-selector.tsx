@@ -46,7 +46,7 @@ export const ChatSensitivitySelector: FC<Prop> = ({ disable }) => {
                 </TabsTrigger>
                 <TabsTrigger
                   value="protected"
-                  className="flex items-center justify-center gap-2"
+                  className="flex items-center justify-center gap-2 hover:cursor-not-allowed"
                   disabled={true}
                   role="tab"
                   aria-selected={chatBody.conversationSensitivity === "protected"}
@@ -58,7 +58,7 @@ export const ChatSensitivitySelector: FC<Prop> = ({ disable }) => {
             </Tabs>
           </div>
         </Tooltip.Trigger>
-        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-sm text-foreground shadow-lg">
+        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-foreground shadow-lg">
           <p>
             <strong>Official:</strong> Verified and formal conversations.
           </p>

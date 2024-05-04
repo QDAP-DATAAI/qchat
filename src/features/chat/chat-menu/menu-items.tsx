@@ -61,7 +61,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
           </Typography>
         </div>
         <div className="mb-4">
-          <label htmlFor="newChatName" className="block text-sm font-medium text-foreground">
+          <label htmlFor="newChatName" className="block font-medium text-foreground">
             New Chat Name
           </label>
           <input
@@ -71,14 +71,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
             onChange={e => setNewName(e.target.value)}
             maxLength={120}
             ref={inputRef}
-            className="mt-1 w-full rounded-md border-altBackground bg-background p-2 shadow-sm"
+            className="mt-1 w-full rounded-md border-altBackground bg-background p-2"
             autoComplete="off"
           />
           {newName.length > 30 && newName.length <= 120 && (
-            <p className="mt-2 text-sm text-accent">Name exceeds 30 characters. Consider shortening it.</p>
+            <p className="mt-2  text-accent">Name exceeds 30 characters. Consider shortening it.</p>
           )}
           {newName.length > 120 && (
-            <p className="mt-2 text-sm text-red-500">Name exceeds 120 characters. Please shorten your chat name.</p>
+            <p className="mt-2  text-red-500">Name exceeds 120 characters. Please shorten your chat name.</p>
           )}
         </div>
         <div className="mt-4 flex justify-end gap-4">

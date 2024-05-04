@@ -4,6 +4,8 @@ import { Heart } from "lucide-react"
 import { getSession } from "next-auth/react"
 import React, { useState, useEffect } from "react"
 
+import Typography from "@/components/typography"
+
 export const EasterEgg = (): React.JSX.Element => {
   const [isEasterEggDay, setIsEasterEggDay] = useState(false)
 
@@ -25,9 +27,9 @@ export const EasterEgg = (): React.JSX.Element => {
       <div className="flex flex-col items-center gap-1">
         <div className={`flex items-center justify-center ${textColorClass}`}>
           <Heart className="size-4" fill="currentColor" />
-          <p className="mx-2 text-sm">
+          <Typography variant="p" className="mx-2">
             Made with love by Keith Oak, Rahul Shokeen, Ella Salehi, Fred Delage, Bruno Piovan and Jay Sindorff
-          </p>
+          </Typography>
           <Heart className="size-4" fill="currentColor" />
         </div>
       </div>

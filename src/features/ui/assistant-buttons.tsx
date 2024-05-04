@@ -3,6 +3,8 @@ import * as Tooltip from "@radix-ui/react-tooltip"
 import { CheckIcon, ClipboardIcon, ThumbsUp, ThumbsDown, BookOpenText } from "lucide-react"
 import React from "react"
 
+import Typography from "@/components/typography"
+
 import { Button } from "./button"
 import { TooltipProvider } from "./tooltip-provider"
 import { useWindowSize } from "./windowsize"
@@ -49,11 +51,8 @@ export const FleschButton: React.FC<FleschButtonProps> = ({ fleschScore }) => {
               {fleschScore}
             </div>
           </Tooltip.Trigger>
-          <Tooltip.Content
-            side="top"
-            className="z-20 rounded-md bg-primary-foreground p-2 text-sm text-foreground shadow-lg"
-          >
-            <p>
+          <Tooltip.Content side="top" className="z-20 rounded-md bg-primary-foreground p-2 text-foreground shadow-lg">
+            <Typography variant="p">
               <strong>Flesch-Kincaid Score (KFKS):</strong> The Flesch-Kincaid Score below shows how easy or difficult
               it is to understand the writing.
               <br /> The higher the score, the more difficult it is to read.
@@ -61,7 +60,7 @@ export const FleschButton: React.FC<FleschButtonProps> = ({ fleschScore }) => {
               Aim for a score of 8 to make sure most people find the message clear.
               <br />
               This includes younger readers and those who are still learning English.
-            </p>
+            </Typography>
           </Tooltip.Content>
         </Tooltip.Root>
       </TooltipProvider>

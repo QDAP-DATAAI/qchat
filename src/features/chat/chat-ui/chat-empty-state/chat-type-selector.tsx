@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react"
 import React, { useEffect, useState } from "react"
 import { FC } from "react"
 
+import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ChatType } from "@/features/chat/models"
 import { AI_NAME } from "@/features/theme/theme-config"
@@ -74,22 +75,22 @@ export const ChatTypeSelector: FC<Prop> = props => {
             </Tabs>
           </div>
         </Tooltip.Trigger>
-        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-sm text-foreground shadow-lg">
-          <p>
+        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-foreground shadow-lg">
+          <Typography variant="p">
             <strong>General</strong> - chats are turn by turn conversations with the {AI_NAME} Assistant.
-          </p>
-          <p>
+          </Typography>
+          <Typography variant="p">
             <strong>File</strong> - Upload PDF files to {AI_NAME} for questions or task completion based on it.
-          </p>
+          </Typography>
           {isAllowedTenant && (
-            <p>
+            <Typography variant="p">
               <strong>Transcription</strong> - Available for authorised agencies.
-            </p>
+            </Typography>
           )}
           {!isAllowedTenant && (
-            <p>
+            <Typography variant="p">
               <strong>Transcription</strong> - is restricted to authorised agencies.
-            </p>
+            </Typography>
           )}
           <Tooltip.Arrow className="fill-primary-foreground" />
         </Tooltip.Content>

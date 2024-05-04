@@ -1,6 +1,7 @@
 import { FC } from "react"
 import { useFormState } from "react-dom"
 
+import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { AI_NAME } from "@/features/theme/theme-config"
 import { Button } from "@/features/ui/button"
@@ -55,24 +56,22 @@ export const CitationSlider: FC<SliderProps> = props => {
           <SheetHeader>
             <SheetTitle id={"Section" + props.order}>Citation for Section {props.order}</SheetTitle>
           </SheetHeader>
-          <div className="text-sm text-muted-foreground">{node}</div>
+          <Typography variant="p" className="text-muted-foreground">
+            {node}
+          </Typography>
           <br></br>
           <SheetHeader>
             <SheetTitle id="citationSheetTitle">Understanding Citations</SheetTitle>
           </SheetHeader>
-          <div className="text-sm text-muted-foreground">
+          <Typography variant="p" className="text-muted-foreground">
             <br></br>
-            <p>
-              The citation presented is a specific snippet from your document, selected by {AI_NAME} through
-              Retrieval-Augmented Generation (RAG) for its relevance to your question.
-            </p>
+            The citation presented is a specific snippet from your document, selected by {AI_NAME} through
+            Retrieval-Augmented Generation (RAG) for its relevance to your question.
             <br></br>
-            <p>
-              If the snippets seem unrelated, it might suggest that {AI_NAME} needs more context or clearer questions to
-              accurately pinpoint the right information. This method aims to deliver focused and relevant insights, but
-              sometimes it may need further clarification to match your question precisely.
-            </p>
-          </div>
+            If the snippets seem unrelated, it might suggest that {AI_NAME} needs more context or clearer questions to
+            accurately pinpoint the right information. This method aims to deliver focused and relevant insights, but
+            sometimes it may need further clarification to match your question precisely.
+          </Typography>
         </SheetContent>
       </Sheet>
     </form>

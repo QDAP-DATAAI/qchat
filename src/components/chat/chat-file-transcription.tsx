@@ -41,7 +41,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
         <header className="flex w-full items-center justify-between">
           <Typography variant="h3">{props.name}</Typography>
         </header>
-        <div className="prose prose-slate max-w-none break-words text-sm italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
+        <div className="prose prose-slate max-w-none break-words italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
           <Markdown content={props.contents.replaceAll("\n", "\n\n") || ""} />
         </div>
         <footer>

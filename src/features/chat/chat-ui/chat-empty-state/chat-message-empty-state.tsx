@@ -1,5 +1,6 @@
 import { FC } from "react"
 
+import Typography from "@/components/typography"
 import { FindChatThreadForCurrentUser, UpsertChatThread } from "@/features/chat/chat-services/chat-thread-service"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ChatFileUI } from "@/features/chat/chat-ui/chat-file/chat-file-ui"
@@ -39,15 +40,15 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
       <Card className="col-span-5 flex flex-col gap-2 p-5 ">
         <EasterEgg />
         <div className="flex flex-col gap-1">
-          <p className="text-sm">Set the Sensitivity of your chat</p>
+          <Typography variant="p">Set the Sensitivity of your chat</Typography>
           <ChatSensitivitySelector disable={false} />
         </div>
         <div className="flex flex-col gap-1">
-          <p className="text-sm">Choose a conversation style</p>
+          <Typography variant="p">Choose a conversation style</Typography>
           <ChatStyleSelector disable={false} />
         </div>
         <div className="flex flex-col gap-1">
-          <p className="text-sm">How would you like to chat?</p>
+          <Typography variant="p">How would you like to chat?</Typography>
           <ChatTypeSelector disable={fileState.isUploadingFile || !!chatBody.chatOverFileName} />
         </div>
         {chatBody.chatType === "data" || chatBody.chatType === "audio" ? (
@@ -57,7 +58,7 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
         )}
         <div className="flex flex-col gap-1">
           <br />
-          <p className="text-sm">Try a suggested starter prompt...</p>
+          <Typography variant="p">Try a suggested starter prompt...</Typography>
           <PromptButton onPromptSelected={handlePromptSelected} selectedPrompt={input} />
         </div>
       </Card>

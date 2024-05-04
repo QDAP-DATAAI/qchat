@@ -20,9 +20,9 @@ const Typography = React.forwardRef<HTMLHeadingElement, TypographyProps>(functio
         {
           "scroll-m-20 text-xl tracking-tight lg:text-2xl ": variant === "h1",
           "scroll-m-20 pb-2 text-lg tracking-tight transition-colors first:mt-0 lg:text-xl": variant === "h2",
-          "scroll-m-20 text-sm tracking-tight lg:text-lg": variant === "h3",
-          "scroll-m-20 text-sm tracking-tight md:text-base": variant === "h4" || variant === "h5" || variant === "span",
-          "text-sm leading-7 md:text-base [&:not(:first-child)]:mt-6": variant === "p",
+          "scroll-m-20 tracking-tight lg:text-lg": variant === "h3",
+          "scroll-m-20 tracking-tight md:text-base": variant === "h4" || variant === "h5" || variant === "span",
+          "leading-7 md:text-base [&:not(:first-child)]:mt-6": variant === "p",
         },
         className
       )}

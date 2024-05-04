@@ -2,6 +2,7 @@ import { ArrowUpCircle, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { FC, useEffect, useRef } from "react"
 
+import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { OffenderTranscriptForm } from "@/features/chat/chat-ui/chat-empty-state/chat-transcript-details"
 import { Button } from "@/features/ui/button"
@@ -86,10 +87,10 @@ export const ChatFileUI: FC = () => {
           )}
         </Button>
       </form>
-      <p id="file-upload-description" className="text-sm text-muted-foreground">
+      <Typography variant="p" id="file-upload-description" className="text-muted-foreground">
         {uploadButtonLabel ||
           "Select a file to upload, please note files are not stored in their original format and may be cleared from the system after thirty days. You can upload up to 3 pdf files, each not exceeding 10mb in size."}
-      </p>
+      </Typography>
       {chatBody.chatType === "audio" && offenderId != null && (
         <div>
           <OffenderTranscriptForm chatThreadId={id} />
