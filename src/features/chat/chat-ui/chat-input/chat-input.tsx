@@ -87,7 +87,7 @@ const ChatInput: FC<Props> = () => {
           className="bg-background py-4 pr-[80px]"
           onChange={onChange}
           onKeyDown={onKeyDown}
-          rows={6}
+          rows={4}
         />
         <div className="absolute bottom-0 right-0 mb-4 mr-2 flex h-full items-end px-8">
           {!isDataChat || (isDataChat && fileChatVisible) ? (

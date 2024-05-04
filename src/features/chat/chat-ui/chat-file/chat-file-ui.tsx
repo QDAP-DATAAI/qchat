@@ -59,6 +59,7 @@ export const ChatFileUI: FC = () => {
           data-max-size="10"
           data-max-files="3"
           multiple={true}
+          label="Upload File"
           aria-describedby="file-upload-description"
           onChange={e => {
             const files = e.currentTarget.files
