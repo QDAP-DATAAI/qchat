@@ -22,7 +22,7 @@ const Sidebar: React.FC = () => {
             {AI_TAGLINE}
           </Typography>
         </div>
-        <div className="col-span-6 hidden md:col-span-1 md:block"></div>
+        <div className="col-span-6 hidden md:col-span-2 md:block"></div>
       </div>
     </>
   )
