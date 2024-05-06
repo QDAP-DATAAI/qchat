@@ -30,7 +30,7 @@ const Sidebar: React.FC = () => {
 
 export const Header: React.FC = () => {
   return (
-    <header className="xs:h-[50px] flex w-full flex-col sm:h-[150px]">
+    <header className="xs:h-[50px] flex w-full flex-col sm:h-[140px]">
       <div className="h-[50px] bg-darkbackground text-white">
         <div className="mx-auto flex h-full items-center justify-between px-8 py-2">
           <div className="block scale-75 md:hidden lg:hidden">
@@ -49,7 +49,7 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </div>
-      <div className="block bg-altBackground py-2 sm:h-[66px]">
+      <div className="block bg-altBackground py-2 sm:h-[80px]">
         <div className="container mx-auto flex items-center">
           <Sidebar />
         </div>
