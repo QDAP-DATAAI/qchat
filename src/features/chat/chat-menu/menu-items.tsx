@@ -72,13 +72,18 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
             maxLength={120}
             ref={inputRef}
             className="mt-1 w-full rounded-md border-altBackground bg-background p-2"
+            className="mt-1 w-full rounded-md border-altBackground bg-background p-2"
             autoComplete="off"
           />
           {newName.length > 30 && newName.length <= 120 && (
-            <p className="mt-2  text-accent">Name exceeds 30 characters. Consider shortening it.</p>
+            <Typography variant="p" className="mt-2 text-accent">
+              Name exceeds 30 characters. Consider shortening it.
+            </Typography>
           )}
           {newName.length > 120 && (
-            <p className="mt-2  text-red-500">Name exceeds 120 characters. Please shorten your chat name.</p>
+            <Typography variant="p" className="mt-2 text-error">
+              Name exceeds 120 characters. Please shorten your chat name.
+            </Typography>
           )}
         </div>
         <div className="mt-4 flex justify-end gap-4">

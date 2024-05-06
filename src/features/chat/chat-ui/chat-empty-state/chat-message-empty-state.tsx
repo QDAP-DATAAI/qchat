@@ -40,15 +40,15 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
       <Card className="col-span-5 flex flex-col gap-2 p-5 ">
         <EasterEgg />
         <div className="flex flex-col gap-1">
-          <Typography variant="p">Set the Sensitivity of your chat</Typography>
+          <Typography variant="h4">Set the Sensitivity of your chat</Typography>
           <ChatSensitivitySelector disable={false} />
         </div>
         <div className="flex flex-col gap-1">
-          <Typography variant="p">Choose a conversation style</Typography>
+          <Typography variant="h4">Choose a conversation style</Typography>
           <ChatStyleSelector disable={false} />
         </div>
         <div className="flex flex-col gap-1">
-          <Typography variant="p">How would you like to chat?</Typography>
+          <Typography variant="h4">How would you like to chat?</Typography>
           <ChatTypeSelector disable={fileState.isUploadingFile || !!chatBody.chatOverFileName} />
         </div>
         {chatBody.chatType === "data" || chatBody.chatType === "audio" ? (
@@ -58,7 +58,7 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
         )}
         <div className="flex flex-col gap-1">
           <br />
-          <Typography variant="p">Try a suggested starter prompt...</Typography>
+          <Typography variant="h4">Try a suggested starter prompt...</Typography>
           <PromptButton onPromptSelected={handlePromptSelected} selectedPrompt={input} />
         </div>
       </Card>

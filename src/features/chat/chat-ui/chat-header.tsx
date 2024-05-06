@@ -10,14 +10,17 @@ interface Prop {}
 
 export const ChatHeader: FC<Prop> = () => {
   const { chatBody } = useChatContext()
+  const files = chatBody.chatOverFileName.split(", ")
 
   return (
     <div className="flex flex-col gap-2">
       <ChatSelectedOptions />
-      <div className="flex h-2 justify-center gap-2">
-        <Typography variant="p" className="items-center" tabIndex={0}>
-          {chatBody.chatOverFileName}
-        </Typography>
+      <div className="flex size-auto flex-col items-center justify-center gap-2">
+        {files.map((file, index) => (
+          <Typography key={index} variant="p" className="items-center" tabIndex={0}>
+            {file}
+          </Typography>
+        ))}
       </div>
       <MiniNewChat />
     </div>

@@ -4,7 +4,7 @@ import Typography from "@/components/typography"
 import { cn } from "@/lib/utils"
 
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("bg-altBackground text-foreground", className)} {...props} />
+  <div ref={ref} className={cn("bg-altBackground text-foreground shadow-sm", className)} {...props} />
 ))
 Card.displayName = "Card"
 
@@ -17,12 +17,7 @@ CardHeader.displayName = "CardHeader"
 
 const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <Typography
-      variant="h3"
-      ref={ref}
-      className={cn("text-2xl font-semibold leading-none tracking-tight", className)}
-      {...props}
-    />
+    <Typography variant="h3" ref={ref} className={cn("font-semibold leading-none", className)} {...props} />
   )
 )
 CardTitle.displayName = "CardTitle"

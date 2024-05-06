@@ -10,6 +10,7 @@ import React from "react"
 
 import { signInProvider } from "@/app-global"
 
+import Typography from "@/components/typography"
 import { cn } from "@/lib/utils"
 
 import { useMiniMenuContext } from "./mini-menu-context"
@@ -95,9 +96,9 @@ export const MiniMenu: React.FC = () => {
               <X />
             </div>
           </div>
-          <h2 id="menu-heading" className="sr-only">
+          <Typography variant="h2" id="menu-heading" className="sr-only">
             Menu
-          </h2>
+          </Typography>
           <div className="mt-16 p-2">
             {menuItems.map(item => (
               <MiniMenuItem key={item.name} closeMenu={handleMenuClose} {...item} />
