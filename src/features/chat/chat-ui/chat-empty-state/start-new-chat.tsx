@@ -23,15 +23,16 @@ export const StartNewChat: FC<object> = () => {
           {AI_TAGLINE}
         </Typography>
         <div className="flex flex-col gap-2">
-          <p>
+          <Typography variant="p">
             {AI_NAME}, your text-based virtual assistant, is equipped with cutting-edge Generative AI technology to
-            empower you.
-          </p>
-          <p>Let {AI_NAME} assist you in accomplishing remarkable outcomes.</p>
-          <p className="hidden lg:block">
+            empower you. Let {AI_NAME} assist you in accomplishing remarkable outcomes.
+          </Typography>
+          <Typography variant="p" className="hidden lg:block">
             Press the plus button below to get started or select one of your existing chats from the left-hand panel.
-          </p>
-          <p className="lg:hidden">Press the plus button below to get started.</p>
+          </Typography>
+          <Typography variant="p" className="lg:hidden">
+            Press the plus button below to get started.
+          </Typography>
         </div>
         <div className="-mx-5 -mb-5 inline-flex items-center justify-center border-t bg-muted p-5">
           <NewChat aria-label="Start a new chat" />

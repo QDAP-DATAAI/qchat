@@ -4,6 +4,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { Check, ChevronRight, Circle } from "lucide-react"
 import * as React from "react"
 
+import Typography from "@/components/typography"
 import { cn } from "@/lib/utils"
 
 import { Button } from "./button"
@@ -108,7 +109,9 @@ const DropdownMenuCheckboxItem = React.forwardRef<
     {...props}
     role="menuitemcheckbox"
   >
-    <span className="mr-2">{checked ? <Check className="size-5 text-indigo-600" /> : null}</span>
+    <Typography variant="span" className="mr-2">
+      {checked ? <Check className="size-5" /> : null}
+    </Typography>
     {children}
   </DropdownMenuPrimitive.CheckboxItem>
 ))
@@ -125,9 +128,9 @@ const DropdownMenuRadioItem = React.forwardRef<
     {...props}
     role="menuitemradio"
   >
-    <span className="mr-2">
+    <Typography variant="span" className="mr-2">
       <Circle className="size-5 text-indigo-600" />
-    </span>
+    </Typography>
     {children}
   </DropdownMenuPrimitive.RadioItem>
 ))

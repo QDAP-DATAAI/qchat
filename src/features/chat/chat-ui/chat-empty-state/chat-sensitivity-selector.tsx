@@ -2,6 +2,7 @@ import * as Tooltip from "@radix-ui/react-tooltip"
 import { Shield, ShieldAlert, ShieldX } from "lucide-react"
 import { FC } from "react"
 
+import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ConversationSensitivity } from "@/features/chat/models"
 import { Tabs, TabsList, TabsTrigger } from "@/features/ui/tabs"
@@ -59,17 +60,13 @@ export const ChatSensitivitySelector: FC<Prop> = ({ disable }) => {
           </div>
         </Tooltip.Trigger>
         <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-foreground shadow-lg">
-          <p>
+          <Typography variant="p">
             <strong>Official:</strong> Verified and formal conversations.
-          </p>
-          <p>
             <strong>Sensitive:</strong> May contain delicate information.
-          </p>
-          <p>
             <strong>Protected (Disabled):</strong> Protected documents or topics covered in Protected documents should
-            not be uploaded to this service.
-          </p>
-          <p>For more information see your Information Management Officer or the Queensland State Archives.</p>
+            not be uploaded to this service. For more information see your Information Management Officer or the
+            Queensland State Archives.
+          </Typography>
           <Tooltip.Arrow className="fill-primary-foreground" />
         </Tooltip.Content>
       </Tooltip.Root>

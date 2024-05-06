@@ -42,7 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }):
   const isProd = process.env.NEXT_PUBLIC_ENV === "production"
 
   return (
-    <html lang="en-AU" suppressHydrationWarning className="size-full overflow-hidden">
+    <html lang="en-AU" suppressHydrationWarning className="size-full overflow-hidden text-base">
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/fse2tsb.css" />
       </head>

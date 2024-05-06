@@ -104,7 +104,11 @@ This approach helps us interact with you in the most effective and considerate m
                 <CardSkeleton />
               </div>
             )}
-            {!isLoading && <span className="ml-2">{session?.user?.name}</span>}
+            {!isLoading && (
+              <Typography variant="span" className="ml-2">
+                {session?.user?.name}
+              </Typography>
+            )}
           </Typography>
         </div>
         <div className="m-2">
@@ -115,7 +119,11 @@ This approach helps us interact with you in the most effective and considerate m
                 <CardSkeleton />
               </div>
             )}
-            {!isLoading && <span className="ml-2">{session?.user?.email}</span>}
+            {!isLoading && (
+              <Typography variant="span" className="ml-2">
+                {session?.user?.email}
+              </Typography>
+            )}
           </Typography>
         </div>
         <div className="mb-4">

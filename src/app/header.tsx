@@ -22,7 +22,7 @@ const Sidebar: React.FC = () => {
             {AI_TAGLINE}
           </Typography>
         </div>
-        <div className="col-span-6 hidden md:col-span-2 md:block"></div>
+        <div className="col-span-6 hidden md:col-span-1 md:block"></div>
       </div>
     </>
   )
@@ -30,7 +30,7 @@ const Sidebar: React.FC = () => {
 
 export const Header: React.FC = () => {
   return (
-    <header className="xs:h-[50px] flex w-full flex-col sm:h-[140px]">
+    <header className="xs:h-[50px] flex w-full flex-col sm:h-[130px]">
       <div className="h-[50px] bg-darkbackground text-white">
         <div className="mx-auto flex h-full items-center justify-between px-8 py-2">
           <div className="block scale-75 md:hidden lg:hidden">

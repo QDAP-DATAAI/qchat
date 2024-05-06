@@ -125,7 +125,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
 
   const safetyWarning = props.message.contentFilterResult ? (
     <div
-      className="mt-2 flex max-w-none justify-center space-x-2 rounded-md bg-alert p-2 text-primary md:text-base"
+      className="mt-2 flex max-w-none justify-center space-x-2 rounded-md bg-alert p-2 text-base text-primary md:text-base"
       tabIndex={0}
       aria-label="Content Safety Warning"
     >
@@ -145,7 +145,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
   return (
     <article className={"container mx-auto flex flex-col py-1 pb-4"}>
       <section
-        className={`prose prose-slate max-w-none flex-col gap-4 overflow-hidden break-words rounded-md bg-background p-4  text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base ${props.threadLocked && "border-4 border-error"}`}
+        className={`prose prose-slate max-w-none flex-col gap-4 overflow-hidden break-words rounded-md bg-background p-4  text-base text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base ${props.threadLocked && "border-4 border-error"}`}
       >
         <div className="flex w-full items-center justify-between">
           <Typography variant="h3" className="mt-0 flex-1 text-heading" tabIndex={0}>
@@ -172,7 +172,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
           />
         </div>
         <div
-          className="prose prose-slate max-w-none break-words  text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
+          className="prose prose-slate max-w-none break-words text-base  text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
           tabIndex={0}
         >
           <Markdown content={props.message.content} />

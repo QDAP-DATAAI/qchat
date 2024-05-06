@@ -10,7 +10,7 @@ export const ChatMenu = async (): Promise<JSX.Element> => {
   if (result.status !== "OK") return <DisplayError errors={result.errors} />
 
   return (
-    <Menu className="hidden h-full w-auto overflow-auto bg-background p-2 md:col-span-2 md:block">
+    <Menu className="hidden h-full w-auto overflow-auto bg-background p-2 md:block lg:col-span-2 xl:col-span-1">
       <MenuHeader className="justify-end">
         <NewChat />
       </MenuHeader>

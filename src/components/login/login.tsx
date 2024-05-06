@@ -13,9 +13,7 @@ export const LogIn: React.FC = () => {
     <div className="flex h-full items-center justify-center">
       <Card className="flex min-w-[300px] flex-col gap-2">
         <CardHeader className="gap-2">
-          <CardTitle className="flex gap-2 text-2xl">
-            <span className="text-siteTitle">{AI_NAME}</span>
-          </CardTitle>
+          <CardTitle className="flex gap-2 text-2xl text-siteTitle">{AI_NAME}</CardTitle>
           <CardDescription>Login in with your Queensland Government account</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">

@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation"
 import React from "react"
 
+import Typography from "@/components/typography"
+import { Button } from "@/features/ui/button"
 import { Card } from "@/features/ui/card"
 
 const Home: React.FC = () => {
@@ -21,18 +23,20 @@ const Home: React.FC = () => {
     <Card className="items-top flex size-full flex-1 justify-center p-10">
       <div className="size-full items-center">
         {" "}
-        <h3 className="text-xl font-semibold">You are not authorised to view this page</h3>
-        <p className="mt-5">
+        <Typography variant="h3" className="text-xl font-semibold">
+          You are not authorised to view this page
+        </Typography>
+        <Typography variant="p" className="mt-5">
           Please{" "}
-          <button
+          <Button
             onClick={handleRedirectHome}
             className="text-link hover:text-altButton hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500"
             aria-label="Return Home"
           >
             click here
-          </button>{" "}
+          </Button>{" "}
           to return home.
-        </p>
+        </Typography>
       </div>
     </Card>
   )

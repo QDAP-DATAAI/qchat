@@ -27,7 +27,7 @@ interface ModalProps {
 
 const PopupMessage: React.FC<{ message: string }> = ({ message }) => (
   <div className="popup-message" role="alert">
-    <p>{message}</p>
+    <Typography variant="p">{message}</Typography>
   </div>
 )
 
@@ -62,7 +62,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
           </Typography>
         </div>
         <div className="mb-4">
-          <label htmlFor="newChatName" className="block font-medium text-foreground">
+          <label htmlFor="newChatName" className="block text-sm font-medium text-foreground">
             New Chat Name
           </label>
           <input
@@ -76,7 +76,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
             autoComplete="off"
           />
           {newName.length > 30 && newName.length <= 120 && (
-            <Typography variant="p" className="mt-2 text-accent">
+            <Typography variant="p" className="mt-2 text-alert">
               Name exceeds 30 characters. Consider shortening it.
             </Typography>
           )}
