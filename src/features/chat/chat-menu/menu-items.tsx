@@ -154,9 +154,9 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
           ) : (
             <MessageCircle size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
           )}
-          <span className="flex flex-1 items-center gap-2 overflow-hidden">
-            <span className="truncate">{thread.name}</span>
-          </span>
+          <Typography variant="span" className="flex flex-1 items-center gap-2 overflow-hidden">
+            {thread.name}
+          </Typography>
           {selectedThreadId !== thread.chatThreadId && (
             <Button
               className="invisible group-hover:visible"
