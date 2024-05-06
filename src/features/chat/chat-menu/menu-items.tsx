@@ -72,7 +72,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
             maxLength={120}
             ref={inputRef}
             className="mt-1 w-full rounded-md border-altBackground bg-background p-2"
-            className="mt-1 w-full rounded-md border-altBackground bg-background p-2"
             autoComplete="off"
           />
           {newName.length > 30 && newName.length <= 120 && (
