@@ -157,18 +157,18 @@ export const ChatRow: FC<ChatRowProps> = props => {
             </Typography>
           )}
           <div className="flex items-center">
+            {props.type === "assistant" && props.showAssistantButtons && (
+              <AssistantButtons
+                isIconChecked={isIconChecked}
+                thumbsUpClicked={thumbsUpClicked}
+                thumbsDownClicked={thumbsDownClicked}
+                handleCopyButton={handleCopyButton}
+                handleThumbsUpClick={handleThumbsUpClick}
+                handleThumbsDownClick={handleThumbsDownClick}
+              />
+            )}
             {props.showAssistantButtons && <FleschButton fleschScore={fleshScore} />}
           </div>
-          {props.type === "assistant" && props.showAssistantButtons && (
-            <AssistantButtons
-              isIconChecked={isIconChecked}
-              thumbsUpClicked={thumbsUpClicked}
-              thumbsDownClicked={thumbsDownClicked}
-              handleCopyButton={handleCopyButton}
-              handleThumbsUpClick={handleThumbsUpClick}
-              handleThumbsDownClick={handleThumbsDownClick}
-            />
-          )}
           <Modal
             chatThreadId={props.chatThreadId}
             chatMessageId={props.chatMessageId}
@@ -191,8 +191,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
         <div className="sr-only" aria-live="assertive">
           {feedbackMessage}
         </div>
-
-        {props.type === "assistant" && props.showAssistantButtons && (
+        {/* {props.type === "assistant" && props.showAssistantButtons && (
           <AssistantButtons
             isIconChecked={isIconChecked}
             thumbsUpClicked={thumbsUpClicked}
@@ -201,7 +200,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
             handleThumbsUpClick={handleThumbsUpClick}
             handleThumbsDownClick={handleThumbsDownClick}
           />
-        )}
+        )} */}
       </section>
     </article>
   )
