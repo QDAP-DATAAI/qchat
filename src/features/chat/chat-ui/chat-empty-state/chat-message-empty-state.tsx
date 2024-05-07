@@ -57,7 +57,6 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
           <div className="flex flex-col gap-1"></div>
         )}
         <div className="flex flex-col gap-1">
-          <br />
           <Typography variant="h4">Try a suggested starter prompt...</Typography>
           <PromptButton onPromptSelected={handlePromptSelected} selectedPrompt={input} />
         </div>
