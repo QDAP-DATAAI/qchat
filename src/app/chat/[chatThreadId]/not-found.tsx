@@ -8,7 +8,6 @@ export default function NotFound(): JSX.Element {
       <div className="container mx-auto flex size-full max-w-xl items-center justify-center gap-2">
         <div className="flex flex-1 flex-col items-start gap-5">
           <Typography variant="h2" className="text-4xl font-bold">
-            {" "}
             Uh-oh! 404
           </Typography>
           <Typography variant="p" className="text-muted-foreground">
