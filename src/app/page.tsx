@@ -12,7 +12,7 @@ export default async function Home(): Promise<JSX.Element> {
     redirect("/chat")
   }
   return (
-    <Card className="relative flex h-full flex-1 items-center justify-center overflow-hidden">
+    <Card className="relative flex h-full flex-1 items-center justify-center overflow-hidden font-light">
       <LogIn />
     </Card>
   )

@@ -155,6 +155,13 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
             <MessageCircle size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
           )}
           <Typography variant="span" className="flex flex-1 items-center gap-2 overflow-hidden">
+            {thread.chatType === "data" ? (
+              <FileText size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
+            ) : thread.chatType === "audio" ? (
+              <AudioLines size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
+            ) : (
+              <MessageCircle size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
+            )}{" "}
             {thread.name}
           </Typography>
           {selectedThreadId !== thread.chatThreadId && (
