@@ -92,7 +92,7 @@ This approach helps us interact with you in the most effective and considerate m
 
   return (
     <Form.Root className="grid size-full min-w-[500px] grid-cols-1 gap-8 pt-5 md:grid-cols-2" onSubmit={handleSubmit}>
-      <div className="mb-4 md:col-span-2">
+      <div className="mb-4 md:col-span-1">
         <Typography variant="h4" className="pt-4 font-bold text-siteTitle">
           Your Details
         </Typography>
@@ -166,7 +166,7 @@ This approach helps us interact with you in the most effective and considerate m
           </div>
         )}
       </div>
-      <div className="prose prose-slate max-w-4xl break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:col-span-2">
+      <div className="prose prose-slate max-w-4xl break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:col-span-1">
         <Markdown content={contextMarkdown} />
       </div>
     </Form.Root>
