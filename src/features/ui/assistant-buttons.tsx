@@ -53,11 +53,12 @@ export const FleschButton: React.FC<FleschButtonProps> = ({ fleschScore }) => {
           </Tooltip.Trigger>
           <Tooltip.Content side="top" className="z-20 rounded-md bg-primary-foreground p-2 text-foreground shadow-lg">
             <Typography variant="p">
-              <strong>Flesch-Kincaid Score (KFKS):</strong> The Flesch-Kincaid Score below shows how easy or difficult
-              it is to understand the writing.
+              <strong>Flesch-Kincaid Score (KFKS):</strong> The Flesch-Kincaid Score below shows
+              <br />
+              how easy or difficult it is to understand the writing.
               <br /> The higher the score, the more difficult it is to read.
               <br />
-              Aim for a score of 8 to make sure most people find the message clear.
+              Aim for a score of <strong>8</strong> to make sure most people find the message clear.
               <br />
               This includes younger readers and those who are still learning English.
             </Typography>

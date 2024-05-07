@@ -159,6 +159,16 @@ export const ChatRow: FC<ChatRowProps> = props => {
           <div className="flex items-center">
             {props.showAssistantButtons && <FleschButton fleschScore={fleshScore} />}
           </div>
+          {props.type === "assistant" && props.showAssistantButtons && (
+            <AssistantButtons
+              isIconChecked={isIconChecked}
+              thumbsUpClicked={thumbsUpClicked}
+              thumbsDownClicked={thumbsDownClicked}
+              handleCopyButton={handleCopyButton}
+              handleThumbsUpClick={handleThumbsUpClick}
+              handleThumbsDownClick={handleThumbsDownClick}
+            />
+          )}
           <Modal
             chatThreadId={props.chatThreadId}
             chatMessageId={props.chatMessageId}
