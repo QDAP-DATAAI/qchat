@@ -89,7 +89,7 @@ const ChatInput: FC<Props> = () => {
           onKeyDown={onKeyDown}
           rows={4}
         />
-        <div className="absolute bottom-0 right-0 mb-4 mr-2 flex h-full items-end px-8">
+        <div className="absolute bottom-0 right-0 mb-4 mr-2 grid h-auto items-end pr-8">
           {!isDataChat || (isDataChat && fileChatVisible) ? (
             <>
               <Button
@@ -98,7 +98,7 @@ const ChatInput: FC<Props> = () => {
                 variant="ghost"
                 ref={buttonRef}
                 disabled={isLoading}
-                aria-label="Submit your message"
+                ariaLabel="Submit your message"
                 aria-busy={isLoading ? "true" : "false"}
               >
                 {isLoading || fileState.isUploadingFile ? (

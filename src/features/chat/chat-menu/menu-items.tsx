@@ -55,7 +55,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
     <div
       className={`bg-opacity/50 fixed inset-0 z-80 flex items-center justify-center bg-black ${isOpen ? "block" : "hidden"}`}
     >
-      <div className="mx-auto w-full max-w-lg overflow-hidden rounded-lg bg-altBackground p-4">
+      <div className="mx-auto w-full max-w-lg overflow-hidden rounded-lg bg-background p-4">
         <div className="mb-4">
           <Typography variant="h4" className="text-foreground">
             Edit Chat Name
@@ -87,10 +87,10 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose 
           )}
         </div>
         <div className="mt-4 flex justify-end gap-4">
-          <Button variant="default" onClick={handleSave} aria-label="Save">
+          <Button variant="default" onClick={handleSave} ariaLabel="Save">
             Save
           </Button>
-          <Button variant="secondary" onClick={onClose} aria-label="Cancel">
+          <Button variant="secondary" onClick={onClose} ariaLabel="Cancel">
             Cancel
           </Button>
         </div>
@@ -155,41 +155,36 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
             <MessageCircle size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
           )}
           <Typography variant="span" className="flex flex-1 items-center gap-2 overflow-hidden">
-            {thread.chatType === "data" ? (
-              <FileText size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
-            ) : thread.chatType === "audio" ? (
-              <AudioLines size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
-            ) : (
-              <MessageCircle size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
-            )}{" "}
             {thread.name}
           </Typography>
-          {selectedThreadId !== thread.chatThreadId && (
+          <div className="grid gap-1">
+            {selectedThreadId !== thread.chatThreadId && (
+              <Button
+                className="opacity-20 group-hover:opacity-100"
+                size="sm"
+                variant="accent"
+                ariaLabel={"Rename " + thread.name}
+                onClick={() => handleOpenModal(thread.chatThreadId)}
+              >
+                <Pencil size={16} />
+              </Button>
+            )}
+            {selectedThreadId === thread.chatThreadId && (
+              <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSaveModal} focusAfterClose={null} />
+            )}
             <Button
-              className="invisible group-hover:visible"
-              size="sm"
-              variant="default"
-              aria-label={`Edit ${thread.name}`}
-              onClick={() => handleOpenModal(thread.chatThreadId)}
+              className="opacity-20 group-hover:opacity-100"
+              size={"sm"}
+              variant="destructive"
+              ariaLabel={"Delete " + thread.name}
+              onClick={() => {
+                setThreadIdToDelete(thread.chatThreadId)
+                setDeleteDialogOpen(true)
+              }}
             >
-              <Pencil size={16} />
+              <Trash size={16} />
             </Button>
-          )}
-          {selectedThreadId === thread.chatThreadId && (
-            <Modal isOpen={true} onClose={handleCloseModal} onSave={handleSaveModal} focusAfterClose={null} />
-          )}
-          <Button
-            className="invisible group-hover:visible"
-            size={"sm"}
-            variant="destructive"
-            aria-label="Delete Chat"
-            onClick={() => {
-              setThreadIdToDelete(thread.chatThreadId)
-              setDeleteDialogOpen(true)
-            }}
-          >
-            <Trash size={16} />
-          </Button>
+          </div>
         </MenuItem>
       ))}
       {deleteDialogOpen && (

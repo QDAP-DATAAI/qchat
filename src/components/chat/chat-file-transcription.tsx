@@ -47,7 +47,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
         <footer>
           <div className="container flex w-full gap-4 p-2">
             <Button
-              aria-label="Download Transcription"
+              ariaLabel="Download Transcription"
               variant={"ghost"}
               size={"default"}
               className={buttonClass}

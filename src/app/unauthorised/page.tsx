@@ -31,7 +31,7 @@ const Home: React.FC = () => {
           <Button
             onClick={handleRedirectHome}
             className="text-link hover:text-altButton hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Return Home"
+            ariaLabel="Return Home"
           >
             click here
           </Button>{" "}

@@ -36,8 +36,8 @@ const MenuItem: React.FC<MenuItemProps> = ({ href, isSelected, children, classNa
       href={href}
       className={cn(
         className,
-        "flex border-separate items-center gap-2 rounded-md border-2 border-transparent p-2 text-base font-medium transition-colors hover:border-altButtonHover hover:bg-altBackgroundShade",
-        isSelected ? "border-altBorder bg-altBackgroundShade" : ""
+        "flex border-separate items-center gap-2 rounded-md border-2 border-transparent p-2 text-base font-medium transition-colors hover:border-altButtonHover hover:bg-backgroundShade",
+        isSelected ? "border-altBorder bg-backgroundShade" : ""
       )}
       {...props}
     >

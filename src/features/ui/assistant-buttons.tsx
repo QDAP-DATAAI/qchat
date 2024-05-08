@@ -42,7 +42,7 @@ export const FleschButton: React.FC<FleschButtonProps> = ({ fleschScore }) => {
   const { iconSize } = useButtonStyles()
 
   return (
-    <div className="container  relative flex w-full justify-end  gap-4 p-2">
+    <div className="relative flex w-full justify-end gap-4">
       <TooltipProvider>
         <Tooltip.Root>
           <Tooltip.Trigger>
@@ -79,9 +79,9 @@ export const AssistantButtons: React.FC<AssistantButtonsProps> = ({
 }) => {
   const { iconSize, buttonClass } = useButtonStyles()
   return (
-    <div className="container flex w-full gap-4 p-2">
+    <div className="flex w-full gap-4">
       <Button
-        aria-label="Copy text"
+        ariaLabel="Copy text"
         variant={"ghost"}
         size={"default"}
         className={buttonClass}
@@ -97,7 +97,7 @@ export const AssistantButtons: React.FC<AssistantButtonsProps> = ({
         className={buttonClass}
         title="Thumbs up"
         onClick={handleThumbsUpClick}
-        aria-label="Provide positive feedback"
+        ariaLabel="Provide positive feedback"
       >
         {thumbsUpClicked ? <CheckIcon size={iconSize} /> : <ThumbsUp size={iconSize} />}
       </Button>
@@ -108,7 +108,7 @@ export const AssistantButtons: React.FC<AssistantButtonsProps> = ({
         className={buttonClass}
         title="Thumbs down"
         onClick={handleThumbsDownClick}
-        aria-label="Provide negative feedback"
+        ariaLabel="Provide negative feedback"
       >
         {thumbsDownClicked ? <CheckIcon size={iconSize} /> : <ThumbsDown size={iconSize} />}
       </Button>
