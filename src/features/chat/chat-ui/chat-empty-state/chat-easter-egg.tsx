@@ -24,11 +24,11 @@ export const EasterEgg = (): React.JSX.Element => {
 
   return (
     <>
-      <div className="flex flex-col items-center gap-1">
+      <div className="jusity-self-center flex flex-col items-center gap-1">
         <div className={`flex items-center justify-center ${textColorClass}`}>
           <Heart className="size-4" fill="currentColor" />
-          <Typography variant="p" className="mx-2">
-            Made with love by Keith Oak, Rahul Shokeen, Ella Salehi, Fred Delage, Bruno Piovan and Jay Sindorff
+          <Typography variant="span" className="mx-2 text-xs">
+            Made with love by Keith Oak, Rahul Shokeen, Ella Salehi, Fred Delage, Bruno Piovan, Jay Sindorff
           </Typography>
           <Heart className="size-4" fill="currentColor" />
         </div>

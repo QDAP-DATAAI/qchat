@@ -37,8 +37,7 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
 
   return (
     <div className="max:h-5/6 container mx-auto grid w-full max-w-3xl grid-cols-5 items-center justify-center gap-9 overflow-auto p-4 pb-[140px]">
-      <Card className="col-span-6 flex flex-col gap-2 p-5 ">
-        <EasterEgg />
+      <Card className="col-span-6 flex flex-col gap-2 rounded-md p-5">
         <div className="flex flex-col gap-1">
           <Typography variant="h4">Set the Sensitivity of your chat</Typography>
           <ChatSensitivitySelector disable={false} />
@@ -60,6 +59,7 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
           <Typography variant="h4">Try a suggested starter prompt...</Typography>
           <PromptButton onPromptSelected={handlePromptSelected} selectedPrompt={input} />
         </div>
+        <EasterEgg />
       </Card>
     </div>
   )
