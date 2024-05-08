@@ -33,7 +33,7 @@ export const ChatSensitivitySelector: FC<Prop> = ({ disable }) => {
                   aria-selected={chatBody.conversationSensitivity === "official"}
                   aria-disabled={disable ? "true" : undefined}
                 >
-                  <Shield size={20} aria-hidden="true" /> Official
+                  <Shield size={16} aria-hidden="true" /> Official
                 </TabsTrigger>
                 <TabsTrigger
                   value="sensitive"
@@ -43,7 +43,7 @@ export const ChatSensitivitySelector: FC<Prop> = ({ disable }) => {
                   aria-selected={chatBody.conversationSensitivity === "sensitive"}
                   aria-disabled={disable ? "true" : undefined}
                 >
-                  <ShieldAlert size={20} aria-hidden="true" /> Sensitive
+                  <ShieldAlert size={16} aria-hidden="true" /> Sensitive
                 </TabsTrigger>
                 <TabsTrigger
                   value="protected"
@@ -53,7 +53,7 @@ export const ChatSensitivitySelector: FC<Prop> = ({ disable }) => {
                   aria-selected={chatBody.conversationSensitivity === "protected"}
                   aria-disabled="true"
                 >
-                  <ShieldX size={20} aria-hidden="true" /> Protected
+                  <ShieldX size={16} aria-hidden="true" /> Protected
                 </TabsTrigger>
               </TabsList>
             </Tabs>

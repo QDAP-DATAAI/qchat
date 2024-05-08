@@ -49,7 +49,7 @@ export const ChatTypeSelector: FC<Prop> = props => {
                   aria-selected={chatBody.chatType === "simple"}
                   aria-disabled={props.disable ? "true" : undefined}
                 >
-                  <MessageCircle size={20} aria-hidden="true" /> General
+                  <MessageCircle size={16} aria-hidden="true" /> General
                 </TabsTrigger>
                 <TabsTrigger
                   value="data"
@@ -59,7 +59,7 @@ export const ChatTypeSelector: FC<Prop> = props => {
                   aria-selected={chatBody.chatType === "data"}
                   aria-disabled={props.disable ? "true" : undefined}
                 >
-                  <FileText size={20} aria-hidden="true" /> File
+                  <FileText size={16} aria-hidden="true" /> File
                 </TabsTrigger>
                 <TabsTrigger
                   value="audio"
@@ -69,7 +69,7 @@ export const ChatTypeSelector: FC<Prop> = props => {
                   aria-selected={chatBody.chatType === "audio"}
                   aria-disabled={!isAllowedTenant || props.disable ? "true" : undefined}
                 >
-                  <AudioLines size={20} aria-hidden="true" /> Transcribe
+                  <AudioLines size={16} aria-hidden="true" /> Transcribe
                 </TabsTrigger>
               </TabsList>
             </Tabs>

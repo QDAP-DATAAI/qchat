@@ -34,7 +34,7 @@ export const ChatStyleSelector: FC<Prop> = props => {
                   aria-selected={chatBody.conversationStyle === "precise"}
                   aria-disabled={props.disable ? "true" : undefined}
                 >
-                  <CircleDot size={20} aria-hidden="true" /> Precise
+                  <CircleDot size={16} aria-hidden="true" /> Precise
                 </TabsTrigger>
                 <TabsTrigger
                   value="balanced"
@@ -44,7 +44,7 @@ export const ChatStyleSelector: FC<Prop> = props => {
                   aria-selected={chatBody.conversationStyle === "balanced"}
                   aria-disabled={props.disable ? "true" : undefined}
                 >
-                  <Scale size={20} aria-hidden="true" /> Balanced
+                  <Scale size={16} aria-hidden="true" /> Balanced
                 </TabsTrigger>
                 <TabsTrigger
                   value="creative"
@@ -54,7 +54,7 @@ export const ChatStyleSelector: FC<Prop> = props => {
                   aria-selected={chatBody.conversationStyle === "creative"}
                   aria-disabled={props.disable ? "true" : undefined}
                 >
-                  <Brush size={20} aria-hidden="true" /> Creative
+                  <Brush size={16} aria-hidden="true" /> Creative
                 </TabsTrigger>
               </TabsList>
             </Tabs>
