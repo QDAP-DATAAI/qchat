@@ -92,7 +92,7 @@ export const AssistantButtons: React.FC<AssistantButtonsProps> = ({
       </Button>
 
       <Button
-        variant={"ghost"}
+        variant={"positive"}
         size={"default"}
         className={buttonClass}
         title="Thumbs up"
@@ -103,7 +103,7 @@ export const AssistantButtons: React.FC<AssistantButtonsProps> = ({
       </Button>
 
       <Button
-        variant={"ghost"}
+        variant={"negative"}
         size={"default"}
         className={buttonClass}
         title="Thumbs down"

@@ -28,12 +28,7 @@ export const Footer: React.FC = () => {
           </a>
         </div>
         <div>
-          <a
-            href={"mailto:" + { SUPPORT_EMAIL }}
-            className="flex items-center"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={"mailto:" + SUPPORT_EMAIL} className="flex items-center" target="_blank" rel="noopener noreferrer">
             <Mail className="mr-2 size-4" />
             <Typography variant="h4">Contact us</Typography>
           </a>

@@ -18,7 +18,7 @@ export const ChatSelectedOptions: FC<Prop> = () => {
   const { chatBody } = useChatContext()
 
   return (
-    <div className="hidden sm:block">
+    <div className="hidden cursor-not-allowed sm:block">
       <Tabs defaultValue="selected" aria-label="Selected Chat Options">
         <TabsList className="grid h-12 w-full grid-cols-1 items-stretch" tabIndex={0}>
           <TabsTrigger

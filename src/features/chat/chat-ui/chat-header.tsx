@@ -13,11 +13,14 @@ export const ChatHeader: FC<Prop> = () => {
   const files = chatBody.chatOverFileName.split(", ")
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex items-start gap-2">
       <ChatSelectedOptions />
-      <div className="flex size-auto flex-col items-center justify-center gap-2">
+      <div className="flex size-auto flex-col items-center justify-center gap-1 rounded-md bg-white p-2">
+        <Typography variant="p" className="items-center font-bold" tabIndex={0}>
+          Uploaded Files:
+        </Typography>
         {files.map((file, index) => (
-          <Typography key={index} variant="p" className="items-center" tabIndex={0}>
+          <Typography key={index} variant="span" className="mt-0 items-center" tabIndex={0}>
             {file}
           </Typography>
         ))}
