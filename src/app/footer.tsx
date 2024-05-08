@@ -8,7 +8,7 @@ import { APP_URL, APP_VANITY_URL } from "@/features/theme/theme-config"
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="min-w-[500px] border-t-4 border-accent bg-background py-2" role="contentinfo">
+    <footer className="min-w-[400px] border-t-4 border-accent bg-background py-2" role="contentinfo">
       <div className="container mx-auto flex size-full items-center justify-between  px-8">
         <div>
           <a href={APP_URL} className="flex items-center" target="_blank" rel="noopener noreferrer">
