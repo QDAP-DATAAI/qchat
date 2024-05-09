@@ -139,6 +139,9 @@ const config: Config = {
         semibold: "600",
         bold: "700",
       },
+      gridTemplateColumns: {
+        "12": "repeat(12, minmax(0, 1fr))",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

@@ -37,7 +37,7 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
 
   return (
     <div className="max:h-5/6 container mx-auto grid w-full max-w-3xl grid-cols-5 items-center justify-center gap-9 overflow-auto p-4 pb-[140px]">
-      <Card className="col-span-6 flex flex-col gap-2 rounded-md p-5">
+      <Card className="col-span-6 flex flex-col gap-2 rounded-md p-4">
         <div className="flex flex-col gap-1">
           <Typography variant="h4">Set the Sensitivity of your chat</Typography>
           <ChatSensitivitySelector disable={false} />
@@ -55,10 +55,12 @@ export const ChatMessageEmptyState: FC<Prop> = () => {
         ) : (
           <div className="flex flex-col gap-1"></div>
         )}
-        <div className="flex flex-col gap-1">
-          <Typography variant="h4">Try a suggested starter prompt...</Typography>
-          <PromptButton onPromptSelected={handlePromptSelected} selectedPrompt={input} />
-        </div>
+        {chatBody.chatType === "simple" ? (
+          <div className="flex flex-col gap-1">
+            <Typography variant="h4">Try a suggested starter prompt...</Typography>
+            <PromptButton onPromptSelected={handlePromptSelected} selectedPrompt={input} />
+          </div>
+        ) : null}
         <EasterEgg />
       </Card>
     </div>

@@ -148,16 +148,25 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
           className="hover:item group relative justify-between"
         >
           {thread.chatType === "data" ? (
-            <FileText size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
+            <FileText
+              size={16}
+              className={chatThreadId === thread.chatThreadId ? "hidden text-brand sm:block" : "hidden sm:block"}
+            />
           ) : thread.chatType === "audio" ? (
-            <AudioLines size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
+            <AudioLines
+              size={16}
+              className={chatThreadId === thread.chatThreadId ? "hidden text-brand sm:block" : "hidden sm:block"}
+            />
           ) : (
-            <MessageCircle size={16} className={chatThreadId === thread.chatThreadId ? " text-brand" : ""} />
+            <MessageCircle
+              size={16}
+              className={chatThreadId === thread.chatThreadId ? "hidden text-brand sm:block" : "hidden sm:block"}
+            />
           )}
-          <Typography variant="span" className="flex flex-1 items-center gap-2 overflow-hidden">
+          <Typography variant="span" className="flex flex-1 items-center gap-1 overflow-hidden">
             {thread.name}
           </Typography>
-          <div className="grid gap-1">
+          <div className="hidden gap-1 sm:grid">
             {selectedThreadId !== thread.chatThreadId && (
               <Button
                 className="opacity-20 group-hover:opacity-100"

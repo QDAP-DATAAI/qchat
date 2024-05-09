@@ -47,13 +47,14 @@ export const NewChat = (): JSX.Element => {
 
   return (
     <Button
-      className="size-[40px] gap-2 rounded-md p-1"
+      className="size-full gap-2 rounded-md p-4"
       variant="default"
       onClick={startNewChat}
       ariaLabel="Start a new chat"
       onKeyDown={handleKeyDown}
     >
-      <MessageSquarePlus size={40} strokeWidth={1.2} />
+      Start a New Chat
+      <MessageSquarePlus size={30} strokeWidth={1.2} />
     </Button>
   )
 }

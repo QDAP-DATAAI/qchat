@@ -6,7 +6,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 const Menu = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("flex w-80 flex-col", className)} {...props} />
+  <div ref={ref} className={cn("size-full overflow-auto bg-altBackground p-2", className)} {...props} />
 ))
 
 Menu.displayName = "Menu"

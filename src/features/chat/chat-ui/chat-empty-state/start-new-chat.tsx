@@ -16,7 +16,7 @@ export const StartNewChat: FC<object> = () => {
       className="container mx-auto grid size-full max-w-3xl grid-cols-3 items-center justify-center gap-9"
       aria-labelledby="startChatTitle"
     >
-      <Card className="col-span-3 flex flex-col gap-5 p-5">
+      <Card className="col-span-3 flex flex-col gap-5 rounded-md p-5">
         <Typography variant="h4" className="text-2xl text-siteTitle" id="startChatTitle">
           {AI_NAME}
           <br />
@@ -34,7 +34,7 @@ export const StartNewChat: FC<object> = () => {
             Press the plus button below to get started.
           </Typography>
         </div>
-        <div className="-mx-5 -mb-5 inline-flex items-center justify-center border-t bg-muted p-5">
+        <div className="-mx-5 -mb-5 inline-flex items-center justify-center rounded-bl-md rounded-br-md border-t bg-muted p-5">
           <NewChat />
           <Button
             onClick={() => router.push("/terms")}

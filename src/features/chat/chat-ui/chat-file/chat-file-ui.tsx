@@ -8,6 +8,7 @@ import { OffenderTranscriptForm } from "@/features/chat/chat-ui/chat-empty-state
 import { Button } from "@/features/ui/button"
 import { Input } from "@/features/ui/input"
 
+import { ChatFilesDisplay } from "./chat-file-list"
 import { useFileSelection } from "./use-file-selection"
 
 export const ChatFileUI: FC = () => {
@@ -16,6 +17,7 @@ export const ChatFileUI: FC = () => {
   const { onSubmit: uploadFile } = useFileSelection({ id })
   const fileInputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+  const files = chatBody.chatOverFileName.split(", ")
 
   const getAcceptedFileType = (chatType: string): string => {
     switch (chatType) {
@@ -43,7 +45,7 @@ export const ChatFileUI: FC = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      <form onSubmit={onSubmit} className="flex gap-2">
+      <form onSubmit={onSubmit} className="flex items-center gap-2">
         <label htmlFor="file-upload" className="sr-only">
           Upload File
         </label>
@@ -78,7 +80,7 @@ export const ChatFileUI: FC = () => {
           {isUploadingFile ? (
             <>
               <Loader2 className="animate-spin" aria-hidden="true" size={20} />
-              <span>Uploading...</span>
+              <Typography variant="span">Uploading...</Typography>
             </>
           ) : (
             <>
@@ -88,7 +90,8 @@ export const ChatFileUI: FC = () => {
           )}
         </Button>
       </form>
-      <Typography variant="p" id="file-upload-description" className="text-muted-foreground">
+      {files.length > 1 && <ChatFilesDisplay files={files} />}
+      <Typography variant="span" id="file-upload-description" className="text-muted-foreground">
         {uploadButtonLabel ||
           "Select a file to upload, please note files are not stored in their original format and may be cleared from the system after thirty days. You can upload up to 3 pdf files, each not exceeding 10mb in size."}
       </Typography>

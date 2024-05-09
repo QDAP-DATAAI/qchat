@@ -176,7 +176,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
           />
         </div>
         <div
-          className="prose prose-slate max-w-none break-words text-base  text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
+          className="prose prose-slate max-w-none break-words text-base text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
           tabIndex={0}
         >
           {props.type === "assistant" && <Markdown content={props.message.content} />}

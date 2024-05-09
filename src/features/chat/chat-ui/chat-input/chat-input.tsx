@@ -77,19 +77,18 @@ const ChatInput: FC<Props> = () => {
   return (
     <form onSubmit={submit} className="absolute bottom-0 z-70 flex w-full items-center">
       <div className="container relative mx-auto flex items-center gap-2 py-2">
-        {fileChatVisible && <ChatFileSlider />}
         <Textarea
           id="chatMessage"
           name="chatMessage"
           value={input}
           placeholder="Send a message"
           aria-label="Send a message"
-          className="bg-background py-4 pr-[80px]"
+          className="bg-background py-4 pr-[40px]"
           onChange={onChange}
           onKeyDown={onKeyDown}
           rows={4}
         />
-        <div className="absolute bottom-0 right-0 mb-4 mr-2 grid h-auto items-end pr-8">
+        <div className="absolute bottom-0 right-5 mb-4 mr-5 grid h-auto items-end">
           {!isDataChat || (isDataChat && fileChatVisible) ? (
             <>
               <Button
@@ -107,6 +106,7 @@ const ChatInput: FC<Props> = () => {
                   <Send aria-hidden="true" size={16} />
                 )}
               </Button>
+              {fileChatVisible && <ChatFileSlider />}
               {!isLoading && !fileState.isUploadingFile && (
                 <ChatInputMenu onDocExport={exportDocument} messageCopy={messages} />
               )}

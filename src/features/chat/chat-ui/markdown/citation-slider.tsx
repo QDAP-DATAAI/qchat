@@ -42,9 +42,8 @@ export const CitationSlider: FC<SliderProps> = props => {
       <Sheet>
         <SheetTrigger asChild>
           <Button
-            aria-label={`Citation number ${props.order}`}
+            ariaLabel={`Citation number ${props.order}`}
             variant="outline"
-            size="sm"
             onClick={handleButtonClick}
             type="button"
             value={props.order}
@@ -56,21 +55,18 @@ export const CitationSlider: FC<SliderProps> = props => {
           <SheetHeader>
             <SheetTitle id={"Section" + props.order}>Citation for Section {props.order}</SheetTitle>
           </SheetHeader>
-          <Typography variant="p" className="text-muted-foreground">
+          <Typography variant="p" className="">
             {node}
           </Typography>
-          <br></br>
-          <SheetHeader>
-            <SheetTitle id="citationSheetTitle">Understanding Citations</SheetTitle>
-          </SheetHeader>
-          <Typography variant="p" className="text-muted-foreground">
-            <br></br>
+          <Typography variant="h2" className="p-2">
+            Understanding Citations
+          </Typography>
+          <Typography variant="p" className="p-2">
             The citation presented is a specific snippet from your document, selected by {AI_NAME} through
-            Retrieval-Augmented Generation (RAG) for its relevance to your question.
-            <br></br>
-            If the snippets seem unrelated, it might suggest that {AI_NAME} needs more context or clearer questions to
-            accurately pinpoint the right information. This method aims to deliver focused and relevant insights, but
-            sometimes it may need further clarification to match your question precisely.
+            Retrieval-Augmented Generation (RAG) for its relevance to your question. If the snippets seem unrelated, it
+            might suggest that {AI_NAME} needs more context or clearer questions to accurately pinpoint the right
+            information. This method aims to deliver focused and relevant insights, but sometimes it may need further
+            clarification to match your question precisely.
           </Typography>
         </SheetContent>
       </Sheet>
