@@ -78,7 +78,7 @@ const SectionTabs: React.FC<SectionTabsProps> = ({ selectedTab, onSelectedTabCha
     onValueChange={onSelectedTabChange as (x: string) => void}
     className="container pb-2"
   >
-    <TabsList aria-label="Conversation Type" className="grid h-12 w-full grid-cols-2 items-stretch">
+    <TabsList aria-label="Conversation Type" className="grid size-full grid-cols-2 items-stretch">
       <TabsTrigger value="chat" className="flex gap-2" role="tab" aria-selected={true}>
         Chat
       </TabsTrigger>

@@ -58,7 +58,7 @@ export default function Modal(props: ModalProps): ReturnType<FC> {
           >
             Submit
           </Button>
-          <Button variant="secondary" onClick={props.onClose}>
+          <Button variant="destructive" onClick={props.onClose}>
             Close
           </Button>
         </div>

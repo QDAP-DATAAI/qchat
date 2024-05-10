@@ -24,7 +24,7 @@ export const ChatSensitivitySelector: FC<Prop> = ({ disable }) => {
               defaultValue={chatBody.conversationSensitivity}
               onValueChange={value => onConversationSensitivityChange(value as ConversationSensitivity)}
             >
-              <TabsList aria-label="Conversation Sensitivity" className="grid h-12 w-full grid-cols-3 items-stretch">
+              <TabsList aria-label="Conversation Sensitivity" className="grid size-full grid-cols-3 items-stretch">
                 <TabsTrigger
                   value="official"
                   className="flex items-center justify-center gap-2"

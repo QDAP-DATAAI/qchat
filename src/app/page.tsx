@@ -11,7 +11,7 @@ export default async function Home(): Promise<JSX.Element> {
     redirect("/chat")
   }
   return (
-    <div className="relative flex h-full flex-1 items-center justify-center overflow-hidden">
+    <div className="col-span-12 size-full">
       <LogIn />
     </div>
   )

@@ -13,7 +13,7 @@ export const ChatHeader: FC<Prop> = () => {
   return (
     <div className="flex items-start gap-2">
       <ChatSelectedOptions />
-      {files.length > 0 && <ChatFilesDisplay files={files} />}
+      {chatBody.chatOverFileName.length != 0 && <ChatFilesDisplay files={files} />}
     </div>
   )
 }

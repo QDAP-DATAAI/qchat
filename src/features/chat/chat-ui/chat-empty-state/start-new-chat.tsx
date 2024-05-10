@@ -27,22 +27,16 @@ export const StartNewChat: FC<object> = () => {
             {AI_NAME}, your text-based virtual assistant, is equipped with cutting-edge Generative AI technology to
             empower you. Let {AI_NAME} assist you in accomplishing remarkable outcomes.
           </Typography>
-          <Typography variant="p" className="hidden lg:block">
-            Press the plus button below to get started or select one of your existing chats from the left-hand panel.
-          </Typography>
-          <Typography variant="p" className="lg:hidden">
-            Press the plus button below to get started.
-          </Typography>
         </div>
-        <div className="-mx-5 -mb-5 inline-flex items-center justify-center rounded-bl-md rounded-br-md border-t bg-muted p-5">
+        <div className="-mx-5 -mb-5 grid grid-cols-3 items-center justify-center rounded-bl-md rounded-br-md bg-muted p-5">
           <NewChat />
           <Button
             onClick={() => router.push("/terms")}
             variant="link"
-            className="text-foreground"
+            className="col-span-2 text-foreground"
             ariaLabel="Terms and Conditions"
           >
-            By starting a new chat you agree to the {AI_NAME} <br /> Terms and Conditions, click here to view them.
+            By starting a chat you agree to the {AI_NAME} Terms and Conditions, click here to view them.
           </Button>
         </div>
       </Card>

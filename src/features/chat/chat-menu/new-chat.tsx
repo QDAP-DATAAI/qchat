@@ -53,8 +53,8 @@ export const NewChat = (): JSX.Element => {
       ariaLabel="Start a new chat"
       onKeyDown={handleKeyDown}
     >
-      Start a New Chat
-      <MessageSquarePlus size={30} strokeWidth={1.2} />
+      New Chat
+      <MessageSquarePlus size={30} strokeWidth={1.2} className="hidden sm:block" />
     </Button>
   )
 }

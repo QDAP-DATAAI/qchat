@@ -79,7 +79,10 @@ export const MiniMenu: React.FC = () => {
         {isMenuOpen ? (
           <X className="items-center hover:bg-link" aria-hidden="true" />
         ) : (
-          <div className="pl-2 text-darkAltButton" aria-hidden="true" />
+          <div
+            className="hover:text-darkAltButtonHover rounded-md pl-2 text-darkAltButton hover:bg-buttonHover"
+            aria-hidden="true"
+          />
         )}
         Menu
       </div>

@@ -20,25 +20,17 @@ const Home: React.FC = () => {
   }
 
   return (
-    <Card className="items-top flex size-full flex-1 justify-center p-10">
-      <div className="size-full items-center">
+    <div className="flex h-full items-center justify-center">
+      <Card className="flex min-w-[300px] flex-col rounded-md bg-altBackground p-8 text-foreground">
         {" "}
         <Typography variant="h3" className="text-xl font-semibold">
           You are not authorised to view this page
         </Typography>
-        <Typography variant="p" className="mt-5">
-          Please{" "}
-          <Button
-            onClick={handleRedirectHome}
-            className="text-link hover:text-altButton hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500"
-            ariaLabel="Return Home"
-          >
-            click here
-          </Button>{" "}
-          to return home.
-        </Typography>
-      </div>
-    </Card>
+        <Button onClick={handleRedirectHome} variant="link" ariaLabel="Return Home">
+          Please click here to return home.
+        </Button>
+      </Card>
+    </div>
   )
 }
 

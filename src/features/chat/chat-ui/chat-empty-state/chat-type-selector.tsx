@@ -40,7 +40,7 @@ export const ChatTypeSelector: FC<Prop> = props => {
                 onChatTypeChange(value as ChatType)
               }}
             >
-              <TabsList aria-label="Conversation Type" className="grid h-12 w-full grid-cols-3 items-stretch">
+              <TabsList aria-label="Conversation Type" className="grid size-full grid-cols-3 items-stretch">
                 <TabsTrigger
                   value="simple"
                   className="flex gap-2"

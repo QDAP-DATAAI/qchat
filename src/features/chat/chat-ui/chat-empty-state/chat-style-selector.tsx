@@ -25,7 +25,7 @@ export const ChatStyleSelector: FC<Prop> = props => {
               defaultValue={chatBody.conversationStyle}
               onValueChange={value => onConversationStyleChange(value as ConversationStyle)}
             >
-              <TabsList aria-label="Conversation Style" className="grid h-12 w-full grid-cols-3 items-stretch">
+              <TabsList aria-label="Conversation Style" className="grid size-full grid-cols-3 items-stretch">
                 <TabsTrigger
                   value="precise"
                   className="flex gap-2"

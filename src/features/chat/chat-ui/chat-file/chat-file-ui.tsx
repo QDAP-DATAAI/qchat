@@ -90,7 +90,7 @@ export const ChatFileUI: FC = () => {
           )}
         </Button>
       </form>
-      {files.length > 1 && <ChatFilesDisplay files={files} />}
+      {chatBody.chatOverFileName.length != 0 && <ChatFilesDisplay files={files} />}
       <Typography variant="span" id="file-upload-description" className="text-muted-foreground">
         {uploadButtonLabel ||
           "Select a file to upload, please note files are not stored in their original format and may be cleared from the system after thirty days. You can upload up to 3 pdf files, each not exceeding 10mb in size."}

@@ -11,7 +11,7 @@ import {
 } from "@/features/chat/chat-services/chat-thread-service"
 import { ChatThreadModel } from "@/features/chat/models"
 import { useGlobalMessageContext } from "@/features/globals/global-message-context"
-import { AlertDialogItem } from "@/features/ui/alert-dialog"
+// import { AlertDialogItem } from "@/features/ui/alert-dialog"
 import { Button } from "@/features/ui/button"
 
 interface Prop {
@@ -106,15 +106,20 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
   const { showError } = useGlobalMessageContext()
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null)
   const [items, setItems] = useState<ChatThreadModel[]>(menuItems)
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
-  const [threadIdToDelete, setThreadIdToDelete] = useState<string | null>(null)
-  const handleDelete = async (): Promise<void> => {
-    if (threadIdToDelete) {
-      await SoftDeleteChatThreadForCurrentUser(threadIdToDelete)
-      setItems(prev => prev.filter(item => item.chatThreadId !== threadIdToDelete))
-      setDeleteDialogOpen(false)
-      router.replace("/chat")
-    }
+  // const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false)
+  // const [threadIdToDelete, setThreadIdToDelete] = useState<string | null>(null)
+  // const handleDelete = async (): Promise<void> => {
+  //   if (threadIdToDelete) {
+  //     await SoftDeleteChatThreadForCurrentUser(threadIdToDelete)
+  //     setItems(prev => prev.filter(item => item.chatThreadId !== threadIdToDelete))
+  //     setDeleteDialogOpen(false)
+  //     router.replace("/chat")
+  //   }
+  // }
+  const handleDelete = async (threadId: string): Promise<void> => {
+    await SoftDeleteChatThreadForCurrentUser(threadId)
+    setItems(prev => prev.filter(item => item.chatThreadId !== threadId))
+    router.replace("/chat")
   }
 
   const handleOpenModal = (chatThreadId: string): void => {
@@ -172,7 +177,7 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
                 className="opacity-20 group-hover:opacity-100"
                 size="sm"
                 variant="accent"
-                ariaLabel={"Rename " + thread.name}
+                ariaLabel={`Rename ${thread.name}`}
                 onClick={() => handleOpenModal(thread.chatThreadId)}
               >
                 <Pencil size={16} />
@@ -185,10 +190,16 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
               className="opacity-20 group-hover:opacity-100"
               size={"sm"}
               variant="destructive"
-              ariaLabel={"Delete " + thread.name}
-              onClick={() => {
-                setThreadIdToDelete(thread.chatThreadId)
-                setDeleteDialogOpen(true)
+              ariaLabel={`Delete ${thread.name}`}
+              onClick={async e => {
+                e.preventDefault()
+                const yesDelete = confirm("Are you sure you want to delete this chat?")
+                if (yesDelete) {
+                  await handleDelete(thread.chatThreadId)
+                }
+                // onClick={() => {
+                //   setThreadIdToDelete(thread.chatThreadId)
+                //   setDeleteDialogOpen(true)
               }}
             >
               <Trash size={16} />
@@ -196,16 +207,18 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
           </div>
         </MenuItem>
       ))}
-      {deleteDialogOpen && (
+      {/* {deleteDialogOpen && (
         <AlertDialogItem
           title="Confirm Deletion"
+          type="warning"
+          size="medium"
           description="Are you sure you want to delete this chat? This action cannot be undone."
           cancelText="Cancel"
           confirmText="Delete"
           onCancel={() => setDeleteDialogOpen(false)}
           onConfirm={handleDelete}
         />
-      )}
+      )} */}
     </>
   )
 }

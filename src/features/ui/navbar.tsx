@@ -12,12 +12,12 @@ interface LinkItem {
   name: string
   href: string
   icon?: React.ElementType
-  condition?: "authenticated" | "admin"
+  condition?: "unauthenticated" | "authenticated" | "admin"
 }
 
 const links: LinkItem[] = [
-  { name: "Home", href: "/", icon: HomeIcon },
-  { name: "Settings", href: "/settings", icon: UserRoundCog, condition: "admin" },
+  { name: "Home", href: "/", icon: HomeIcon, condition: "unauthenticated" },
+  { name: "Settings", href: "/settings", icon: UserRoundCog, condition: "authenticated" },
   { name: "Prompt Guide", href: "/prompt-guide", icon: BookMarked, condition: "authenticated" },
   { name: "What's new", href: "/whats-new", icon: CloudUpload, condition: "authenticated" },
   { name: "Factual Errors", href: "/hallucinations", icon: SpellCheck2, condition: "authenticated" },
@@ -26,7 +26,6 @@ const links: LinkItem[] = [
 
 const validateCondition = (link: LinkItem) => (session: Session | null) => {
   if (link.condition === "authenticated" && !session?.user) return false
-  if (link.condition === "admin" && !session?.user?.qchatAdmin) return false
   return true
 }
 
@@ -63,8 +62,8 @@ export const NavBar: React.FC = () => {
                   </a>
                 </div>
               ))}
-          {!session && status !== "loading" && <div className="col-span-6"></div>}
-          <div className="relative col-span-4 flex min-h-[40px] items-center justify-end">
+          {!session && status !== "loading" && <div className="col-span-8"></div>}
+          <div className="relative col-span-2 flex min-h-[40px] items-center justify-end">
             <ThemeSwitch />
           </div>
         </div>
