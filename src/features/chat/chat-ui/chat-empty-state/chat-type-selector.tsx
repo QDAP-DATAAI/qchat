@@ -75,23 +75,23 @@ export const ChatTypeSelector: FC<Prop> = props => {
             </Tabs>
           </div>
         </Tooltip.Trigger>
-        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-foreground shadow-lg">
+        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-4 text-foreground shadow-lg">
           <Typography variant="p">
             <strong>General</strong> - chats are turn by turn conversations with the {AI_NAME} Assistant.
-          </Typography>
-          <Typography variant="p">
+            <br />
             <strong>File</strong> - Upload PDF files to {AI_NAME} for questions or task completion based on it.
+            <br />
+            {isAllowedTenant && (
+              <>
+                <strong>Transcription</strong> - Available for authorised agencies.
+              </>
+            )}
+            {!isAllowedTenant && (
+              <>
+                <strong>Transcription</strong> - is restricted to authorised agencies.
+              </>
+            )}
           </Typography>
-          {isAllowedTenant && (
-            <Typography variant="p">
-              <strong>Transcription</strong> - Available for authorised agencies.
-            </Typography>
-          )}
-          {!isAllowedTenant && (
-            <Typography variant="p">
-              <strong>Transcription</strong> - is restricted to authorised agencies.
-            </Typography>
-          )}
           <Tooltip.Arrow className="fill-primary-foreground" />
         </Tooltip.Content>
       </Tooltip.Root>

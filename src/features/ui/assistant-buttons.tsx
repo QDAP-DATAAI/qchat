@@ -51,7 +51,7 @@ export const FleschButton: React.FC<FleschButtonProps> = ({ fleschScore }) => {
               {fleschScore}
             </div>
           </Tooltip.Trigger>
-          <Tooltip.Content side="top" className="z-20 rounded-md bg-primary-foreground p-2 text-foreground shadow-lg">
+          <Tooltip.Content side="top" className="z-20 rounded-md bg-primary-foreground p-4 text-foreground shadow-lg">
             <Typography variant="p">
               <strong>Flesch-Kincaid Score (KFKS):</strong> The Flesch-Kincaid Score below shows
               <br />

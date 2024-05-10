@@ -60,17 +60,14 @@ export const ChatStyleSelector: FC<Prop> = props => {
             </Tabs>
           </div>
         </Tooltip.Trigger>
-        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-foreground shadow-lg">
+        <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-4 text-foreground shadow-lg">
           <Typography variant="p">
             This controls the &quot;temperature&quot; of the model, with the values for each being 0.1, 0.5 and 1
-          </Typography>
-          <Typography variant="p">
+            <br />
             <strong>Precise:</strong> Focused and detail-oriented conversations.
-          </Typography>
-          <Typography variant="p">
+            <br />
             <strong>Balanced:</strong> A mix of precision and creativity.
-          </Typography>
-          <Typography variant="p">
+            <br />
             <strong>Creative:</strong> Open-ended and imaginative discussions.
           </Typography>
           <Tooltip.Arrow className="fill-primary-foreground" />
