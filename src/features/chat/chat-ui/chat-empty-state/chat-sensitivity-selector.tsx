@@ -62,7 +62,9 @@ export const ChatSensitivitySelector: FC<Prop> = ({ disable }) => {
         <Tooltip.Content side="top" className="rounded-md bg-primary-foreground p-2 text-foreground shadow-lg">
           <Typography variant="p">
             <strong>Official:</strong> Verified and formal conversations.
+            <br />
             <strong>Sensitive:</strong> May contain delicate information.
+            <br />
             <strong>Protected (Disabled):</strong> Protected documents or topics covered in Protected documents should
             not be uploaded to this service. For more information see your Information Management Officer or the
             Queensland State Archives.
