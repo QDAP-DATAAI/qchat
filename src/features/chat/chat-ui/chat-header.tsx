@@ -13,7 +13,9 @@ export const ChatHeader: FC<Prop> = () => {
   return (
     <div className="flex items-start gap-2">
       <ChatSelectedOptions />
-      {chatBody.chatOverFileName.length != 0 && <ChatFilesDisplay files={files} />}
+      <div className="hidden sm:block">
+        {chatBody.chatOverFileName.length != 0 && <ChatFilesDisplay files={files} />}
+      </div>
     </div>
   )
 }
