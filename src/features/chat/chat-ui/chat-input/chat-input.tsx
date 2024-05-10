@@ -81,12 +81,13 @@ const ChatInput: FC<Props> = () => {
           id="chatMessage"
           name="chatMessage"
           value={input}
-          placeholder="Send a message"
+          placeholder="Send a message, or use the right hand menu to export your chat to document, add another document or more."
           aria-label="Send a message"
           className="bg-background py-4 pr-[40px]"
           onChange={onChange}
           onKeyDown={onKeyDown}
           rows={4}
+          disabled={isLoading || fileState.isUploadingFile}
         />
         <div className="absolute bottom-0 right-5 mb-4 mr-5 grid h-auto items-end">
           {!isDataChat || (isDataChat && fileChatVisible) ? (

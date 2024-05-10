@@ -29,15 +29,19 @@ export const StartNewChat: FC<object> = () => {
           </Typography>
         </div>
         <div className="-mx-5 -mb-5 grid grid-cols-3 items-center justify-center rounded-bl-md rounded-br-md bg-muted p-5">
-          <NewChat />
-          <Button
-            onClick={() => router.push("/terms")}
-            variant="link"
-            className="col-span-2 text-foreground"
-            ariaLabel="Terms and Conditions"
-          >
-            By starting a chat you agree to the {AI_NAME} Terms and Conditions, click here to view them.
-          </Button>
+          <div>
+            <NewChat />
+          </div>
+          <div className="col-span-2">
+            <Button
+              onClick={() => router.push("/terms")}
+              variant="link"
+              className="text-sm text-foreground"
+              ariaLabel="Terms and Conditions"
+            >
+              By starting a chat you agree to the {AI_NAME} Terms and Conditions.
+            </Button>
+          </div>
         </div>
       </Card>
     </section>
