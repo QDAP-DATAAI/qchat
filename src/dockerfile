@@ -1,9 +1,9 @@
 FROM node:alpine AS base
 
 RUN apk --no-cache upgrade && \
-  apk add --no-cache ca-certificates libc6-compat && \
-  mkdir -p /etc/pki/ca-trust/source/anchors && \
-  update-ca-certificates
+  apk add --no-cache ca-certificates libc6-compat \
+  && mkdir -p /etc/pki/ca-trust/source/anchors \
+  && update-ca-certificates
 
 WORKDIR /app
 
@@ -29,23 +29,21 @@ ARG FEATURE_TRANSCRIBE_TENANTS
 ARG GTAG
 ARG SYSTEM_PROMPT
 
-ENV AZURE_BUILD_ID=$BUILD_ID \
-  NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING=$APPLICATION_INSIGHTS \
-  NEXT_PUBLIC_FEATURE_TRANSCRIBE_TENANTS=$FEATURE_TRANSCRIBE_TENANTS \
-  NEXT_PUBLIC_GTAG=$GTAG \
-  NEXT_PUBLIC_SYSTEM_PROMPT=$SYSTEM_PROMPT \
-  NODE_ENV=production \
-  NEXT_TELEMETRY_DISABLED=1
+ENV AZURE_BUILD_ID=$BUILD_ID
+ENV NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING=$APPLICATION_INSIGHTS
+ENV NEXT_PUBLIC_FEATURE_TRANSCRIBE_TENANTS=$FEATURE_TRANSCRIBE_TENANTS
+ENV NEXT_PUBLIC_GTAG=$GTAG
+ENV NEXT_PUBLIC_SYSTEM_PROMPT=$SYSTEM_PROMPT
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build
 
 FROM base AS runner
 WORKDIR /app
 
-ENV NODE_ENV=production \
-  NEXT_TELEMETRY_DISABLED=1 \
-  PORT=443 \
-  HOSTNAME=0.0.0.0
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
 
 RUN addgroup --system --gid 1001 nodejs && \
   adduser --system --uid 1001 nextjs
@@ -57,5 +55,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY package.json package-lock.json* ./
 
 USER nextjs
+
+ENV PORT 443
+ENV HOSTNAME 0.0.0.0
 
 CMD ["node", "server.js"]
