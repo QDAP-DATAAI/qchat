@@ -1,5 +1,4 @@
 import { Container, CosmosClient, PartitionKeyDefinitionVersion, PartitionKeyKind } from "@azure/cosmos"
-
 import { GetCosmosAccessToken } from "./cosmos-auth"
 
 interface AuthToken {
