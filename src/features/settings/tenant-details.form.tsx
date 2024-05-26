@@ -1,8 +1,10 @@
 "use client"
 
 import * as Form from "@radix-ui/react-form"
-import { Trash } from "lucide-react"
+import { CircleX } from "lucide-react"
 import React, { useState, FormEvent, useEffect } from "react"
+
+import { SUPPORT_EMAIL } from "@/app-global"
 
 import { Markdown } from "@/components/markdown/markdown"
 import Typography from "@/components/typography"
@@ -290,7 +292,7 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
                     ariaLabel={`Delete ${group}`}
                     onClick={() => setDeleteGroupId(group)}
                   >
-                    <Trash size={16} />
+                    <CircleX size={16} />
                   </Button>
                 </div>
               ))
@@ -349,9 +351,12 @@ const DeleteGroupDialog: React.FC<{
           </Typography>
         </div>
         <div className="mb-5">
-          <Typography variant="h4" className="text-foreground">
-            Sessions are valid for up-to 8 hours and this will not revoke the users access. Reach out to support for
-            urgent assistance
+          <Typography variant="p" className="text-foreground">
+            Sessions are valid for up-to 8 hours and this will not revoke the users access. Reach out to{" "}
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="text-bold text-link">
+              support
+            </a>{" "}
+            for urgent assistance
           </Typography>
         </div>
         <div className="flex justify-end">
