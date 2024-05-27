@@ -1,5 +1,4 @@
-/* eslint-disable react/no-unescaped-entities */
-import { OctagonAlert } from "lucide-react"
+import { SearchX } from "lucide-react"
 import React, { Component } from "react"
 interface ErrorBoundaryProps {
   children: React.ReactNode
@@ -27,15 +26,18 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     if (this.state.hasError) {
       return (
         <div
-          className="my-2 flex max-w-none justify-center space-x-2 rounded-md bg-secondary p-2 text-base text-text md:text-base"
+          className="my-2 flex max-w-none justify-center space-x-2 rounded-md bg-backgroundShade p-2 text-base text-text md:text-base"
           tabIndex={0}
         >
-          <div className="flex items-center justify-center">
-            <OctagonAlert size={20} />
+          <div className="flex items-center justify-center text-alert">
+            <SearchX size={20} />
           </div>
           <div className="flex flex-grow items-center justify-center text-center">
-            Oops! Looks like there's a hiccup, and we can't show the response right now. But no worries, feel free to
-            keep the conversation going!
+            Oops! Looks like there&apos;s a hiccup, and we can&apos;t show the response right now. But no worries, feel
+            free to keep the conversation going!
+          </div>
+          <div className="flex items-center justify-center text-alert">
+            <SearchX size={20} />
           </div>
         </div>
       )
