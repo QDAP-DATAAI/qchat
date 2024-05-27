@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import { OctagonAlert } from "lucide-react"
 import React, { Component } from "react"
 interface ErrorBoundaryProps {
