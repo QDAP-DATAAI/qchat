@@ -459,7 +459,7 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
               <Form.Root className="my-4" onSubmit={handleValidateAndSubmitGroups}>
                 <Form.Field name="newGroups" serverInvalid={serverErrors.groups}>
                   <Form.Label htmlFor="newGroups" className="block">
-                    Add New Group GUIDs (comma-separated):
+                    Add New Group GUIDs, groups are not currently validated for you (comma-separated):
                   </Form.Label>
                   <Form.Control asChild>
                     <input
