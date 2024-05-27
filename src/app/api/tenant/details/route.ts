@@ -13,6 +13,7 @@ const tenantUpdateSchema = yup
       .array()
       .of(yup.string().matches(/^[a-fA-F0-9-]{36}$/, "Invalid group GUID"))
       .optional(),
+    requiresGroupLogin: yup.boolean().optional(),
   })
   .noUnknown(true, "Attempted to update invalid fields")
 
@@ -26,7 +27,7 @@ export async function POST(request: NextRequest, _response: NextResponse): Promi
         stripUnknown: true,
       }
     )
-    const { tenantId, contextPrompt, groups } = validatedData
+    const { tenantId, contextPrompt, groups, requiresGroupLogin } = validatedData
 
     const existingTenantResult = await GetTenantById(tenantId)
     if (existingTenantResult.status !== "OK") {
@@ -49,7 +50,14 @@ export async function POST(request: NextRequest, _response: NextResponse): Promi
       }
     }
 
-    if (groups !== undefined) {
+    if (requiresGroupLogin !== undefined) {
+      if (requiresGroupLogin !== existingTenantResult.response.requiresGroupLogin) {
+        updatedData.requiresGroupLogin = requiresGroupLogin
+        hasUpdates = true
+      }
+    }
+
+    if (requiresGroupLogin !== false && groups !== undefined) {
       const validGroups = groups.filter((group): group is string => group !== undefined && group.length === 36)
       const newGroups = validGroups.filter(group => !existingTenantResult.response.groups.includes(group))
       if (newGroups.length > 0) {
@@ -96,6 +104,7 @@ export async function GET(): Promise<Response> {
     administrators: existingTenantResult.response.administrators,
     groups: existingTenantResult.response.groups || ["No groups found"],
     preferences: existingTenantResult.response.preferences || { contextPrompt: "" },
+    requiresGroupLogin: existingTenantResult.response.requiresGroupLogin,
   }
 
   return new Response(JSON.stringify({ status: "OK", data: tenantDetails }), {

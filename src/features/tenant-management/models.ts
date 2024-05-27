@@ -35,6 +35,7 @@ export type TenantDetails = {
   supportEmail: string
   departmentName: string
   administrators: string[]
+  requiresGroupLogin: boolean
   groups: string[]
   preferences: TenantPreferences
 }

@@ -12,8 +12,10 @@ import { showError, showSuccess } from "@/features/globals/global-message-store"
 import { useAppInsightsContext } from "@/features/insights/app-insights-context"
 import { TenantDetails } from "@/features/tenant-management/models"
 import SystemPrompt from "@/features/theme/readable-systemprompt"
+import { AI_NAME } from "@/features/theme/theme-config"
 import { Button } from "@/features/ui/button"
 import { CardSkeleton } from "@/features/ui/card-skeleton"
+import { SwitchComponent } from "@/ui/switch"
 
 interface PromptFormProps {}
 
@@ -111,6 +113,35 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
     setIsSubmittingContextPrompt(false)
   }
 
+  const handleClearContextPrompt = async (): Promise<void> => {
+    setIsSubmittingContextPrompt(true)
+    setServerErrors({ ...serverErrors, contextPrompt: false })
+
+    const response = await fetch("/api/tenant/details", {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contextPrompt: "",
+      }),
+    })
+
+    const data: ErrorResponse = await parseJSON(response)
+
+    if (!response.ok) {
+      showError(extractErrorMessage(data), logError)
+      setServerErrors({ ...serverErrors, contextPrompt: true })
+    } else {
+      showSuccess({ title: "Success", description: "Context prompt cleared successfully!" }, logEvent)
+      await fetchDetails().then(res => setTenant(res))
+      setContextPrompt("")
+    }
+
+    setIsSubmittingContextPrompt(false)
+  }
+
   const handleSubmitGroups = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     const newGroupGuids = new FormData(e.currentTarget).get("newGroups") as string
@@ -172,6 +203,34 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
     setIsSubmittingGroups(false)
   }
 
+  const handleSwitchChange = async (isChecked: boolean): Promise<void> => {
+    setIsSubmittingGroups(true)
+    setServerErrors({ ...serverErrors, groups: false })
+
+    const response = await fetch("/api/tenant/details", {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        requiresGroupLogin: isChecked,
+      }),
+    })
+
+    const data: ErrorResponse = await parseJSON(response)
+
+    if (!response.ok) {
+      showError(extractErrorMessage(data), logError)
+      setServerErrors({ ...serverErrors, groups: true })
+    } else {
+      showSuccess({ title: "Success", description: "Group login requirement updated successfully!" }, logEvent)
+      await fetchDetails().then(res => setTenant(res))
+    }
+
+    setIsSubmittingGroups(false)
+  }
+
   return (
     <>
       {deleteGroupId && (
@@ -208,6 +267,7 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
                   rows={8}
                   maxLength={500}
                   required
+                  aria-label="New context prompt"
                 />
               </Form.Control>
               {serverErrors.contextPrompt && (
@@ -217,11 +277,27 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
               )}
             </Form.Field>
             {!isLoading && (
-              <Form.Submit asChild>
-                <Button type="submit" variant="default" disabled={isSubmittingContextPrompt}>
-                  {isSubmittingContextPrompt ? "Updating..." : "Update Context Prompt"}
+              <div className="flex gap-4">
+                <Form.Submit asChild>
+                  <Button
+                    type="submit"
+                    variant="default"
+                    disabled={isSubmittingContextPrompt}
+                    ariaLabel="Update context prompt"
+                  >
+                    {isSubmittingContextPrompt ? "Updating..." : "Update Context Prompt"}
+                  </Button>
+                </Form.Submit>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={handleClearContextPrompt}
+                  disabled={isSubmittingContextPrompt}
+                  ariaLabel="Clear context prompt"
+                >
+                  {isSubmittingContextPrompt ? "Clearing..." : "Clear Context Prompt"}
                 </Button>
-              </Form.Submit>
+              </div>
             )}
           </Form.Root>
           {isLoading ? (
@@ -279,52 +355,100 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
             )}
           </Typography>
           <Typography variant="h5" className="mb-4">
-            Current Groups:
-            {isLoading ? (
-              <CardSkeleton />
-            ) : (
-              tenant?.groups?.map(group => (
-                <div className="mt-2 flex justify-between rounded-md bg-altBackgroundShade p-4" key={group}>
-                  <b>{group}</b>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    ariaLabel={`Delete ${group}`}
-                    onClick={() => setDeleteGroupId(group)}
-                  >
-                    <CircleX size={16} />
-                  </Button>
-                </div>
-              ))
-            )}
+            Login Management:
           </Typography>
-          <Form.Root className="my-4" onSubmit={handleSubmitGroups}>
-            <Form.Field name="newGroups" serverInvalid={serverErrors.groups}>
-              <Form.Label htmlFor="newGroups" className="block">
-                Add New Group GUIDs (comma-separated):
-              </Form.Label>
-              <Form.Control asChild>
-                <input
-                  type="text"
-                  id="newGroups"
-                  className="my-4 w-full rounded-md border-2 p-2"
-                  placeholder="Enter new group GUIDs..."
+          {isLoading ? (
+            <CardSkeleton />
+          ) : (
+            <div className="mb-4 rounded-md bg-altBackgroundShade">
+              <div className="mt-2 flex justify-between p-4">
+                <SwitchComponent
+                  id="requires-group-login"
+                  label="Requires Group Login:"
+                  variant="default"
+                  isChecked={tenant?.requiresGroupLogin}
+                  onCheckedChange={handleSwitchChange}
                 />
-              </Form.Control>
-              {serverErrors.groups && (
-                <Form.Message role="alert" className="text-QLD-alert my-4">
-                  Error updating groups. Please try again.
-                </Form.Message>
-              )}
-            </Form.Field>
-            {!isLoading && (
-              <Form.Submit asChild>
-                <Button type="submit" variant="default" className="my-4 justify-end" disabled={isSubmittingGroups}>
-                  {isSubmittingGroups ? "Updating..." : "Update Groups"}
-                </Button>
-              </Form.Submit>
-            )}
-          </Form.Root>
+              </div>
+              <div className="mt-2 flex justify-between p-4">
+                <Typography variant="p">
+                  Please note that{" "}
+                  {tenant?.requiresGroupLogin ? (
+                    <>
+                      disabling group login will allow all Internal users in your Tenant to have access to {AI_NAME}.
+                      This does not include Guest Users. This change or adding groups will take effect immediately.
+                    </>
+                  ) : (
+                    <>
+                      enabling group login will restrict access to {AI_NAME} to only users who belong to specified
+                      groups or Global Administrators. This does not include Guest Users. This change will take effect
+                      immediately.
+                    </>
+                  )}
+                </Typography>
+              </div>
+            </div>
+          )}
+          {tenant?.requiresGroupLogin && (
+            <>
+              <Typography variant="h5" className="mb-4">
+                Current Groups:
+                {isLoading ? (
+                  <CardSkeleton />
+                ) : (
+                  tenant?.groups?.map(group => (
+                    <div className="mt-2 flex justify-between rounded-md bg-altBackgroundShade p-4" key={group}>
+                      <b>{group}</b>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        ariaLabel={`Delete ${group}`}
+                        onClick={() => setDeleteGroupId(group)}
+                      >
+                        <CircleX size={16} />
+                      </Button>
+                    </div>
+                  ))
+                )}
+              </Typography>
+              <Form.Root className="my-4" onSubmit={handleSubmitGroups}>
+                <Form.Field name="newGroups" serverInvalid={serverErrors.groups}>
+                  <Form.Label htmlFor="newGroups" className="block">
+                    Add New Group GUIDs (comma-separated):
+                  </Form.Label>
+                  <Form.Control asChild>
+                    <input
+                      type="text"
+                      autoComplete="off"
+                      id="newGroups"
+                      className="my-4 w-full rounded-md border-2 p-2"
+                      placeholder="Enter new group GUIDs..."
+                      aria-label="New group GUIDs"
+                      disabled={!tenant?.requiresGroupLogin}
+                    />
+                  </Form.Control>
+                  {serverErrors.groups && (
+                    <Form.Message role="alert" className="text-QLD-alert my-4">
+                      Error updating groups. Please try again.
+                    </Form.Message>
+                  )}
+                </Form.Field>
+                {!isLoading && (
+                  <Form.Submit asChild>
+                    <Button
+                      type="submit"
+                      variant="default"
+                      className="my-4 justify-end"
+                      disabled={isSubmittingGroups || !tenant?.requiresGroupLogin}
+                      ariaLabel="Update groups"
+                    >
+                      {isSubmittingGroups ? "Updating..." : "Update Groups"}
+                    </Button>
+                  </Form.Submit>
+                )}
+              </Form.Root>
+            </>
+          )}
         </div>
       </div>
     </>
@@ -338,32 +462,43 @@ const DeleteGroupDialog: React.FC<{
   onClose: () => void
 }> = ({ group, loading, onConfirm, onClose }) => {
   return (
-    <div className="fixed inset-0 z-80 flex items-center justify-center bg-black bg-opacity-50">
+    <div
+      className="fixed inset-0 z-80 flex items-center justify-center bg-black bg-opacity-80"
+      role="dialog"
+      aria-labelledby="dialog-title"
+      aria-describedby="dialog-description"
+    >
       <div className="mx-auto w-full max-w-lg overflow-hidden rounded-lg bg-background p-4">
         <div className="mb-4">
-          <Typography variant="h4" className="text-foreground">
+          <Typography variant="h4" className="text-foreground" id="dialog-title">
             Are you sure you want to delete this group?
           </Typography>
         </div>
         <div className="mb-4">
-          <Typography variant="h5" className="text-foreground">
+          <Typography variant="h5" className="text-foreground" id="dialog-description">
             Group GUID: <b>{group}</b>
           </Typography>
         </div>
         <div className="mb-5">
           <Typography variant="p" className="text-foreground">
-            Sessions are valid for up-to 8 hours and this will not revoke the users access. Reach out to{" "}
+            Sessions are valid for up to 8 hours and this will not revoke the user&apos;s access. Reach out to{" "}
             <a href={`mailto:${SUPPORT_EMAIL}`} className="text-bold text-link">
               support
             </a>{" "}
-            for urgent assistance
+            for urgent assistance.
           </Typography>
         </div>
         <div className="flex justify-end">
-          <Button variant="default" onClick={onClose} disabled={loading}>
+          <Button variant="default" onClick={onClose} disabled={loading} aria-label="Cancel">
             Cancel
           </Button>
-          <Button variant="destructive" className="ml-2" onClick={() => onConfirm(group)} disabled={loading}>
+          <Button
+            variant="destructive"
+            className="ml-2"
+            onClick={() => onConfirm(group)}
+            disabled={loading}
+            aria-label="Confirm delete group"
+          >
             Delete Group
           </Button>
         </div>
@@ -372,6 +507,5 @@ const DeleteGroupDialog: React.FC<{
   )
 }
 
-//TODO: Add a call to API tenant groups to validate the groups exist.
+// TODO: Add a call to API tenant groups to validate the groups exist.
 // Reminder groups locally are different from the groups returned from TUO - see authapi.
-// Add a clear prompt button
