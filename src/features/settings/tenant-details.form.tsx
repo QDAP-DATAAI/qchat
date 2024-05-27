@@ -105,7 +105,7 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
       setContextPrompt(temp)
       setServerErrors({ ...serverErrors, contextPrompt: true })
     } else {
-      showSuccess({ title: "Success", description: "Context prompt updated successfully!" }, logEvent)
+      showSuccess({ title: "Success", description: "Tenant Context prompt updated successfully!" }, logEvent)
       await fetchDetails().then(res => setTenant(res))
       ;(e.target as HTMLFormElement)?.reset()
     }
@@ -142,13 +142,47 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
     setIsSubmittingContextPrompt(false)
   }
 
-  const handleSubmitGroups = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleValidateAndSubmitGroups = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
     const newGroupGuids = new FormData(e.currentTarget).get("newGroups") as string
 
     setIsSubmittingGroups(true)
     setServerErrors({ ...serverErrors, groups: false })
 
+    // Call the validation API
+    const validationResponse = await fetch("/api/tenant/groups", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        groupGuids: newGroupGuids.split(",").map(guid => guid.trim()),
+      }),
+    })
+
+    const validationData: { guid: string; name: string | null; isValid: boolean }[] | ErrorResponse =
+      await parseJSON(validationResponse)
+
+    if (!validationResponse.ok) {
+      const errorMsg = extractErrorMessage(validationData as ErrorResponse)
+      showError(errorMsg, logError)
+      setServerErrors({ ...serverErrors, groups: true })
+      setIsSubmittingGroups(false)
+      return
+    }
+
+    // Check if any group is invalid
+    const invalidGroups = (validationData as { guid: string; name: string | null; isValid: boolean }[]).filter(
+      group => !group.isValid
+    )
+    if (invalidGroups.length > 0) {
+      showError(`Invalid groups: ${invalidGroups.map(group => group.guid).join(", ")}`, logError)
+      setServerErrors({ ...serverErrors, groups: true })
+      setIsSubmittingGroups(false)
+      return
+    }
+
+    // Proceed with the update if validation is successful
     const response = await fetch("/api/tenant/details", {
       method: "POST",
       cache: "no-store",
@@ -207,29 +241,39 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
     setIsSubmittingGroups(true)
     setServerErrors({ ...serverErrors, groups: false })
 
-    const response = await fetch("/api/tenant/details", {
-      method: "POST",
-      cache: "no-store",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        requiresGroupLogin: isChecked,
-      }),
-    })
+    try {
+      const response = await fetch("/api/tenant/details", {
+        method: "POST",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          requiresGroupLogin: isChecked,
+        }),
+      })
 
-    const data: ErrorResponse = await parseJSON(response)
+      const data: ErrorResponse = await parseJSON(response)
 
-    if (!response.ok) {
-      showError(extractErrorMessage(data), logError)
+      if (!response.ok) {
+        showError(extractErrorMessage(data), logError)
+        setServerErrors({ ...serverErrors, groups: true })
+      } else {
+        showSuccess({ title: "Success", description: "Group login requirement updated successfully!" }, logEvent)
+        const tenantDetails = await fetchDetails()
+        setTenant(tenantDetails)
+      }
+    } catch (error) {
+      showError("An error occurred while updating group login requirement.", logError, () => {
+        throw error
+      })
       setServerErrors({ ...serverErrors, groups: true })
-    } else {
-      showSuccess({ title: "Success", description: "Group login requirement updated successfully!" }, logEvent)
-      await fetchDetails().then(res => setTenant(res))
+    } finally {
+      setIsSubmittingGroups(false)
     }
-
-    setIsSubmittingGroups(false)
   }
+
+  const grpRequired = tenant?.requiresGroupLogin || false
 
   return (
     <>
@@ -365,15 +409,16 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
                 <SwitchComponent
                   id="requires-group-login"
                   label="Requires Group Login:"
-                  variant="default"
-                  isChecked={tenant?.requiresGroupLogin}
+                  variant={"destructive"}
+                  isChecked={grpRequired ? true : false}
                   onCheckedChange={handleSwitchChange}
                 />
               </div>
+              {/* TODO fix the initial state not rendering correctly */}
               <div className="mt-2 flex justify-between p-4">
                 <Typography variant="p">
                   Please note that{" "}
-                  {tenant?.requiresGroupLogin ? (
+                  {grpRequired ? (
                     <>
                       disabling group login will allow all Internal users in your Tenant to have access to {AI_NAME}.
                       This does not include Guest Users. This change or adding groups will take effect immediately.
@@ -389,7 +434,7 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
               </div>
             </div>
           )}
-          {tenant?.requiresGroupLogin && (
+          {grpRequired && (
             <>
               <Typography variant="h5" className="mb-4">
                 Current Groups:
@@ -411,7 +456,7 @@ export const TenantDetailsForm: React.FC<PromptFormProps> = () => {
                   ))
                 )}
               </Typography>
-              <Form.Root className="my-4" onSubmit={handleSubmitGroups}>
+              <Form.Root className="my-4" onSubmit={handleValidateAndSubmitGroups}>
                 <Form.Field name="newGroups" serverInvalid={serverErrors.groups}>
                   <Form.Label htmlFor="newGroups" className="block">
                     Add New Group GUIDs (comma-separated):
@@ -506,6 +551,3 @@ const DeleteGroupDialog: React.FC<{
     </div>
   )
 }
-
-// TODO: Add a call to API tenant groups to validate the groups exist.
-// Reminder groups locally are different from the groups returned from TUO - see authapi.

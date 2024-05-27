@@ -2,7 +2,7 @@
 
 import * as Form from "@radix-ui/react-form"
 import { useSession } from "next-auth/react"
-import React, { useState, FormEvent, useEffect } from "react"
+import React, { useState, useEffect, FormEvent } from "react"
 
 import { Markdown } from "@/components/markdown/markdown"
 import Typography from "@/components/typography"
@@ -18,6 +18,7 @@ export const UserDetailsForm: React.FC<PromptFormProps> = () => {
   const { logError } = useAppInsightsContext()
   const { data: session } = useSession()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isClearing, setIsClearing] = useState(false)
   const [serverErrors, setServerErrors] = useState({ contextPrompt: false })
   const [contextPrompt, setContextPrompt] = useState("")
   const [isLoading, setIsLoading] = useState(true)
@@ -93,6 +94,30 @@ This approach helps us interact with you in the most effective and considerate m
     setIsSubmitting(false)
   }
 
+  const handleClearContextPrompt = async (): Promise<void> => {
+    setIsClearing(true)
+    setServerErrors({ contextPrompt: false })
+
+    const response = await fetch("/api/user/details", {
+      method: "POST",
+      cache: "no-store",
+      body: JSON.stringify({
+        contextPrompt: "",
+        upn: session?.user?.upn,
+        tenantId: session?.user?.tenantId,
+      }),
+    })
+
+    if (!response.ok) {
+      showError("Context prompt could not be cleared. Please try again later.")
+    } else {
+      showSuccess({ title: "Success", description: "Context prompt cleared successfully!" })
+      setContextPrompt("")
+    }
+
+    setIsClearing(false)
+  }
+
   return (
     <Form.Root className="grid size-full grid-cols-1 gap-8 p-4 md:grid-cols-2" onSubmit={handleSubmit}>
       <div className="mb-4 md:col-span-1">
@@ -159,13 +184,13 @@ This approach helps us interact with you in the most effective and considerate m
         {!isLoading && (
           <div className="flex justify-end">
             <Form.Submit asChild>
-              <Button type="submit" variant="default" disabled={isSubmitting} className="mr-2">
+              <Button type="submit" variant="default" disabled={isSubmitting || isClearing} className="mr-2">
                 {isSubmitting ? "Updating..." : "Update"}
               </Button>
             </Form.Submit>
-            {/* <Button onClick={async e => handleSubmit(e, true)} variant="destructive" disabled={isSubmitting}>
-              Remove Current Prompt
-            </Button> */}
+            <Button onClick={handleClearContextPrompt} variant="destructive" disabled={isClearing || isSubmitting}>
+              {isClearing ? "Clearing..." : "Clear Context Prompt"}
+            </Button>
           </div>
         )}
       </div>
@@ -175,5 +200,3 @@ This approach helps us interact with you in the most effective and considerate m
     </Form.Root>
   )
 }
-
-// TODO: Add a clear prompt button
