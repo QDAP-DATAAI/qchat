@@ -3,7 +3,7 @@ import { JWT } from "next-auth/jwt"
 import { Provider } from "next-auth/providers"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
-import { UserSignInHandler, SignInErrorType, isTenantAdmin } from "./sign-in"
+import { UserSignInHandler, SignInErrorType } from "./sign-in"
 
 export interface AuthToken extends JWT {
   admin: boolean
