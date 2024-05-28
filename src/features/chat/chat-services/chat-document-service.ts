@@ -106,17 +106,16 @@ export const IndexDocuments = async (
   fileName: string,
   docs: string[],
   chatThreadId: string,
-  order: number,
   contentsToSave?: string
 ): ServerActionResponseAsync<AzureCogDocumentIndex[]> => {
   try {
     const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
-    const documentsToIndex: AzureCogDocumentIndex[] = docs.map(docContent => ({
+    const documentsToIndex: AzureCogDocumentIndex[] = docs.map((docContent, index) => ({
       id: uniqueId(),
       chatThreadId,
       userId,
       pageContent: docContent,
-      order,
+      order: index + 1,
       metadata: fileName,
       tenantId,
       createdDate: new Date().toISOString(),
