@@ -27,7 +27,8 @@ export const ChatFileUI: FC = () => {
       case "data":
         return ".pdf"
       case "audio":
-        return shouldUseWhisper() ? "audio/*, video/*" : ".wav"
+        // whisper supports any audio/video as input but ACG only supports .wav, because there's side by side now, when using whisper, it will also call acg so just use .wav for now.
+        return ".wav" // shouldUseWhisper() ? "audio/*, video/*" : ".wav"
       default:
         return ""
     }
