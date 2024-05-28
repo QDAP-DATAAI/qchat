@@ -58,7 +58,7 @@ export class UserSignInHandler {
         const tenantRecord: TenantRecord = {
           tenantId: user.tenantId,
           primaryDomain: domain,
-          requiresGroupLogin: true,
+          requiresGroupLogin: false,
           id: user.tenantId,
           email: user.upn,
           supportEmail: SUPPORT_EMAIL_PREFIX + domain,
