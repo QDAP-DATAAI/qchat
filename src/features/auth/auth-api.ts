@@ -56,7 +56,7 @@ const configureIdentityProvider = (): Provider[] => {
           profile.tenantId = profile.employee_idp || profile.tid
           profile.groups = profile.groups || profile.employee_groups
 
-          const tenantAdmin = await isTenantAdmin(profile)
+          // const tenantAdmin = await isTenantAdmin(profile)
           return {
             ...profile,
             id: profile.sub,
@@ -65,7 +65,7 @@ const configureIdentityProvider = (): Provider[] => {
             upn: profile.upn,
             admin: admin,
             globalAdmin: true,
-            tenantAdmin: tenantAdmin,
+            tenantAdmin: true,
             userId: profile.upn,
           }
         },
