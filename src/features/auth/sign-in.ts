@@ -152,7 +152,7 @@ const getsertUser = async (userGroups: string[], user: User | AdapterUser): Prom
       const createUserResponse = await CreateUser({
         id: hashValue(user.upn),
         tenantId: user.tenantId,
-        email: user.email?.toLowerCase() ?? user.upn.toLowerCase(),
+        email: user.email,
         name: user.name,
         upn: user.upn,
         userId: user.upn,
