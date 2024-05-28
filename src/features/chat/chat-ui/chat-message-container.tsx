@@ -45,22 +45,26 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
       ) : undefined}
 
       <div className="flex flex-1 flex-col justify-end pb-[140px]">
-        {selectedTab === "chat"
-          ? messages.map((message, index) => (
-              <ChatRow
-                key={message.id}
-                chatMessageId={message.id}
-                name={message.role === ChatRole.User ? session?.user?.name || "" : AI_NAME}
-                message={message}
-                type={message.role as ChatRole}
-                chatThreadId={chatThreadId}
-                showAssistantButtons={index === messages.length - 1 ? !isLoading : true}
-                threadLocked={index === messages.length - 1 && chatThreadLocked}
-              />
-            ))
-          : documentsWithTranscriptions.map(document => (
+        {selectedTab === "chat" ? (
+          messages.map((message, index) => (
+            <ChatRow
+              key={message.id}
+              chatMessageId={message.id}
+              name={message.role === ChatRole.User ? session?.user?.name || "" : AI_NAME}
+              message={message}
+              type={message.role as ChatRole}
+              chatThreadId={chatThreadId}
+              showAssistantButtons={index === messages.length - 1 ? !isLoading : true}
+              threadLocked={index === messages.length - 1 && chatThreadLocked}
+            />
+          ))
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            {documentsWithTranscriptions.map(document => (
               <ChatFileTranscription key={document.id} name={document.name} contents={document.contents || ""} />
             ))}
+          </div>
+        )}
         {isLoading && <ChatLoading />}
       </div>
     </div>
