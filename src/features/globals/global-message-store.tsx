@@ -1,11 +1,6 @@
 import { ToastAction } from "@radix-ui/react-toast"
 
-import { toast } from "@/features/ui/use-toast"
-
-interface MessageProp {
-  title: string
-  description: string
-}
+import { type Toast, toast } from "@/features/ui/use-toast"
 
 export const showError = (
   error: string,
@@ -32,11 +27,11 @@ export const showError = (
 }
 
 export const showSuccess = (
-  message: MessageProp,
+  message: Toast,
   logEvent?: (name: string, properties?: Record<string, unknown>) => void
 ): void => {
   toast(message)
   if (logEvent) {
-    logEvent(message.title, { description: message.description })
+    logEvent?.(message.title || "Show Success", { description: message.description })
   }
 }
