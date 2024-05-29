@@ -192,7 +192,7 @@ export async function isTenantAdmin(user: User | AdapterUser): Promise<boolean> 
     }
 
     const tenant = tenantResponse.response
-    const normalisedUserIdentifier = (user.upn ?? user.email ?? "").toLowerCase()
+    const normalisedUserIdentifier = (user.upn || user.email || "")?.toLowerCase()
     const isTenantAdmin = tenant.administrators.map(admin => admin.toLowerCase()).includes(normalisedUserIdentifier)
     return isTenantAdmin
   } catch (_error) {
