@@ -3,7 +3,7 @@ import { JWT } from "next-auth/jwt"
 import { Provider } from "next-auth/providers"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
-import { UserSignInHandler, SignInErrorType } from "./sign-in"
+import { UserSignInHandler, SignInErrorType, isTenantAdmin } from "./sign-in"
 
 export interface AuthToken extends JWT {
   admin: boolean
@@ -52,11 +52,11 @@ const configureIdentityProvider = (): Provider[] => {
           const upnLower = profile.upn.toLowerCase()
           const email = profile.email?.toLowerCase() ?? upnLower
           const admin = adminEmails.includes(email || upnLower)
-          // const globalAdmin = profile.roles?.includes("GlobalAdmin") ? true : false
+          const globalAdmin = profile.roles?.includes("GlobalAdmin") ? true : false
           profile.tenantId = profile.employee_idp || profile.tid
           profile.groups = profile.groups || profile.employee_groups
 
-          // const tenantAdmin = await isTenantAdmin(profile)
+          const tenantAdmin = await isTenantAdmin(profile)
           return {
             ...profile,
             id: profile.sub,
@@ -64,8 +64,8 @@ const configureIdentityProvider = (): Provider[] => {
             email: email,
             upn: profile.upn,
             admin: admin,
-            globalAdmin: true,
-            tenantAdmin: true,
+            globalAdmin: globalAdmin,
+            tenantAdmin: tenantAdmin,
             userId: profile.upn,
           }
         },
