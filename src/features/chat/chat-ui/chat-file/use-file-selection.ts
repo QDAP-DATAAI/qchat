@@ -31,12 +31,12 @@ export const useFileSelection = (
       formData.append("chatType", chatBody.chatType)
       formData.append("id", props.id)
 
-      const runList = formData.get("chatType") === "audio" && shouldUseWhisper() ? ["acg", "whisper"] : [""]
+      const runList = formData.get("chatType") === "audio" && shouldUseWhisper() ? ["acs", "whisper"] : [""]
 
       const file: File | null = formData.get(chatBody.chatType) as unknown as File
 
       runList.forEach(async element => {
-        if (element !== "acg") formData.append(element, "1")
+        if (element !== "acs") formData.append(element, "1")
 
         const fileName =
           runList.length === 1
