@@ -1,3 +1,5 @@
+"use client"
+
 import { useWindowSize } from "@/features/ui/windowsize"
 
 export const useButtonStyles = (): { iconSize: number; buttonClass: string } => {

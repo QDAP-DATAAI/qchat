@@ -1,3 +1,5 @@
+"use client"
+
 import { Sparkles, Sparkle } from "lucide-react"
 import { useState } from "react"
 
