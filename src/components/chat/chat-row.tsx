@@ -9,7 +9,8 @@ import Typography from "@/components/typography"
 import { calculateFleschKincaidScore } from "@/features/chat/chat-services/chat-flesch"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ChatRole, PromptMessage } from "@/features/chat/models"
-import { AssistantButtons, RewriteMessageButton } from "@/features/ui/assistant-buttons"
+import { AssistantButtons } from "@/features/ui/assistant-buttons"
+import { RewriteMessageButton } from "@/features/ui/assistant-buttons/rewrite-message-button"
 
 interface ChatRowProps {
   chatMessageId: string
