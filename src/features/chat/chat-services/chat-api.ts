@@ -161,6 +161,16 @@ async function* makeContentFilterResponse(lockChatThread: boolean): AsyncGenerat
   }
 }
 
+type CustomContentSafetyCategory = {
+  category: string
+  severity: string
+}
+
+type CustomContentSafetyResult = {
+  ethical: CustomContentSafetyCategory | null
+  values: CustomContentSafetyCategory | null
+}
+
 async function getChatResponse(
   chatThread: ChatThreadModel,
   systemPrompt: ChatCompletionMessageParam,
@@ -175,14 +185,44 @@ async function getChatResponse(
 }> {
   let contentFilterTriggerCount = chatThread.contentFilterTriggerCount ?? 0
 
+  const mySafetyFilters = {
+    ethical: ["transparency", "accountable", "fairness"],
+    values: ["discrimination", "illegal activities"],
+  }
+
+  function checkCustomContentSafety(content: string): CustomContentSafetyResult {
+    const customSafetyResult: CustomContentSafetyResult = {
+      ethical: null,
+      values: null,
+    }
+
+    for (const [category, filters] of Object.entries(mySafetyFilters)) {
+      for (const filter of filters) {
+        if (content.includes(filter)) {
+          customSafetyResult[category as keyof CustomContentSafetyResult] = {
+            category: filter,
+            severity: "low",
+          }
+        }
+      }
+    }
+
+    return customSafetyResult
+  }
+
   try {
     const openAI = OpenAIInstance()
+    const response = await openAI.chat.completions.create({
+      messages: [systemPrompt, ...mapOpenAIChatMessages(history), userMessage],
+      model: process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
+      stream: true,
+    })
+
+    const customContentSafetyResult = checkCustomContentSafety(userMessage.content ?? "")
+
     return {
-      response: await openAI.chat.completions.create({
-        messages: [systemPrompt, ...mapOpenAIChatMessages(history), userMessage],
-        model: process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
-        stream: true,
-      }),
+      response,
+      contentFilterResult: customContentSafetyResult,
       updatedThread: chatThread,
     }
   } catch (exception) {
@@ -191,24 +231,31 @@ async function getChatResponse(
     const contentFilterResult = exception.error as JSONValue
     contentFilterTriggerCount++
 
+    const customContentSafetyResult = checkCustomContentSafety(userMessage.content ?? "")
+
+    const combinedContentFilterResult = {
+      contentFilterResult,
+      customContentSafety: customContentSafetyResult,
+    }
+
     data.append({
       id: addMessage.id,
       content: addMessage.content,
       role: addMessage.role,
-      contentFilterResult,
+      contentFilterResult: combinedContentFilterResult,
       contentFilterTriggerCount,
     })
 
-    const upadatedThread = await UpsertChatThread({
+    const updatedThread = await UpsertChatThread({
       ...chatThread,
       contentFilterTriggerCount,
     })
-    if (upadatedThread.status !== "OK") throw upadatedThread.errors
+    if (updatedThread.status !== "OK") throw updatedThread.errors
 
     return {
       response: makeContentFilterResponse(contentFilterTriggerCount >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED),
-      contentFilterResult,
-      updatedThread: upadatedThread.response,
+      contentFilterResult: combinedContentFilterResult,
+      updatedThread: updatedThread.response,
     }
   }
 }
