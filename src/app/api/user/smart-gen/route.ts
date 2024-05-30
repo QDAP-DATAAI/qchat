@@ -12,10 +12,10 @@ const smartGenItemSchema = yup.object<SmartGenModel>({
 export async function POST(request: Request, _response: Response): Promise<Response> {
   try {
     const requestBody = await request.json()
-    const validatedData = await smartGenItemSchema.validate(requestBody, {
+    const validatedData = (await smartGenItemSchema.validate(requestBody, {
       abortEarly: false,
       stripUnknown: true,
-    })
+    })) as SmartGenModel
     const response = await UpsertSmartGen(validatedData)
     if (response.status !== "OK") throw response.errors
     return new Response(JSON.stringify({ status: "OK" }), { status: 200 })

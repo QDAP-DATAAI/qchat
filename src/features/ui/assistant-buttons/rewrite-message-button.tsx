@@ -21,9 +21,11 @@ export const RewriteMessageButton: React.FC<RewriteMessageButtonProps> = ({
   const { logError } = useAppInsightsContext()
 
   const [rewriteClicked, setRewriteClicked] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleRewriteWithSuggestions = async (): Promise<void> => {
     setRewriteClicked(true)
+    setIsLoading(true)
     const action = getRewriterAction(fleschScore, !!message.contentFilterResult)
     const rewrittenMessage = rewriteTexts(action, message.content)
     try {
@@ -45,6 +47,7 @@ export const RewriteMessageButton: React.FC<RewriteMessageButtonProps> = ({
     } catch (error) {
       logError(error instanceof Error ? error : new Error(JSON.stringify(error)))
     } finally {
+      setIsLoading(false)
       onAssistantButtonClick(rewrittenMessage)
       setTimeout(() => setRewriteClicked(false), 2000)
     }
@@ -59,7 +62,11 @@ export const RewriteMessageButton: React.FC<RewriteMessageButtonProps> = ({
       title="Rewrite with suggestions"
       onClick={handleRewriteWithSuggestions}
     >
-      {rewriteClicked ? <Sparkles size={iconSize} /> : <Sparkle size={iconSize} />}
+      {rewriteClicked ? (
+        <Sparkles size={iconSize} className={isLoading ? "animate-spin" : ""} />
+      ) : (
+        <Sparkle size={iconSize} />
+      )}
     </Button>
   )
 }
