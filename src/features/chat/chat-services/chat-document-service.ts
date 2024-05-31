@@ -68,22 +68,22 @@ const ensureSearchIsConfigured = (): boolean => {
   return true
 }
 
-export const UploadDocument = async (formData: FormData): ServerActionResponseAsync<[string[], string?]> => {
+export const UploadDocument = async (formData: FormData): ServerActionResponseAsync<[string[], string?, string?]> => {
   try {
     const isConfigValid = ensureSearchIsConfigured()
     if (!isConfigValid) throw new Error("Azure Search is not configured")
 
     const chatType = formData.get("chatType") as string
-    let fileContent: [string[], string?]
+    let fileContent: [string[], string?, string?]
     if (chatType === "audio") {
       if (formData.has("whisper")) {
         const transcription = await transcribeAudio(formData)
-        const splitDocuments = chunkDocumentWithOverlap(transcription)
-        fileContent = [splitDocuments, transcription]
+        const splitDocuments = chunkDocumentWithOverlap(transcription.text)
+        fileContent = [splitDocuments, transcription.text, transcription.vtt]
       } else {
-        const docs = await speechToTextRecognizeOnce(formData)
-        const splitDocuments = chunkDocumentWithOverlap(docs.join("\n"))
-        fileContent = [splitDocuments, docs.join("\n")]
+        const transcription = await speechToTextRecognizeOnce(formData)
+        const splitDocuments = chunkDocumentWithOverlap(transcription.text)
+        fileContent = [splitDocuments, transcription.text, transcription.vtt]
       }
     } else {
       const docs = await LoadFile(formData, chatType)
@@ -106,7 +106,8 @@ export const IndexDocuments = async (
   fileName: string,
   docs: string[],
   chatThreadId: string,
-  contentsToSave?: string
+  contentsToSave?: string,
+  extraContents?: string
 ): ServerActionResponseAsync<AzureCogDocumentIndex[]> => {
   try {
     const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
@@ -134,6 +135,7 @@ export const IndexDocuments = async (
       tenantId,
       name: fileName,
       contents: contentsToSave,
+      extraContents: extraContents,
     }
     const container = await HistoryContainer()
     const { resource } = await container.items.upsert<ChatDocumentModel>(modelToSave)

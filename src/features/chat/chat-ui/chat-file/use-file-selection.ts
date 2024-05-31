@@ -47,11 +47,11 @@ export const useFileSelection = (
         if (uploadResponse.status !== "OK") throw showError(uploadResponse.errors[0].message)
 
         const indexErrors = []
-        const [splitDocuments, contents] = uploadResponse.response
+        const [splitDocuments, contents, vtt] = uploadResponse.response
 
         try {
           setUploadButtonLabel(`Indexing file ${fileName}...`)
-          const indexResponse = await IndexDocuments(fileName, splitDocuments, props.id, contents)
+          const indexResponse = await IndexDocuments(fileName, splitDocuments, props.id, contents, vtt)
 
           if (indexResponse.status !== "OK") {
             showError(`${file.name} failed to be indexed. ${indexResponse.errors[0].message}`)

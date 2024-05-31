@@ -133,6 +133,7 @@ export interface ChatDocumentModel {
   isDeleted: boolean
   createdAt: Date
   contents?: string
+  extraContents?: string
   type: ChatRecordType.Document
 }
 

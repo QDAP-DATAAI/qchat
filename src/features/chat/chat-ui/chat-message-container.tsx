@@ -61,7 +61,12 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
         ) : (
           <div className="grid grid-cols-2 gap-4">
             {documentsWithTranscriptions.map(document => (
-              <ChatFileTranscription key={document.id} name={document.name} contents={document.contents || ""} />
+              <ChatFileTranscription
+                key={document.id}
+                name={document.name}
+                contents={document.contents || ""}
+                vtt={document.extraContents || ""}
+              />
             ))}
           </div>
         )}
