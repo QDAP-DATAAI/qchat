@@ -34,7 +34,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
     <article className={"container mx-auto flex flex-col py-1 pb-2"}>
       <ErrorBoundary>
         <section
-          className={`prose prose-slate max-w-none flex-col gap-4 overflow-hidden break-words rounded-md px-4 py-2 text-base text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base ${props.threadLocked && "border-4 border-error"} ${props.type === "assistant" && "bg-backgroundShade"} ${props.type != "assistant" && "bg-altBackgroundShade"}`}
+          className={`prose prose-slate max-w-full flex-col gap-4 overflow-hidden break-words rounded-md px-4 py-2 text-base text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base ${props.threadLocked && "border-4 border-error"} ${props.type === "assistant" && "bg-backgroundShade"} ${props.type != "assistant" && "bg-altBackgroundShade"}`}
         >
           {props.type === "assistant" && (
             <div className="flex w-full items-center justify-between">
@@ -56,7 +56,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
             </div>
           )}
           <div
-            className="prose prose-slate max-w-none break-words text-base text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
+            className="prose prose-slate max-w-full break-words text-base text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base"
             tabIndex={0}
           >
             <div className="flex w-full items-center justify-between">
@@ -82,6 +82,9 @@ export const ChatRow: FC<ChatRowProps> = props => {
               <div className="flex flex-grow items-center justify-center text-center">
                 This message has triggered our content safety warnings, please rephrase your message, start a new chat
                 or reach out to support if you have concerns.
+              </div>
+              <div className="flex items-center justify-center">
+                <OctagonAlert size={20} />
               </div>
             </div>
           )}
