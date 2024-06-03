@@ -186,8 +186,7 @@ async function getChatResponse(
   let contentFilterTriggerCount = chatThread.contentFilterTriggerCount ?? 0
 
   const mySafetyFilters = {
-    ethical: ["transparency", "accountable", "fairness"],
-    values: ["discrimination", "illegal activities"],
+    ethical: ["Ethical", "Fair", "Transparent", "Empathetic", "Accountable", "Local"],
   }
 
   function checkCustomContentSafety(content: string): CustomContentSafetyResult {
@@ -201,7 +200,7 @@ async function getChatResponse(
         if (content.includes(filter)) {
           customSafetyResult[category as keyof CustomContentSafetyResult] = {
             category: filter,
-            severity: "low",
+            severity: "safe" || "warning" || "danger",
           }
         }
       }
