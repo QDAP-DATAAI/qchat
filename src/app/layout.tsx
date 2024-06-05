@@ -11,6 +11,7 @@ import { ThemeProvider } from "@/features/theme/theme-provider"
 import { NavBar } from "@/features/ui/navbar"
 import { Toaster } from "@/features/ui/toaster"
 import { cn } from "@/lib/utils"
+import { applicationInsights } from "@/features/insights/app-insights"
 
 import { Footer } from "./footer"
 import { Header } from "./header"
@@ -37,6 +38,10 @@ export const metadata: Metadata = {
 }
 
 export const dynamic = "force-dynamic"
+
+console.log("applicationInsights", process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING)
+if (process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING)
+  applicationInsights.initialize(process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING)
 
 export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {
   const isProd = process.env.NODE_ENV === "production"
