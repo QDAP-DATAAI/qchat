@@ -60,6 +60,7 @@ export interface ChatMessageModel {
   type: ChatRecordType.Message
   role: ChatRole
   fleschKincaidScore?: number
+  isPartial?: boolean
 }
 export interface UserChatMessageModel extends ChatMessageModel {
   role: ChatRole.User
