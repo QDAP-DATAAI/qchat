@@ -39,7 +39,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic"
 
-console.log("applicationInsights", process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING)
 if (process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING)
   applicationInsights.initialize(process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING)
 

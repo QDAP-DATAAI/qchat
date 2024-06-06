@@ -10,7 +10,7 @@ const createTelemetryService = (): {
   appInsights: ApplicationInsights
   initialize: (connectionString: string) => void
 } => {
-  const initialize = (connectionString: string) => {
+  const initialize = (connectionString: string): void => {
     appInsights = new ApplicationInsights({
       config: {
         connectionString,
