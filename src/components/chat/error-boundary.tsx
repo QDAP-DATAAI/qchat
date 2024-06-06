@@ -1,47 +1,35 @@
-import { SearchX } from "lucide-react"
-import React, { Component } from "react"
-interface ErrorBoundaryProps {
-  children: React.ReactNode
+"use client"
+import React, { Component, ErrorInfo, ReactNode } from "react"
+
+import logger from "@/features/insights/app-insights"
+
+type Props = {
+  children?: ReactNode
+  fallback?: ReactNode
 }
 
-interface ErrorBoundaryState {
+type State = {
   hasError: boolean
 }
 
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
-    super(props)
-    this.state = { hasError: false }
+class ErrorBoundary extends Component<Props, State> {
+  public state: State = {
+    hasError: false,
   }
 
-  static getDerivedStateFromError(_error: Error): ErrorBoundaryState {
+  public static getDerivedStateFromError(error: Error): State {
+    logger.error("[ErrorBoundary] getDerivedStateFromError caught an error", { error })
+    // Update state so the next render will show the fallback UI.
     return { hasError: true }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    console.error("ErrorBoundary caught an error", error, errorInfo)
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    logger.error("[ErrorBoundary] componentDidCatch caught an error", { error, errorInfo })
   }
 
-  render(): React.ReactNode {
-    if (this.state.hasError) {
-      return (
-        <div
-          className="my-2 flex max-w-none justify-center space-x-2 rounded-md bg-backgroundShade p-2 text-base text-text md:text-base"
-          tabIndex={0}
-        >
-          <div className="flex items-center justify-center text-alert">
-            <SearchX size={20} />
-          </div>
-          <div className="flex flex-grow items-center justify-center text-center">
-            Oops! Looks like there&apos;s a hiccup, and we can&apos;t show the response right now. But no worries, feel
-            free to keep the conversation going!
-          </div>
-          <div className="flex items-center justify-center text-alert">
-            <SearchX size={20} />
-          </div>
-        </div>
-      )
-    }
+  public render(): ReactNode {
+    if (this.state.hasError)
+      return this.props.fallback || <h1>Oops! Looks like there&apos;s a hiccup, please try again later.</h1>
     return this.props.children
   }
 }
