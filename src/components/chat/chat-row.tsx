@@ -3,7 +3,7 @@
 import { OctagonAlert, SearchX } from "lucide-react"
 import React, { FC, useState } from "react"
 
-import ErrorBoundary from "@/components/chat/error-boundary"
+import ErrorBoundary from "@/components/error-boundary"
 import { Markdown } from "@/components/markdown/markdown"
 import Typography from "@/components/typography"
 import { calculateFleschKincaidScore } from "@/features/chat/chat-services/chat-flesch"
