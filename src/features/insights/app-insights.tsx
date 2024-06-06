@@ -1,12 +1,15 @@
+import { ClickAnalyticsPlugin } from "@microsoft/applicationinsights-clickanalytics-js"
 import { SeverityLevel } from "@microsoft/applicationinsights-common"
 import { ApplicationInsights } from "@microsoft/applicationinsights-web"
-import { ClickAnalyticsPlugin } from "@microsoft/applicationinsights-clickanalytics-js"
 
-type CustomProperties = { [key: string]: any }
+type CustomProperties = { [key: string]: unknown }
 
 let appInsights: ApplicationInsights
 
-const createTelemetryService = () => {
+const createTelemetryService = (): {
+  appInsights: ApplicationInsights
+  initialize: (connectionString: string) => void
+} => {
   const initialize = (connectionString: string) => {
     appInsights = new ApplicationInsights({
       config: {
@@ -38,7 +41,7 @@ const createTelemetryService = () => {
   }
 }
 
-const info = (message: string, customProperties?: CustomProperties) => {
+const info = (message: string, customProperties?: CustomProperties): void => {
   const telemetry = {
     message,
     severityLevel: SeverityLevel.Information,
@@ -46,7 +49,7 @@ const info = (message: string, customProperties?: CustomProperties) => {
   appInsights?.trackTrace(telemetry, customProperties)
 }
 
-const warning = (message: string, customProperties?: CustomProperties) => {
+const warning = (message: string, customProperties?: CustomProperties): void => {
   const telemetry = {
     message,
     severityLevel: SeverityLevel.Warning,
@@ -54,7 +57,7 @@ const warning = (message: string, customProperties?: CustomProperties) => {
   appInsights?.trackTrace(telemetry, customProperties)
 }
 
-const error = (message: string, customProperties?: CustomProperties) => {
+const error = (message: string, customProperties?: CustomProperties): void => {
   const telemetry = {
     message,
     severityLevel: SeverityLevel.Error,
@@ -68,7 +71,7 @@ type CriticalErrorPayload = {
   token: string
 }
 
-const critical = (message: string, customProperties: CriticalErrorPayload & CustomProperties) => {
+const critical = (message: string, customProperties: CriticalErrorPayload & CustomProperties): void => {
   const telemetry = {
     message,
     severityLevel: SeverityLevel.Critical,
@@ -76,7 +79,7 @@ const critical = (message: string, customProperties: CriticalErrorPayload & Cust
   appInsights?.trackTrace(telemetry, customProperties)
 }
 
-const event = (name: string, customProperties?: CustomProperties) => {
+const event = (name: string, customProperties?: CustomProperties): void => {
   const telemetry = {
     name,
     properties: customProperties,

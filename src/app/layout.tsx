@@ -6,12 +6,12 @@ import "./globals.css"
 
 import { GlobalConfigProvider } from "@/features/globals/global-client-config-context"
 import { Providers } from "@/features/globals/providers"
+import { applicationInsights } from "@/features/insights/app-insights"
 import { AI_AUTHOR, AI_NAME, AI_TAGLINE, APP_URL } from "@/features/theme/theme-config"
 import { ThemeProvider } from "@/features/theme/theme-provider"
 import { NavBar } from "@/features/ui/navbar"
 import { Toaster } from "@/features/ui/toaster"
 import { cn } from "@/lib/utils"
-import { applicationInsights } from "@/features/insights/app-insights"
 
 import { Footer } from "./footer"
 import { Header } from "./header"
