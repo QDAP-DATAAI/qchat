@@ -6,7 +6,7 @@ Below are the updates for the Queensland Government QChat Virtual Assistant.
 
 - If you are a technical or business staff member working on AI Projects, you can click [here](https://forms.office.com/r/YZzMFLexPK) to request to join the Queensland Government AI Community of Practice. This platform is designed to facilitate knowledge sharing and collaboration among AI professionals within the government.
 
-## 🐞 Version 1.4.8 Updates - 3 June 2024
+## 🐞 Version 1.4.8 Updates - 7 June 2024
 
 - **Stop Scrolling QChat!:** We've updated QChat to not scroll to bottom when receiving messages after you first scroll, this will help you stop and read longer messages at your own pace. Simply scroll up from the bottom of the screen and QChat won't bring you down to the end of it's response!
 
