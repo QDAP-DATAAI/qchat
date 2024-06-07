@@ -50,7 +50,7 @@
     "@radix-ui/react-tooltip": "^1.0.7",
     "@tailwindcss/typography": "^0.5.13",
     "@types/dompurify": "^3.0.5",
-    "ai": "^3.0.13",
+    "ai": "3.0.20",
     "applicationinsights": "^3.0.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
