@@ -1,4 +1,4 @@
-import { hashValue } from "@/features/auth/helpers"
+import { userSession } from "@/features/auth/helpers"
 import { ServerActionResponseAsync } from "@/features/common/server-action-response"
 import { UserContainer } from "@/features/common/services/cosmos"
 import { arraysAreEqual } from "@/lib/utils"
@@ -117,16 +117,11 @@ export const UpdateUser = async (
 }
 
 export const GetUserByUpn = async (tenantId: string, upn: string): ServerActionResponseAsync<UserRecord> => {
-  const lowerUpn = upn.toLowerCase()
-  const lowerHashUpn = hashValue(lowerUpn)
-
   const query = {
-    query:
-      "SELECT * FROM c WHERE c.tenantId = @tenantId AND (LOWER(c.upn) = @lowerUpn OR LOWER(c.upn) = @lowerHashUpn)",
+    query: "SELECT * FROM c WHERE c.tenantId = @tenantId AND c.upn = @upn",
     parameters: [
       { name: "@tenantId", value: tenantId },
-      { name: "@lowerUpn", value: lowerUpn },
-      { name: "@lowerHashUpn", value: lowerHashUpn },
+      { name: "@upn", value: upn },
     ],
   }
   try {
@@ -147,4 +142,15 @@ export const GetUserByUpn = async (tenantId: string, upn: string): ServerActionR
       errors: [{ message: `${error}` }],
     }
   }
+}
+
+export const GetUserPreferences = async (): ServerActionResponseAsync<UserPreferences> => {
+  const user = await userSession()
+  if (!user) return { status: "ERROR", errors: [{ message: "User not found" }] }
+
+  const existingUserResult = await GetUserByUpn(user.tenantId, user.upn)
+  if (existingUserResult.status !== "OK") return existingUserResult
+
+  const preferences: UserPreferences = existingUserResult.response.preferences || { contextPrompt: "" }
+  return { status: "OK", response: preferences }
 }

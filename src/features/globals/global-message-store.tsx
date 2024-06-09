@@ -1,42 +1,24 @@
 import { ToastAction } from "@radix-ui/react-toast"
 
-import { toast } from "@/features/ui/use-toast"
+import logger from "@/features/insights/app-insights"
+import { type Toast, toast } from "@/features/ui/use-toast"
 
-interface MessageProp {
-  title: string
-  description: string
+export const showError = (error: string, reload?: () => void): void => {
+  if (typeof window !== "undefined")
+    toast({
+      variant: "destructive",
+      description: error,
+      action: reload ? (
+        <ToastAction altText="Try again" onClick={() => reload()}>
+          Try again
+        </ToastAction>
+      ) : undefined,
+    })
+
+  logger.error(error)
 }
 
-export const showError = (
-  error: string,
-  logError?: (error: Error, properties?: Record<string, unknown>) => void,
-  reload?: () => void
-): void => {
-  toast({
-    variant: "destructive",
-    description: error,
-    action: reload ? (
-      <ToastAction
-        altText="Try again"
-        onClick={() => {
-          reload()
-        }}
-      >
-        Try again
-      </ToastAction>
-    ) : undefined,
-  })
-  if (logError) {
-    logError(new Error(error))
-  }
-}
-
-export const showSuccess = (
-  message: MessageProp,
-  logEvent?: (name: string, properties?: Record<string, unknown>) => void
-): void => {
-  toast(message)
-  if (logEvent) {
-    logEvent(message.title, { description: message.description })
-  }
+export const showSuccess = (message: Toast): void => {
+  if (typeof window !== "undefined") toast(message)
+  logger.event(message.title || "Show Success", { description: message.description })
 }
