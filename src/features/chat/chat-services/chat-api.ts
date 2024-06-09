@@ -4,6 +4,7 @@ import { ChatCompletionChunk, ChatCompletionMessageParam, Completion } from "ope
 import { Stream } from "openai/streaming"
 
 import {
+  AssistantChatMessageModel,
   ChatMessageModel,
   ChatRecordType,
   ChatRole,
@@ -15,6 +16,7 @@ import {
 } from "@/features/chat/models"
 import { mapOpenAIChatMessages } from "@/features/common/mapping-helper"
 import { OpenAIInstance } from "@/features/common/services/open-ai"
+import logger from "@/features/insights/app-insights"
 
 import { buildDataChatMessages, buildSimpleChatMessages, getContextPrompts } from "./chat-api-helper"
 import { calculateFleschKincaidScore } from "./chat-flesch"
@@ -94,25 +96,62 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
     })
     if (chatMessageResponse.status !== "OK") throw chatMessageResponse
 
+    const createAssistantChatRecord = (
+      content: string,
+      isPartial: boolean = false,
+      originalCompletion: string = "",
+      fleschKincaidScore: number | undefined = undefined
+    ): AssistantChatMessageModel => ({
+      id: props.data.completionId,
+      createdAt: new Date(),
+      type: ChatRecordType.Message,
+      isDeleted: false,
+      content: content,
+      originalCompletion: originalCompletion,
+      role: ChatRole.Assistant,
+      chatThreadId: chatThread.id,
+      userId: chatThread.userId,
+      tenantId: chatThread.tenantId,
+      feedback: FeedbackType.None,
+      sentiment: ChatSentiment.Neutral,
+      reason: "",
+      fleschKincaidScore: fleschKincaidScore,
+      isPartial: isPartial,
+    })
+
+    const partialMessage: string[] = []
+    let timer: NodeJS.Timeout | undefined
+    let completed = false
+
+    const handlePartialText = (text: string): void => {
+      if (completed) return
+      partialMessage.push(text)
+
+      if (timer) {
+        clearTimeout(timer)
+      }
+
+      timer = setTimeout(async () => {
+        if (completed) return //just in case...
+        await UpsertChatMessage(createAssistantChatRecord(partialMessage.join(""), true))
+      }, 1000)
+    }
+
     const stream = OpenAIStream(response as AsyncIterable<Completion>, {
+      onText: handlePartialText,
       async onCompletion(completion: string) {
+        completed = true
+        clearTimeout(timer)
+
         const translatedCompletion = await translate(completion)
-        const addedMessage = await UpsertChatMessage({
-          id: props.data.completionId,
-          createdAt: new Date(),
-          type: ChatRecordType.Message,
-          isDeleted: false,
-          originalCompletion: translatedCompletion ? completion : "",
-          content: translatedCompletion ? translatedCompletion : completion,
-          role: ChatRole.Assistant,
-          chatThreadId: chatThread.id,
-          userId: chatThread.userId,
-          tenantId: chatThread.tenantId,
-          feedback: FeedbackType.None,
-          sentiment: ChatSentiment.Neutral,
-          reason: "",
-          fleschKincaidScore: calculateFleschKincaidScore(translatedCompletion ? translatedCompletion : completion),
-        })
+        const addedMessage = await UpsertChatMessage(
+          createAssistantChatRecord(
+            translatedCompletion ? translatedCompletion : completion,
+            false,
+            translatedCompletion ? completion : "",
+            calculateFleschKincaidScore(translatedCompletion ? translatedCompletion : completion)
+          )
+        )
         if (addedMessage?.status !== "OK") throw addedMessage.errors
 
         data.append({
@@ -133,6 +172,8 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
   } catch (error) {
     const errorResponse = error instanceof Error ? error.message : "An unknown error occurred."
     const errorStatusText = error instanceof Error ? error.toString() : "Unknown Error"
+
+    logger.error("ChatApi error", { error })
 
     return new Response(errorResponse, {
       status: 500,
