@@ -13,7 +13,6 @@ import {
   MapPinOff,
 } from "lucide-react"
 
-// Define the categories as an enum
 export enum ContentSafetyCategory {
   Hate = "Hate",
   SelfHarm = "SelfHarm",
@@ -27,8 +26,6 @@ export enum ContentSafetyCategory {
   Accountability = "Accountability",
   LocalRelevance = "LocalRelevance",
 }
-
-// Extend the original interface and rename it to QGovTextCategoriesAnalysisOutput
 export interface QGovTextCategoriesAnalysisOutput extends OriginalTextCategoriesAnalysisOutput {
   categories: Array<{
     category: ContentSafetyCategory
@@ -36,7 +33,6 @@ export interface QGovTextCategoriesAnalysisOutput extends OriginalTextCategories
   }>
 }
 
-// Create a class that implements the QGovTextCategoriesAnalysisOutput interface
 export class QGovCustomTextAnalysis implements QGovTextCategoriesAnalysisOutput {
   categories: Array<{
     category: ContentSafetyCategory
@@ -45,25 +41,21 @@ export class QGovCustomTextAnalysis implements QGovTextCategoriesAnalysisOutput 
 
   constructor(categories: Array<{ category: ContentSafetyCategory; severity?: number }>) {
     this.categories = categories
-    this.category = ContentSafetyCategory.Hate // Add this line
+    this.category = ContentSafetyCategory.Hate
   }
 
-  // Method to join the message for all categories
   generateMessage(): string {
     return this.categories.map(cat => `This message may ${categorySeverityMessageMap[cat.category]};`).join(" ")
   }
 
-  category: ContentSafetyCategory // Add this line
+  category: ContentSafetyCategory
 }
 
-// Example usage with multiple categories
-const customAnalysis = new QGovCustomTextAnalysis([
+const _customAnalysis = new QGovCustomTextAnalysis([
   { category: ContentSafetyCategory.Hate, severity: 3 },
   { category: ContentSafetyCategory.SexualContent, severity: 2 },
 ])
-console.log(customAnalysis.generateMessage())
 
-// Mappings
 export const categoryIconMap: Record<ContentSafetyCategory, React.ElementType> = {
   [ContentSafetyCategory.Hate]: Angry,
   [ContentSafetyCategory.SexualContent]: Milestone,
