@@ -29,17 +29,17 @@ export enum ContentSafetyCategory {
 export interface QGovTextCategoriesAnalysisOutput extends OriginalTextCategoriesAnalysisOutput {
   categories: Array<{
     category: ContentSafetyCategory
-    severity?: number
+    severity?: string
   }>
 }
 
 export class QGovCustomTextAnalysis implements QGovTextCategoriesAnalysisOutput {
   categories: Array<{
     category: ContentSafetyCategory
-    severity?: number
+    severity?: string
   }>
 
-  constructor(categories: Array<{ category: ContentSafetyCategory; severity?: number }>) {
+  constructor(categories: Array<{ category: ContentSafetyCategory; severity?: string }>) {
     this.categories = categories
     this.category = ContentSafetyCategory.Hate
   }
@@ -52,8 +52,8 @@ export class QGovCustomTextAnalysis implements QGovTextCategoriesAnalysisOutput 
 }
 
 const _customAnalysis = new QGovCustomTextAnalysis([
-  { category: ContentSafetyCategory.Hate, severity: 3 },
-  { category: ContentSafetyCategory.SexualContent, severity: 2 },
+  { category: ContentSafetyCategory.Hate, severity: "medium" },
+  { category: ContentSafetyCategory.SexualContent, severity: "safe" },
 ])
 
 export const categoryIconMap: Record<ContentSafetyCategory, React.ElementType> = {
