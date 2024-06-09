@@ -30,7 +30,7 @@ const createCosmosClient = (authToken: string): CosmosClient => {
 
 const CosmosInstance = async (): Promise<CosmosClient> => {
   //If token is not expired, return the client
-  if (_cosmosClient && _authToken && _authToken.expiry > Date.now()) {
+  if (_cosmosClient && _authToken && _authToken.expiry < Date.now()) {
     return _cosmosClient
   }
   await fetchAndSetAuthToken()
