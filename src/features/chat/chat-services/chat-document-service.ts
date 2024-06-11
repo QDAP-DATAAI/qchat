@@ -12,7 +12,7 @@ import logger from "@/features/insights/app-insights"
 import { uniqueId } from "@/lib/utils"
 
 import { AzureCogDocumentIndex, indexDocuments } from "./azure-cog-search/azure-cog-vector-store"
-import { speechToTextRecognizeOnce, transcribeAudio } from "./chat-audio-helper"
+import { transcribeAudio } from "./chat-audio-helper"
 import { arrayBufferToBase64, customBeginAnalyzeDocument } from "./chat-document-helper"
 import { chunkDocumentWithOverlap } from "./text-chunk"
 import { isNotNullOrEmpty } from "./utils"
@@ -77,15 +77,9 @@ export const UploadDocument = async (formData: FormData): ServerActionResponseAs
     const chatType = formData.get("chatType") as string
     let fileContent: [string[], string?, string?]
     if (chatType === "audio") {
-      if (formData.has("whisper")) {
-        const transcription = await transcribeAudio(formData)
-        const splitDocuments = chunkDocumentWithOverlap(transcription.text)
-        fileContent = [splitDocuments, transcription.text, transcription.vtt]
-      } else {
-        const transcription = await speechToTextRecognizeOnce(formData)
-        const splitDocuments = chunkDocumentWithOverlap(transcription.text)
-        fileContent = [splitDocuments, transcription.text, transcription.vtt]
-      }
+      const transcription = await transcribeAudio(formData)
+      const splitDocuments = chunkDocumentWithOverlap(transcription.text)
+      fileContent = [splitDocuments, transcription.text, transcription.vtt]
     } else {
       const docs = await LoadFile(formData, chatType)
       const splitDocuments = chunkDocumentWithOverlap(docs.join("\n"))
