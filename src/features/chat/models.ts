@@ -75,6 +75,7 @@ export interface AssistantChatMessageModel extends ChatMessageModel {
   feedback: FeedbackType
   sentiment: ChatSentiment
   reason: string
+  isPartial?: boolean
 }
 
 export interface ChatThreadModel {
@@ -133,6 +134,7 @@ export interface ChatDocumentModel {
   isDeleted: boolean
   createdAt: Date
   contents?: string
+  extraContents?: string
   type: ChatRecordType.Document
 }
 

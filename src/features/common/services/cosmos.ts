@@ -1,6 +1,6 @@
-import { CosmosClient, ErrorResponse, Container, PartitionKeyDefinitionVersion, PartitionKeyKind } from "@azure/cosmos"
+import { CosmosClient, Container, PartitionKeyDefinitionVersion, PartitionKeyKind } from "@azure/cosmos"
 
-import { GetCosmosAccessToken } from "./cosmos-auth"
+import { GetCosmosAccessToken, getTokenExpiry } from "./cosmos-auth"
 
 interface AuthToken {
   token: string
@@ -9,21 +9,12 @@ interface AuthToken {
 
 let _cosmosClient: CosmosClient | null = null
 let _authToken: AuthToken | null = null
-let _tokenRefreshTimer: NodeJS.Timeout | null = null
 
 const fetchAndSetAuthToken = async (): Promise<void> => {
   const token = await GetCosmosAccessToken()
-  const expiry = Date.now() + 22 * 60 * 60 * 1000
+  const expiry = await getTokenExpiry(token)
   _authToken = { token, expiry }
   _cosmosClient = createCosmosClient(token)
-  scheduleTokenRefresh()
-}
-
-const scheduleTokenRefresh = (): void => {
-  if (_tokenRefreshTimer) {
-    clearTimeout(_tokenRefreshTimer)
-  }
-  _tokenRefreshTimer = setTimeout(fetchAndSetAuthToken, 21 * 60 * 60 * 1000)
 }
 
 const createCosmosClient = (authToken: string): CosmosClient => {
@@ -38,20 +29,12 @@ const createCosmosClient = (authToken: string): CosmosClient => {
 }
 
 const CosmosInstance = async (): Promise<CosmosClient> => {
-  try {
-    if (_cosmosClient && _authToken && Date.now() < _authToken.expiry) {
-      return _cosmosClient
-    }
-    await fetchAndSetAuthToken()
-    return _cosmosClient!
-  } catch (error) {
-    if (error instanceof ErrorResponse && error.statusCode === 401) {
-      console.error("Token expired. Re-authenticating...")
-      await fetchAndSetAuthToken()
-      return _cosmosClient!
-    }
-    throw error
+  //If token is not expired, return the client
+  if (_cosmosClient && _authToken && _authToken.expiry > Date.now()) {
+    return _cosmosClient
   }
+  await fetchAndSetAuthToken()
+  return _cosmosClient!
 }
 
 let _historyContainer: Container | null = null

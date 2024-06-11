@@ -8,10 +8,11 @@ import { ChatDocumentModel, ChatRecordType } from "@/features/chat/models"
 import { xMonthsAgo } from "@/features/common/date-helper"
 import { ServerActionResponseAsync } from "@/features/common/server-action-response"
 import { HistoryContainer } from "@/features/common/services/cosmos"
+import logger from "@/features/insights/app-insights"
 import { uniqueId } from "@/lib/utils"
 
 import { AzureCogDocumentIndex, indexDocuments } from "./azure-cog-search/azure-cog-vector-store"
-import { speechToTextRecognizeOnce } from "./chat-audio-helper"
+import { transcribeAudio } from "./chat-audio-helper"
 import { arrayBufferToBase64, customBeginAnalyzeDocument } from "./chat-document-helper"
 import { chunkDocumentWithOverlap } from "./text-chunk"
 import { isNotNullOrEmpty } from "./utils"
@@ -47,7 +48,7 @@ const ensureSearchIsConfigured = (): boolean => {
     isNotNullOrEmpty(process.env.AZURE_SEARCH_API_VERSION)
 
   if (!isSearchConfigured) {
-    console.error("Azure search environment variables are not configured.")
+    logger.error("Azure search environment variables are not configured.")
     return false
   }
 
@@ -55,30 +56,30 @@ const ensureSearchIsConfigured = (): boolean => {
     isNotNullOrEmpty(process.env.APIM_BASE) && isNotNullOrEmpty(process.env.APIM_KEY)
 
   if (!isDocumentIntelligenceConfigured) {
-    console.error("Azure document intelligence environment variables are not configured.")
+    logger.error("Azure document intelligence environment variables are not configured.")
     return false
   }
 
   const isEmbeddingsConfigured = isNotNullOrEmpty(process.env.AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME)
 
   if (!isEmbeddingsConfigured) {
-    console.error("Azure OpenAI Embedding variables are not configured.")
+    logger.error("Azure OpenAI Embedding variables are not configured.")
     return false
   }
   return true
 }
 
-export const UploadDocument = async (formData: FormData): ServerActionResponseAsync<[string[], string?]> => {
+export const UploadDocument = async (formData: FormData): ServerActionResponseAsync<[string[], string?, string?]> => {
   try {
     const isConfigValid = ensureSearchIsConfigured()
     if (!isConfigValid) throw new Error("Azure Search is not configured")
 
     const chatType = formData.get("chatType") as string
-    let fileContent: [string[], string?]
+    let fileContent: [string[], string?, string?]
     if (chatType === "audio") {
-      const docs = await speechToTextRecognizeOnce(formData)
-      const splitDocuments = chunkDocumentWithOverlap(docs.join("\n"))
-      fileContent = [splitDocuments, docs.join("\n")]
+      const transcription = await transcribeAudio(formData)
+      const splitDocuments = chunkDocumentWithOverlap(transcription.text)
+      fileContent = [splitDocuments, transcription.text, transcription.vtt]
     } else {
       const docs = await LoadFile(formData, chatType)
       const splitDocuments = chunkDocumentWithOverlap(docs.join("\n"))
@@ -100,17 +101,17 @@ export const IndexDocuments = async (
   fileName: string,
   docs: string[],
   chatThreadId: string,
-  order: number,
-  contentsToSave?: string
+  contentsToSave?: string,
+  extraContents?: string
 ): ServerActionResponseAsync<AzureCogDocumentIndex[]> => {
   try {
     const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
-    const documentsToIndex: AzureCogDocumentIndex[] = docs.map(docContent => ({
+    const documentsToIndex: AzureCogDocumentIndex[] = docs.map((docContent, index) => ({
       id: uniqueId(),
       chatThreadId,
       userId,
       pageContent: docContent,
-      order,
+      order: index + 1,
       metadata: fileName,
       tenantId,
       createdDate: new Date().toISOString(),
@@ -129,6 +130,7 @@ export const IndexDocuments = async (
       tenantId,
       name: fileName,
       contents: contentsToSave,
+      extraContents: extraContents,
     }
     const container = await HistoryContainer()
     const { resource } = await container.items.upsert<ChatDocumentModel>(modelToSave)
