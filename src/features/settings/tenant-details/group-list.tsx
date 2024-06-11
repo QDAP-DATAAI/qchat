@@ -19,10 +19,8 @@ export const GroupList: React.FC<{ tenantGroups: string[] }> = ({ tenantGroups }
 
   const handleNewGroups = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
-
     const form = new FormData(e.currentTarget)
     const newGroupGuids = (form.get("newGroups") as string).split(",").map(guid => guid.trim())
-
     try {
       await submit([...groups, ...newGroupGuids])
       ;(e.target as HTMLFormElement)?.reset()

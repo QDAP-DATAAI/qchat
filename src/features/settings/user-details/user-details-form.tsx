@@ -20,10 +20,8 @@ export const UserDetailsForm: React.FC<{ preferences: UserPreferences }> = ({ pr
 
   const handleSubmitContextPrompt = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
-
     const form = new FormData(e.currentTarget)
     const newContextPrompt = form.get("contextPrompt") as string
-
     try {
       await submit(newContextPrompt)
       ;(e.target as HTMLFormElement)?.reset()

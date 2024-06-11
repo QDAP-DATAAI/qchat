@@ -18,10 +18,8 @@ export const TenantDetailsForm: React.FC<{ tenant: TenantDetails }> = ({ tenant 
 
   const handleSubmitContextPrompt = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault()
-
     const form = new FormData(e.currentTarget)
     const newContextPrompt = form.get("contextPrompt") as string
-
     try {
       await submit(newContextPrompt)
       ;(e.target as HTMLFormElement)?.reset()
