@@ -16,6 +16,7 @@ import { FileAudioSource } from "microsoft-cognitiveservices-speech-sdk/distrib/
 import { AudioOutputFormatImpl } from "microsoft-cognitiveservices-speech-sdk/distrib/lib/src/sdk/Audio/AudioOutputFormat"
 
 import { GetSpeechToken } from "@/features/chat/chat-ui/chat-speech/speech-service"
+import logger from "@/features/insights/app-insights"
 
 import { arrayBufferToBase64 } from "./chat-document-helper"
 
@@ -123,24 +124,16 @@ async function _recognizeOnceFromFile(recognizer: SpeechRecognizer): Promise<str
 
     return recognisedText
   } catch (e) {
-    // TODO handle error
-    console.error(e)
+    logger.error("Error in speech recognition", { error: e instanceof Error ? e.message : e })
     return ""
   }
 }
 
 const handleCanceledReason = (result: SpeechRecognitionResult): void => {
-  // TODO handle error
   const cancellation = CancellationDetails.fromResult(result)
-  //TODO handle error
-  console.error(`CANCELED: Reason=${cancellation.reason}`)
-
-  if (cancellation.reason === CancellationReason.Error) {
-    //TODO handle error
-    console.error(`CANCELED: ErrorCode=${cancellation.ErrorCode}`)
-    console.error(`CANCELED: ErrorDetails=${cancellation.errorDetails}`)
-    console.error("CANCELED: Did you set the speech resource key and region values?")
-  }
+  if (cancellation.reason === CancellationReason.Error)
+    logger.error("Speech recognition cancellation error", { cancellation })
+  else logger.event("Speech recognition cancellation", { cancellation })
 }
 
 /**
@@ -191,6 +184,9 @@ async function startRecognition(recognizer: SpeechRecognizer): Promise<{
   return {
     vtt: vtt.join("\n"),
     text: texts.join("\n"),
+ catch (e) {
+    logger.error("Error in speech recognition", { error: e instanceof Error ? e.message : e })
+    return []
   }
 }
 
@@ -234,9 +230,8 @@ const _audioConfigFromStream = async (file: File): Promise<AudioConfig> => {
 
     return audioConfig
   } catch (e) {
-    // TODO handle error
-    console.error(e)
-    throw new Error("Unsupported audio file. " + e)
+    logger.error("Unsupported audio file", { error: e instanceof Error ? e.message : e })
+    throw e
   }
 }
 
