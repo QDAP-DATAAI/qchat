@@ -55,7 +55,7 @@ export const transcribeAudio = async (
   vtt: string
   text: string
 }> => {
-  console.warn("transcribing audio using whisper")
+  logger.warning("transcribing audio using whisper")
 
   const AZURE_ML_MANAGED_ERROR_CODE = 424
   // const AZURE_ML_TIMEOUT_ERROR_CODE = 408
@@ -87,12 +87,12 @@ export const transcribeAudio = async (
       }
     }
 
-    console.error("whisper response error: ", body)
+    logger.error("whisper response error " + body)
     throw body
   }
 
   const text = await response.text()
-  console.error("whisper error: ", text)
+  logger.error("whisper error " + text)
 
   throw text
 }
@@ -184,9 +184,9 @@ async function startRecognition(recognizer: SpeechRecognizer): Promise<{
   return {
     vtt: vtt.join("\n"),
     text: texts.join("\n"),
- catch (e) {
-    logger.error("Error in speech recognition", { error: e instanceof Error ? e.message : e })
-    return []
+    //  catch (e) {
+    //     logger.error("Error in speech recognition", { error: e instanceof Error ? e.message : e })
+    //     return []
   }
 }
 
