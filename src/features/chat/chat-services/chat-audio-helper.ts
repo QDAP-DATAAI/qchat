@@ -184,9 +184,6 @@ async function startRecognition(recognizer: SpeechRecognizer): Promise<{
   return {
     vtt: vtt.join("\n"),
     text: texts.join("\n"),
-    //  catch (e) {
-    //     logger.error("Error in speech recognition", { error: e instanceof Error ? e.message : e })
-    //     return []
   }
 }
 
