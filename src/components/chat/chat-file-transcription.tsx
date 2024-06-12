@@ -48,7 +48,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   }
 
   return (
-    <article className="mx-auto flex flex-col py-1 pb-4">
+    <article className="container mx-auto flex flex-col py-1 pb-4">
       <section className="flex-col gap-4 overflow-hidden rounded-md bg-background p-4">
         <header className="flex w-full items-center justify-between">
           <Typography variant="h3">{props.name}</Typography>
