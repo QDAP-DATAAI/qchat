@@ -1,4 +1,4 @@
-import { UserRoundCog, FileClock, CircleHelp, Building2 } from "lucide-react"
+import { UserRoundCog, FileClock, CircleHelp, Building2, SyringeIcon } from "lucide-react"
 
 import { isTenantAdmin } from "@/features/auth/helpers"
 import { SettingsMenuItem } from "@/features/settings/settings-menu-item"
@@ -8,6 +8,7 @@ const menuItems = [
   { url: "/settings/history", icon: <FileClock size={16} />, text: "Chat history" },
   { url: "/settings/help", icon: <CircleHelp size={16} />, text: "Help & Support" },
   { url: "/settings/tenant", icon: <Building2 size={16} />, text: "Department details", adminRequired: true },
+  { url: "/settings/migrations", icon: <SyringeIcon size={16} />, text: "Emergency migrations", adminRequired: true },
 ]
 
 export const SettingsMenuItems = async (): Promise<JSX.Element> => {
