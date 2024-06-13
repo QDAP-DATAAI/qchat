@@ -22,8 +22,6 @@ import { useGlobalMessageContext } from "@/features/globals/global-message-conte
 import { uniqueId } from "@/lib/utils"
 
 import { FileState, useFileState } from "./chat-file/use-file-state"
-import { SpeechToTextProps, useSpeechToText } from "./chat-speech/use-speech-to-text"
-import { TextToSpeechProps, useTextToSpeech } from "./chat-speech/use-text-to-speech"
 
 interface ChatContextProps extends UseChatHelpers {
   id: string
@@ -33,7 +31,6 @@ interface ChatContextProps extends UseChatHelpers {
   onChatTypeChange: (value: ChatType) => void
   onConversationStyleChange: (value: ConversationStyle) => void
   onConversationSensitivityChange: (value: ConversationSensitivity) => void
-  speech: TextToSpeechProps & SpeechToTextProps
   isModalOpen?: boolean
   openModal?: () => void
   closeModal?: () => void
@@ -57,12 +54,6 @@ interface Prop {
 export const ChatProvider: FC<Prop> = props => {
   const { showError } = useGlobalMessageContext()
   const Router = useRouter()
-  const speechSynthesizer = useTextToSpeech()
-  const speechRecognizer = useSpeechToText({
-    onSpeech(value) {
-      response.setInput(value)
-    },
-  })
 
   const fileState = useFileState()
 
@@ -78,9 +69,6 @@ export const ChatProvider: FC<Prop> = props => {
     chatThreadName: props.chatThread.name,
   })
 
-  const { textToSpeech } = speechSynthesizer
-  const { isMicrophoneUsed, resetMicrophoneUsed } = speechRecognizer
-
   const onError = (error: Error): void => showError(error.message)
 
   const [nextId, setNextId] = useState<string | undefined>(undefined)
@@ -93,10 +81,6 @@ export const ChatProvider: FC<Prop> = props => {
     body: chatBody,
     initialMessages: props.chats,
     onFinish: (lastMessage: Message) => {
-      if (isMicrophoneUsed) {
-        textToSpeech(lastMessage.content)
-        resetMicrophoneUsed()
-      }
       Router.refresh()
     },
     generateId: () => {
@@ -169,10 +153,6 @@ export const ChatProvider: FC<Prop> = props => {
         onConversationSensitivityChange,
         fileState,
         id: props.id,
-        speech: {
-          ...speechSynthesizer,
-          ...speechRecognizer,
-        },
         isModalOpen,
         openModal,
         closeModal,

@@ -127,6 +127,7 @@ export const UpdateChatThreadToFileDetails = async (
     const response = await FindChatThreadForCurrentUser(chatThreadId)
     if (response.status !== "OK") return response
     const chatThread = response.response
+    chatThread.name = `Chat with ${chatOverFileName}`
     chatThread.chatType = newType
     chatThread.chatOverFileName = chatOverFileName
     return await UpsertChatThread(chatThread)
