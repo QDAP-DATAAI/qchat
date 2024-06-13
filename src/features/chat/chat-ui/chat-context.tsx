@@ -80,7 +80,7 @@ export const ChatProvider: FC<Prop> = props => {
     id: props.id,
     body: chatBody,
     initialMessages: props.chats,
-    onFinish: (lastMessage: Message) => {
+    onFinish: () => {
       Router.refresh()
     },
     generateId: () => {
