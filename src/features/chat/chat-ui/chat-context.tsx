@@ -1,6 +1,6 @@
 "use client"
 
-import { ChatRequestOptions, JSONValue, Message } from "ai"
+import { ChatRequestOptions, JSONValue } from "ai"
 import { UseChatHelpers, useChat } from "ai/react"
 import { useRouter } from "next/navigation"
 import React, { FC, FormEvent, createContext, useContext, useRef, useState } from "react"
