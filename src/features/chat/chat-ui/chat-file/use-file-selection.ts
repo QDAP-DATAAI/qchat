@@ -25,7 +25,7 @@ export const useFileSelection = (
     try {
       setIsUploadingFile(true)
       if (chatBody.chatType === "audio") {
-        setUploadButtonLabel("Uploading and transcribing audio...")
+        setUploadButtonLabel("Uploading and transcribing file...")
       } else {
         setUploadButtonLabel("Uploading file...")
       }

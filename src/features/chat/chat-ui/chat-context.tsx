@@ -2,7 +2,6 @@
 
 import { ChatRequestOptions, JSONValue } from "ai"
 import { UseChatHelpers, useChat } from "ai/react"
-import { useRouter } from "next/navigation"
 import React, { FC, FormEvent, createContext, useContext, useRef, useState } from "react"
 
 import { MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED } from "@/features/chat/chat-services/chat-api"
@@ -53,8 +52,6 @@ interface Prop {
 
 export const ChatProvider: FC<Prop> = props => {
   const { showError } = useGlobalMessageContext()
-  const Router = useRouter()
-
   const fileState = useFileState()
 
   const [chatBody, setChatBody] = useState<PromptBody>({
@@ -80,9 +77,6 @@ export const ChatProvider: FC<Prop> = props => {
     id: props.id,
     body: chatBody,
     initialMessages: props.chats,
-    onFinish: () => {
-      Router.refresh()
-    },
     generateId: () => {
       if (nextIdRef.current) {
         const returnValue = nextIdRef.current

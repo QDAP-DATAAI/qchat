@@ -11,7 +11,7 @@ export const transcribeAudio = async (
   vtt: string
   text: string
 }> => {
-  logger.warning("transcribing audio using whisper")
+  logger.warning("transcribing file using whisper")
 
   const AZURE_ML_MANAGED_ERROR_CODE = 424
   // const AZURE_ML_TIMEOUT_ERROR_CODE = 408
