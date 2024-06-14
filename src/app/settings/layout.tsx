@@ -22,10 +22,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <SettingsProvider config={config.response}>
-      <div className="col-span-3 size-full overflow-auto">
+      <div className="col-span-2 size-full overflow-auto">
         <SettingsMenu />
       </div>
-      <div className="col-span-9 size-full overflow-auto">
+      <div className="col-span-10 size-full overflow-auto">
         <Card className="size-full overflow-auto bg-altBackground">
           <div className="size-full bg-altBackground text-foreground">
             <section className="mx-auto size-full justify-center bg-altBackground">{children}</section>

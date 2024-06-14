@@ -153,3 +153,27 @@ export const GetUserPreferences = async (): ServerActionResponseAsync<UserPrefer
   const preferences: UserPreferences = existingUserResult.response.preferences || { contextPrompt: "" }
   return { status: "OK", response: preferences }
 }
+
+export const GetUsersByTenantId = async (tenantId: string): ServerActionResponseAsync<UserRecord[]> => {
+  const user = await userSession()
+  if (!user) return { status: "ERROR", errors: [{ message: "User not found" }] }
+  if (!user.admin) return { status: "ERROR", errors: [{ message: "Permission Denied - User is not an admin" }] }
+
+  try {
+    const query = {
+      query: "SELECT * FROM c WHERE c.tenantId = @tenantId",
+      parameters: [{ name: "@tenantId", value: tenantId }],
+    }
+    const container = await UserContainer()
+    const { resources } = await container.items.query<UserRecord>(query).fetchAll()
+    return {
+      status: "OK",
+      response: resources,
+    }
+  } catch (e) {
+    return {
+      status: "ERROR",
+      errors: [{ message: `${e}` }],
+    }
+  }
+}

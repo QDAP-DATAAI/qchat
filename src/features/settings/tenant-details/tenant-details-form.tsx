@@ -13,6 +13,7 @@ import { TenantDetails } from "@/features/tenant-management/models"
 import SystemPrompt from "@/features/theme/readable-systemprompt"
 import { Button } from "@/features/ui/button"
 import { SmartGen } from "@/features/ui/smart-gen"
+import { Textarea } from "@/features/ui/textarea"
 
 export const TenantDetailsForm: React.FC<{ tenant: TenantDetails }> = ({ tenant }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -46,7 +47,7 @@ export const TenantDetailsForm: React.FC<{ tenant: TenantDetails }> = ({ tenant 
       ? "Context prompt could not be updated. Please try again later."
       : "Context prompt could not be cleared. Please try again later."
     try {
-      const response = await fetch("/api/tenant/details", {
+      const response = await fetch(`/api/tenant/${tenant.id}/details`, {
         method: "POST",
         cache: "no-store",
         headers: { "Content-Type": "application/json" },
@@ -75,15 +76,13 @@ ${tenantPrompt}
 `
 
   const sanitisePrompt = async (): Promise<void> => {
-    if (!input || input.length < 1) {
-      setInput("")
-      return
-    }
+    if (input?.length < 1) return
+
     try {
       const formatInput = buildInput({ systemPrompt: config.systemPrompt, tenantPrompt: input })
       const res = await smartGen({
         toolName: "contextPromptSanitiser",
-        context: { uiComponent: "UserDetailsForm" },
+        context: { uiComponent: "TenantDetailsForm" },
         input: formatInput,
       })
       if (res === null) throw new Error("Error sanitising context prompt. Please try again.")
@@ -113,10 +112,10 @@ ${tenantPrompt}
         <Form.Field name="contextPrompt" serverInvalid={error}>
           <Form.Label htmlFor="contextPrompt" className="flex items-center gap-2">
             New Context Prompt:
-            <SmartGen onClick={sanitisePrompt} />
+            <SmartGen onClick={sanitisePrompt} disabled={!input} />
           </Form.Label>
           <Form.Control asChild>
-            <textarea
+            <Textarea
               id="contextPrompt"
               name="contextPrompt"
               className="mt-4 w-full rounded-md border-2 p-2"

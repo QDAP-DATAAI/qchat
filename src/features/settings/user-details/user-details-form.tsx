@@ -90,10 +90,8 @@ ${userPrompt}
 `
 
   const sanitisePrompt = async (): Promise<void> => {
-    if (!input || input.length < 1) {
-      setInput("")
-      return
-    }
+    if (input?.length < 1) return
+
     try {
       const formatInput = buildInput({
         systemPrompt: config.systemPrompt,
@@ -113,8 +111,8 @@ ${userPrompt}
     }
   }
 
-  const handleTemplateClick = async (): Promise<void> => {
-    await setInput(`Brief Role Description:
+  const handleTemplateClick = (): void => {
+    setInput(`Brief Role Description:
 Preferred Communication Style:
 Other Preferences: `)
   }
