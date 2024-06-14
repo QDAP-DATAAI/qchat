@@ -38,9 +38,14 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
   }, [isLoading, router])
 
   useEffect(() => {
+    let unsubscribe = false
     if (isLoading) {
+      if (unsubscribe) return
       setSupressScrolling(false)
       setSelectedTab("chat")
+    }
+    return () => {
+      unsubscribe = true
     }
   }, [isLoading])
 
