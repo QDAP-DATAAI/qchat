@@ -50,6 +50,7 @@ export default function Page(): JSX.Element {
       <div className="m-2">
         <Button onClick={handleGetUsers}>Get affected users</Button>
         <br />
+        {!!items.length && <p>{items.length} users found</p>}
         {!!items.length && (
           <table className="mt-4 size-full table-auto border-4">
             <thead className="border-b-4">
