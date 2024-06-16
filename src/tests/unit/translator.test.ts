@@ -118,11 +118,11 @@ describe("translator", () => {
     expect(actual).toBe(expected)
   })
 
-  it("should handle original words splited after translation", () => {
+  it("should keep original words if translation splitted the words", () => {
     // Arrange
-    const originalText = "on guardrail design and performance standards:\n\n1."
+    const originalText = "on guardrail design and performance Standards:\n\n1."
     const translatedText = "on guard rail design and performance standards:\n\n1."
-    const expected = "on guard rail design and performance standards:\n\n1."
+    const expected = "on guardrail design and performance Standards:\n\n1."
 
     // Act
     const actual = revertCase(originalText, translatedText)
