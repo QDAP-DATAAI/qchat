@@ -45,6 +45,18 @@ export const ChatFileUI: FC = () => {
 
   return (
     <div className="flex flex-col gap-2">
+      {chatBody.chatType === "audio" && !chatBody.internalReference && (
+        <div>
+          <TranscriptForm />
+        </div>
+      )}
+      {chatBody.internalReference && (
+        <div className="mt-4">
+          <Typography variant="p" className="text-muted-foreground">
+            Reference ID: {chatBody.internalReference}
+          </Typography>
+        </div>
+      )}
       <form onSubmit={onSubmit} className="flex items-center gap-2">
         <label htmlFor="file-upload" className="sr-only">
           Upload File
@@ -55,7 +67,7 @@ export const ChatFileUI: FC = () => {
           name={chatBody.chatType}
           type="file"
           required
-          disabled={isUploadingFile}
+          disabled={isUploadingFile && chatBody.chatType === "audio" && !chatBody.internalReference}
           accept={acceptedFileType}
           data-file-types={acceptedFileType}
           data-max-size="10"
@@ -73,7 +85,9 @@ export const ChatFileUI: FC = () => {
         />
         <Button
           type="submit"
-          disabled={!(!isFileNull && !isUploadingFile)}
+          disabled={
+            !(!isFileNull && !isUploadingFile) || (chatBody.chatType === "audio" && !chatBody.internalReference)
+          }
           className="flex items-center gap-1"
           aria-disabled={isUploadingFile ? "true" : undefined}
         >
@@ -95,11 +109,6 @@ export const ChatFileUI: FC = () => {
         {uploadButtonLabel ||
           "Select a file to upload, please note files are not stored in their original format and may be cleared from the system after thirty days. You can upload up to 3 pdf files, each not exceeding 10mb in size."}
       </Typography>
-      {chatBody.chatType === "audio" && !chatBody.internalReference && (
-        <div>
-          <TranscriptForm />
-        </div>
-      )}
     </div>
   )
 }

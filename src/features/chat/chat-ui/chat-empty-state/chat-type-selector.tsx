@@ -1,6 +1,5 @@
 import * as Tooltip from "@radix-ui/react-tooltip"
 import { AudioLines, FileText, MessageCircle } from "lucide-react"
-import { useSession } from "next-auth/react"
 import React, { useEffect, useState } from "react"
 import { FC } from "react"
 
@@ -19,15 +18,14 @@ const tenants = process.env.NEXT_PUBLIC_FEATURE_TRANSCRIBE_TENANTS?.split(",") |
 
 export const ChatTypeSelector: FC<Prop> = props => {
   const { chatBody, onChatTypeChange } = useChatContext()
-  const { data: session } = useSession()
   const [isAllowedTenant, setIsAllowedTenant] = useState(false)
 
   useEffect(() => {
-    if (session) {
-      const tenantId = session.user?.tenantId
+    if (chatBody) {
+      const tenantId = chatBody.tenantId
       setIsAllowedTenant(tenants.includes(tenantId))
     }
-  }, [session])
+  }, [chatBody])
 
   return (
     <TooltipProvider>
@@ -44,7 +42,7 @@ export const ChatTypeSelector: FC<Prop> = props => {
                 <TabsTrigger
                   value="simple"
                   className="flex gap-2"
-                  disabled={props.disable}
+                  disabled={chatBody.chatOverFileName != "" || chatBody.internalReference != "" || props.disable}
                   role="tab"
                   aria-selected={chatBody.chatType === "simple"}
                   aria-disabled={props.disable ? "true" : undefined}
@@ -54,7 +52,7 @@ export const ChatTypeSelector: FC<Prop> = props => {
                 <TabsTrigger
                   value="data"
                   className="flex gap-2"
-                  disabled={props.disable}
+                  disabled={chatBody.chatOverFileName != "" || chatBody.internalReference != "" || props.disable}
                   role="tab"
                   aria-selected={chatBody.chatType === "data"}
                   aria-disabled={props.disable ? "true" : undefined}
@@ -64,7 +62,7 @@ export const ChatTypeSelector: FC<Prop> = props => {
                 <TabsTrigger
                   value="audio"
                   className="flex gap-2"
-                  disabled={!isAllowedTenant || props.disable}
+                  disabled={!isAllowedTenant || props.disable || chatBody.chatOverFileName != ""}
                   role="tab"
                   aria-selected={chatBody.chatType === "audio"}
                   aria-disabled={!isAllowedTenant || props.disable ? "true" : undefined}

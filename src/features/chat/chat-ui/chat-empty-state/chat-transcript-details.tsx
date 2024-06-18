@@ -38,7 +38,7 @@ export const TranscriptForm = (): JSX.Element => {
       setIsIdSaved(true)
     } catch (_error) {
       setMessage("Failed to save reference ID.")
-      logger.warning("Failed to save reference ID.", { id, referenceId })
+      logger.warning("Failed to save reference ID." + id + referenceId)
       setIsIdSaved(false)
     } finally {
       setSubmitting(false)
@@ -48,7 +48,6 @@ export const TranscriptForm = (): JSX.Element => {
   const customRef =
     preferences.customReferenceFields?.find(c => c.name === "internalReference") ||
     defaultPreferences.customReferenceFields?.[0]
-  const placeholder = "Please enter a valid id"
 
   return (
     <div className="bg-background p-5">
@@ -67,7 +66,7 @@ export const TranscriptForm = (): JSX.Element => {
               type="text"
               id="internalReference"
               name="internalReference"
-              placeholder={placeholder}
+              placeholder="Please enter a valid id"
               pattern={customRef.pattern.source}
               title={customRef.label}
               required
