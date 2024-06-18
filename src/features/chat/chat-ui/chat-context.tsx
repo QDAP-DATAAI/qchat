@@ -18,6 +18,7 @@ import {
   ChatDocumentModel,
 } from "@/features/chat/models"
 import { useGlobalMessageContext } from "@/features/globals/global-message-context"
+import { TenantPreferences } from "@/features/tenant-management/models"
 import { uniqueId } from "@/lib/utils"
 
 import { FileState, useFileState } from "./chat-file/use-file-state"
@@ -36,6 +37,7 @@ interface ChatContextProps extends UseChatHelpers {
   chatThreadLocked: boolean
   messages: PromptMessage[]
   documents: ChatDocumentModel[]
+  tenantPreferences?: TenantPreferences
 }
 
 const ChatContext = createContext<ChatContextProps | null>(null)
@@ -46,6 +48,7 @@ interface Prop {
   chatThread: ChatThreadModel
   documents: ChatDocumentModel[]
   chatThreadName?: ChatThreadModel["name"]
+  tenantPreferences?: TenantPreferences
 }
 
 export const ChatProvider: FC<Prop> = props => {
@@ -135,6 +138,7 @@ export const ChatProvider: FC<Prop> = props => {
           }
         }),
         documents: props.documents,
+        tenantPreferences: props.tenantPreferences,
         chatThreadLocked:
           (props.chatThread?.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED,
         handleSubmit,
