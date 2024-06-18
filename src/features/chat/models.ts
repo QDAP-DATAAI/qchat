@@ -94,7 +94,7 @@ export interface ChatThreadModel {
   conversationStyle: ConversationStyle
   chatOverFileName: string
   type: ChatRecordType.Thread
-  offenderId?: string
+  internalReference?: string
   isDisabled: boolean
   prompts: string[]
   selectedPrompt: string
@@ -109,7 +109,7 @@ export interface PromptBody {
   chatOverFileName: string
   tenantId: string
   userId: string
-  offenderId?: string
+  internalReference?: string
   chatThreadName?: string
 }
 
