@@ -15,7 +15,7 @@ interface Prop {
 
 const tenants = process.env.NEXT_PUBLIC_FEATURE_TRANSCRIBE_TENANTS?.split(",") || []
 
-const ChatTypeSelector: FC<Prop> = ({ disable }) => {
+export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
   const { chatBody, onChatTypeChange } = useChatContext()
   const [isAllowedTenant, setIsAllowedTenant] = useState<boolean>(false)
 
@@ -94,5 +94,3 @@ const ChatTypeSelector: FC<Prop> = ({ disable }) => {
     </TooltipProvider>
   )
 }
-
-export default ChatTypeSelector
