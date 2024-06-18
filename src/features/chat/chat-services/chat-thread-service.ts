@@ -388,7 +388,7 @@ export const UpdateChatThreadCreatedAt = async (chatThreadId: string): ServerAct
       conversationStyle: ConversationStyle.Precise,
       conversationSensitivity: ConversationSensitivity.Official,
       chatOverFileName: "",
-      offenderId: "",
+      internalReference: "",
     }
 
     const container = await HistoryContainer()
@@ -411,9 +411,9 @@ export const UpdateChatThreadCreatedAt = async (chatThreadId: string): ServerAct
   }
 }
 
-export const AssociateOffenderWithChatThread = async (
+export const AssociateReferenceWithChatThread = async (
   chatThreadId: string,
-  offenderId: string | undefined
+  internalReference: string | undefined
 ): ServerActionResponseAsync<ChatThreadModel> => {
   logger.event("AssociateOffenderWithChatThread", { chatThreadId, offenderId })
   const threadResponse = await FindChatThreadForCurrentUser(chatThreadId)
@@ -421,14 +421,14 @@ export const AssociateOffenderWithChatThread = async (
 
   const threadToUpdate = {
     ...threadResponse.response,
-    offenderId: offenderId,
+    internalReference: internalReference,
   }
   const container = await HistoryContainer()
   const { resource } = await container.items.upsert<ChatThreadModel>(threadToUpdate)
   if (!resource)
     return {
       status: "NOT_FOUND",
-      errors: [{ message: "Failed to associate offender with chat thread" }],
+      errors: [{ message: "Failed to associate reference with chat thread" }],
     }
   return {
     status: "OK",
