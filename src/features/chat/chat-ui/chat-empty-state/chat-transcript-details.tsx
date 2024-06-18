@@ -54,7 +54,7 @@ export const TranscriptForm = (): JSX.Element => {
     <div className="bg-background p-5">
       {isIdSaved ? (
         <Typography variant="p" className="text-muted-foreground">
-          Internal Reference ID {chatBody.internalReference} saved.
+          Internal Reference ID {referenceId} saved.
         </Typography>
       ) : (
         <form onSubmit={handleSubmit}>
