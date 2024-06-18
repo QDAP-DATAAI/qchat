@@ -97,7 +97,7 @@ export const ChatFileUI: FC = () => {
       </Typography>
       {chatBody.chatType === "audio" && !chatBody.internalReference && (
         <div>
-          <TranscriptForm chatThreadId={id} tenantId={chatBody.tenantId} />
+          <TranscriptForm />
         </div>
       )}
     </div>

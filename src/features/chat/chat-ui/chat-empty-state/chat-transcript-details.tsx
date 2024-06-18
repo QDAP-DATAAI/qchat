@@ -1,72 +1,54 @@
 import * as Label from "@radix-ui/react-label"
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 
 import Typography from "@/components/typography"
 import { AssociateReferenceWithChatThread } from "@/features/chat/chat-services/chat-thread-service"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import logger from "@/features/insights/app-insights"
-import { TenantPreferences } from "@/features/tenant-management/models"
-import { GetTenantById } from "@/features/tenant-management/tenant-service"
 import { Button } from "@/features/ui/button"
 
-interface TranscriptFormProps {
-  chatThreadId: string
-  tenantId: string
+const defaultPreferences = {
+  contextPrompt: "",
+  customReferenceFields: [
+    {
+      name: "internalReference",
+      pattern: /^[a-zA-Z0-9]*$/,
+      label: "Internal Reference ID",
+    },
+  ],
 }
 
-const defaultPreferences: TenantPreferences = {
-  contextPrompt: "Enter reference ID",
-  history: [],
-}
-
-export const TranscriptForm = ({ chatThreadId, tenantId }: TranscriptFormProps): JSX.Element => {
-  const { chatBody, setChatBody } = useChatContext()
+export const TranscriptForm = (): JSX.Element => {
+  const { id, chatBody, setChatBody, tenantPreferences } = useChatContext()
   const [submitting, setSubmitting] = useState(false)
   const [isIdSaved, setIsIdSaved] = useState(false)
   const [message, setMessage] = useState("")
-  const [preferences, setPreferences] = useState<TenantPreferences>(defaultPreferences)
-
-  useEffect(() => {
-    const fetchPreferences = async (): Promise<void> => {
-      try {
-        const tenant = await GetTenantById(tenantId)
-        if (tenant.status !== "OK") throw new Error("Tenant not found")
-        setPreferences(tenant.response.preferences || defaultPreferences)
-      } catch (error) {
-        logger.error("Error fetching tenant preferences: " + error)
-        setPreferences(defaultPreferences)
-      }
-    }
-
-    fetchPreferences().catch(error => logger.error("Error in fetchPreferences: " + error))
-  }, [tenantId])
+  const [referenceId, setReferenceId] = useState<string>(chatBody.internalReference || "")
+  const preferences = tenantPreferences || defaultPreferences
 
   const handleSubmit = async (event: { preventDefault: () => void }): Promise<void> => {
     event.preventDefault()
     setSubmitting(true)
     setMessage("")
 
-    try {      
-      await AssociateReferenceWithChatThread(chatThreadId, chatBody.internalReference)
-      setMessage(`Reference ID ${chatBody.internalReference} saved.`)
+    try {
+      setChatBody({ ...chatBody, internalReference: referenceId })
+      await AssociateReferenceWithChatThread(id, referenceId)
+      setMessage(`Reference ID ${referenceId} saved.`)
       setIsIdSaved(true)
     } catch (_error) {
       setMessage("Failed to save reference ID.")
+      logger.warning("Failed to save reference ID.", { id, referenceId })
       setIsIdSaved(false)
     } finally {
       setSubmitting(false)
     }
   }
 
-  const handleReferenceChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const value = e.target.value
-    const internalReference = chatBody.internalReference ? value : ""
-    setChatBody({ ...chatBody, internalReference })
-  }
-
-  const regex = /^[A-Za-z][0-9]{6}$/
-  const placeholder = preferences.contextPrompt || "Enter reference ID"
-  const title = "ID must start with a letter followed by six digits (e.g., A123456)"
+  const customRef =
+    preferences.customReferenceFields?.find(c => c.name === "internalReference") ||
+    defaultPreferences.customReferenceFields?.[0]
+  const placeholder = "Please enter a valid id"
 
   return (
     <div className="bg-background p-5">
@@ -78,7 +60,7 @@ export const TranscriptForm = ({ chatThreadId, tenantId }: TranscriptFormProps):
         <form onSubmit={handleSubmit}>
           <div className="flex grid-cols-3 flex-wrap items-center gap-[15px]">
             <Label.Root htmlFor="internalReference" className="leading-[35px] text-muted-foreground">
-              Internal Reference Number:
+              {customRef.label} :
             </Label.Root>
             <input
               className="bg-inputBackground shadow-blackA6 inline-flex h-[35px] w-[200px] appearance-none items-center justify-center rounded-[4px] px-[10px] leading-none text-muted-foreground shadow-[0_0_0_1px] outline-none selection:bg-accent selection:text-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2"
@@ -86,12 +68,12 @@ export const TranscriptForm = ({ chatThreadId, tenantId }: TranscriptFormProps):
               id="internalReference"
               name="internalReference"
               placeholder={placeholder}
-              pattern={regex.source}
-              title={title}
+              pattern={customRef.pattern.source}
+              title={customRef.label}
               required
-              autoComplete="off"              
-              value={chatBody.internalReference}
-              onChange={handleReferenceChange}
+              autoComplete="off"
+              value={referenceId}
+              onChange={e => setReferenceId(e.target.value)}
             />
             <Button variant="default" type="submit" disabled={submitting}>
               {submitting ? "Submitting..." : "Submit"}
