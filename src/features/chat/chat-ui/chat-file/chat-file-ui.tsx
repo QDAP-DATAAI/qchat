@@ -45,11 +45,7 @@ export const ChatFileUI: FC = () => {
 
   return (
     <div className="flex flex-col gap-2">
-      {chatBody.chatType === "audio" && !chatBody.internalReference && (
-        <div>
-          <TranscriptForm />
-        </div>
-      )}
+      {chatBody.chatType === "audio" && !chatBody.internalReference && <TranscriptForm />}
       {chatBody.internalReference && (
         <div className="mt-4">
           <Typography variant="p" className="text-muted-foreground">
