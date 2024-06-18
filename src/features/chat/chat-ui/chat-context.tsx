@@ -33,7 +33,6 @@ interface ChatContextProps extends UseChatHelpers {
   isModalOpen?: boolean
   openModal?: () => void
   closeModal?: () => void
-  offenderId?: string
   chatThreadLocked: boolean
   messages: PromptMessage[]
   documents: ChatDocumentModel[]
@@ -46,7 +45,6 @@ interface Prop {
   chats: Array<UserChatMessageModel | AssistantChatMessageModel>
   chatThread: ChatThreadModel
   documents: ChatDocumentModel[]
-  offenderId?: string
   chatThreadName?: ChatThreadModel["name"]
 }
 
@@ -62,7 +60,7 @@ export const ChatProvider: FC<Prop> = props => {
     chatOverFileName: props.chatThread.chatOverFileName,
     tenantId: props.chatThread.tenantId,
     userId: props.chatThread.userId,
-    offenderId: props.chatThread.offenderId,
+    internalReference: props.chatThread.internalReference,
     chatThreadName: props.chatThread.name,
   })
 
