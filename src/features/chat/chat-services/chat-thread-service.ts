@@ -415,7 +415,7 @@ export const AssociateReferenceWithChatThread = async (
   chatThreadId: string,
   internalReference: string | undefined
 ): ServerActionResponseAsync<ChatThreadModel> => {
-  logger.event("AssociateOffenderWithChatThread", { chatThreadId, offenderId })
+  logger.event("AssociateReferenceWithChatThread", { chatThreadId, internalReference })
   const threadResponse = await FindChatThreadForCurrentUser(chatThreadId)
   if (threadResponse.status !== "OK") return threadResponse
 
