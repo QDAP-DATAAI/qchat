@@ -254,8 +254,6 @@ export const CreateChatThread = async (): ServerActionResponseAsync<ChatThreadMo
       conversationSensitivity: ConversationSensitivity.Official,
       type: ChatRecordType.Thread,
       chatOverFileName: "",
-      prompts: [],
-      selectedPrompt: "",
     }
 
     const container = await HistoryContainer()
