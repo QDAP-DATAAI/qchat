@@ -4,7 +4,7 @@ import { FC, useEffect, useRef } from "react"
 
 import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
-import { OffenderTranscriptForm } from "@/features/chat/chat-ui/chat-empty-state/chat-transcript-details"
+import { TranscriptForm } from "@/features/chat/chat-ui/chat-empty-state/chat-transcript-details"
 import { Button } from "@/features/ui/button"
 import { Input } from "@/features/ui/input"
 
@@ -12,7 +12,7 @@ import { ChatFilesDisplay } from "./chat-file-list"
 import { useFileSelection } from "./use-file-selection"
 
 export const ChatFileUI: FC = () => {
-  const { id, fileState, chatBody, offenderId } = useChatContext()
+  const { id, fileState, chatBody } = useChatContext()
   const { isFileNull, setIsFileNull, uploadButtonLabel, isUploadingFile } = fileState
   const { onSubmit: uploadFile } = useFileSelection({ id })
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -95,9 +95,9 @@ export const ChatFileUI: FC = () => {
         {uploadButtonLabel ||
           "Select a file to upload, please note files are not stored in their original format and may be cleared from the system after thirty days. You can upload up to 3 pdf files, each not exceeding 10mb in size."}
       </Typography>
-      {chatBody.chatType === "audio" && offenderId != null && (
+      {chatBody.chatType === "audio" && !chatBody.internalReference && (
         <div>
-          <OffenderTranscriptForm chatThreadId={id} />
+          <TranscriptForm chatThreadId={id} tenantId={chatBody.tenantId} />
         </div>
       )}
     </div>
