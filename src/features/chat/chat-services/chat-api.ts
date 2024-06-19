@@ -29,6 +29,7 @@ import { FindTopChatMessagesForCurrentUser, UpsertChatMessage } from "./chat-mes
 import { InitThreadSession, UpsertChatThread } from "./chat-thread-service"
 import { translator } from "./chat-translator-service"
 import { UpdateChatThreadIfUncategorised } from "./chat-utility"
+import { ContentSafetyCategory } from "./content-safety"
 
 const dataChatTypes = ["data", "mssql", "audio"]
 export const MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED = 3
@@ -228,6 +229,44 @@ async function getChatResponse(
 }> {
   let contentFilterTriggerCount = chatThread.contentFilterTriggerCount ?? 0
 
+  const mySafetyFilters = {
+    ethical: [
+      ContentSafetyCategory.Ethical,
+      ContentSafetyCategory.Fairness,
+      ContentSafetyCategory.Transparency,
+      ContentSafetyCategory.Empathy,
+      ContentSafetyCategory.Accountability,
+      ContentSafetyCategory.LocalRelevance,
+    ],
+  }
+
+  type CustomContentSafetyResult = {
+    ethical: CustomContentSafetyCategory | null
+  }
+
+  type CustomContentSafetyCategory = {
+    category: string
+    severity?: string
+  }
+
+  function checkCustomContentSafety(content: string): CustomContentSafetyResult {
+    const customSafetyResult: CustomContentSafetyResult = {
+      ethical: null,
+    }
+
+    for (const [category, filters] of Object.entries(mySafetyFilters)) {
+      for (const filter of filters) {
+        if (content.includes(ContentSafetyCategory[filter as unknown as keyof typeof ContentSafetyCategory])) {
+          customSafetyResult[category as keyof CustomContentSafetyResult] = {
+            category: filter as ContentSafetyCategory,
+          }
+        }
+      }
+    }
+
+    return customSafetyResult
+  }
+
   try {
     const openAI = OpenAIInstance({ contentSafetyOn: ["audio"].includes(chatThread.chatType) })
     return {
@@ -244,11 +283,18 @@ async function getChatResponse(
     const contentFilterResult = exception.error as JSONValue
     contentFilterTriggerCount++
 
+    const customContentSafetyResult = checkCustomContentSafety(userMessage.content ?? "")
+
+    const combinedContentFilterResult = {
+      contentFilterResult,
+      customContentSafety: customContentSafetyResult,
+    }
+
     data.append({
       id: addMessage.id,
       content: addMessage.content,
       role: addMessage.role,
-      contentFilterResult,
+      contentFilterResult: combinedContentFilterResult,
       contentFilterTriggerCount,
     })
 
@@ -260,7 +306,7 @@ async function getChatResponse(
 
     return {
       response: makeContentFilterResponse(contentFilterTriggerCount >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED),
-      contentFilterResult,
+      contentFilterResult: combinedContentFilterResult,
       updatedThread: upadatedThread.response,
     }
   }
