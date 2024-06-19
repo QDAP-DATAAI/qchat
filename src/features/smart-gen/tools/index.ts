@@ -19,9 +19,11 @@ export function contextPromptSanitiser(template: string): (input: string) => Pro
       })
 
       if (result === null || result === undefined) throw new Error("Error sanitising context prompt. Please try again.")
+      // eslint-disable-next-line
       console.log({ result })
       return result
     } catch (error) {
+      // eslint-disable-next-line
       console.error({ error })
       logger.error("Error sanitising context prompt", { error })
       throw error
