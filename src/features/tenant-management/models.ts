@@ -55,3 +55,5 @@ export type TenantConfig = {
   email: string
   tools: { name: string; enabled: boolean; template: string }[]
 }
+
+export type CustomReferenceFieldNames = "internalReference"
