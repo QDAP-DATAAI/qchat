@@ -1,5 +1,7 @@
 import { Message } from "ai"
 
+import { QGovTextCategoriesAnalysisOutput } from "./chat-services/content-safety"
+
 export enum ConversationStyle {
   Creative = "creative",
   Balanced = "balanced",
@@ -110,7 +112,7 @@ export interface PromptBody {
 }
 
 export interface PromptMessage extends Message {
-  contentFilterResult?: unknown
+  contentFilterResult?: QGovTextCategoriesAnalysisOutput
   sentiment?: ChatSentiment
   feedback?: FeedbackType
   reason?: string

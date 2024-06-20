@@ -7,7 +7,9 @@ import ErrorBoundary from "@/components/error-boundary"
 import { Markdown } from "@/components/markdown/markdown"
 import Typography from "@/components/typography"
 import { calculateFleschKincaidScore } from "@/features/chat/chat-services/chat-flesch"
+// import { QGovCustomTextAnalysis } from "@/features/chat/chat-services/content-safety"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
+// import { ContentSafetyWarning } from "@/features/chat/chat-ui/content-safety/content-safety-warning"
 import { ChatRole, PromptMessage } from "@/features/chat/models"
 import { AssistantButtons } from "@/features/ui/assistant-buttons"
 import { RewriteMessageButton } from "@/features/ui/assistant-buttons/rewrite-message-button"
@@ -29,6 +31,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
     props.type === "assistant" ? props.message.content : `**${props.name || "You"}**: ${props.message.content}`
 
   const fleschScore = calculateFleschKincaidScore(props.message.content)
+  const safetyWarning = props.message?.contentFilterResult
 
   return (
     <article className={"container mx-auto flex flex-col py-1 pb-2"}>
@@ -80,14 +83,16 @@ export const ChatRow: FC<ChatRowProps> = props => {
                 <OctagonAlert size={20} />
               </div>
               <div className="flex flex-grow items-center justify-center text-center">
-                This message has triggered our content safety warnings, please rephrase your message, start a new chat
-                or reach out to support if you have concerns.
+                {safetyWarning as React.ReactNode}
               </div>
               <div className="flex items-center justify-center">
                 <OctagonAlert size={20} />
               </div>
             </div>
           )}
+          {/* {!!props.message?.contentFilterResult && (
+            <ContentSafetyWarning {...(props.message?.contentFilterResult as QGovCustomTextAnalysis)} />
+          )} */}
           <div className="sr-only" aria-live="assertive">
             {feedbackMessage}
           </div>

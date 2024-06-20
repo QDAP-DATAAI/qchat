@@ -1,24 +1,22 @@
 import { OctagonAlert } from "lucide-react"
 import React, { FC } from "react"
 
+import { QGovTextCategoriesAnalysisOutput } from "@/features/chat/chat-services/content-safety"
 import {
   categorySeverityMessageMap,
   categoryIconMap,
   ContentSafetyCategory,
 } from "@/features/chat/chat-services/content-safety"
 
-export interface ContentSafetyWarningProps {
-  categories: Array<{
-    category: ContentSafetyCategory
-    severity?: number
-  }>
-}
+export const ContentSafetyWarning: FC<{ QGovTextCategoriesAnalysisOutput: QGovTextCategoriesAnalysisOutput }> = ({
+  QGovTextCategoriesAnalysisOutput,
+}) => {
+  const warningMessages = QGovTextCategoriesAnalysisOutput.categories
+    .map(cat => categorySeverityMessageMap[cat.category as ContentSafetyCategory])
+    .join(", ")
 
-const ContentSafetyWarning: FC<ContentSafetyWarningProps> = ({ categories }) => {
-  const warningMessages = categories.map(cat => categorySeverityMessageMap[cat.category]).join(", ")
-
-  const Icons = categories.map(cat => {
-    const IconComponent = categoryIconMap[cat.category]
+  const Icons = QGovTextCategoriesAnalysisOutput.categories.map(cat => {
+    const IconComponent = categoryIconMap[cat.category as ContentSafetyCategory]
     return <IconComponent size={20} key={`icon-${cat.category}`} />
   })
 

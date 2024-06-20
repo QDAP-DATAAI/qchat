@@ -25,10 +25,10 @@ import logger from "@/features/insights/app-insights"
 
 // Define the categories as an enum
 export enum ContentSafetyCategory {
-  Hate = "hate",
-  SelfHarm = "selfHarm",
-  SexualContent = "sexualContent",
-  Violence = "violence",
+  Hate = "Hate",
+  SelfHarm = "SelfHarm",
+  SexualContent = "Sexual",
+  Violence = "Violence",
   Ethical = "ethical",
   Impartial = "impartial",
   Fairness = "fairness",
@@ -138,7 +138,7 @@ async function analyzeContentSafety(
       const textResponse = await client.path("/text:analyze").post(analyzeTextParameters)
 
       if (isUnexpected(textResponse)) {
-        throw new Error(`Unexpected response: ${textResponse.body}`)
+        throw new Error(`Unexpected response: ${JSON.stringify(textResponse.body)}`)
       }
 
       return {
@@ -146,7 +146,7 @@ async function analyzeContentSafety(
           category: ContentSafetyCategory[cat.category as keyof typeof ContentSafetyCategory],
           severity: cat.severity,
         })),
-        category: ContentSafetyCategory.Hate, // Dummy assignment, replace as needed
+        category: ContentSafetyCategory.Hate,
       }
     }
     if (contentType === "image") {
@@ -162,7 +162,7 @@ async function analyzeContentSafety(
       const imageResponse = await client.path("/image:analyze").post(analyzeImageParameters)
 
       if (isUnexpected(imageResponse)) {
-        throw new Error(`Unexpected response: ${imageResponse.body}`)
+        throw new Error(`Unexpected response: ${JSON.stringify(imageResponse.body)}`)
       }
 
       return {
@@ -170,7 +170,7 @@ async function analyzeContentSafety(
           category: ContentSafetyCategory[cat.category as keyof typeof ContentSafetyCategory],
           severity: cat.severity,
         })),
-        category: ContentSafetyCategory.Hate, // Dummy assignment, replace as needed
+        category: ContentSafetyCategory.Hate,
       }
     }
   } catch (error) {
@@ -181,26 +181,24 @@ async function analyzeContentSafety(
   return null
 }
 
-export async function performContentAnalysis(textContent: string): Promise<void> {
-  // const endpoint = "https://<resource-name>.cognitiveservices.azure.com"
-  const endpoint = "https://qdap-dev-apim.azure-api.net/safeai/v2.0/contentsafety"
-  const credential = new AzureKeyCredential("<your-api-key>")
+export async function performContentAnalysis(textContent: string): Promise<QGovTextCategoriesAnalysisOutput | null> {
+  const endpoint = "https://api-dev.ai.qld.gov.au/safeai/v2.0"
+  const credential = new AzureKeyCredential(process.env.APIM_KEY)
   const categories = ["Hate", "SelfHarm", "Sexual", "Violence"]
 
   try {
     const result = await analyzeContentSafety(endpoint, credential, textContent, categories, "text")
-
     if (!result) {
-      return
+      return null
     }
 
     if (result.categories) {
-      const analysis = new QGovCustomTextAnalysis(result.categories)
-      logger.info(analysis.generateMessage())
-    } else {
-      logger.warning("Content analysis returned no result or categories.")
+      return result as QGovTextCategoriesAnalysisOutput | null
     }
+    logger.warning("Content analysis returned no result or categories.")
+    return null
   } catch (error) {
     logger.error("An error occurred during content analysis:" + error)
+    return null
   }
 }

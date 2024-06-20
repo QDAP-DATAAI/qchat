@@ -1,8 +1,10 @@
-import { OpenAIStream, StreamingTextResponse, JSONValue, StreamData } from "ai"
+import { OpenAIStream, StreamingTextResponse, StreamData } from "ai"
 import { BadRequestError } from "openai"
 import { ChatCompletionChunk, ChatCompletionMessageParam, Completion } from "openai/resources"
 import { Stream } from "openai/streaming"
 
+import { performContentAnalysis } from "@/features/chat/chat-services/content-safety"
+import { QGovTextCategoriesAnalysisOutput } from "@/features/chat/chat-services/content-safety"
 import {
   AssistantChatMessageModel,
   ChatMessageModel,
@@ -166,10 +168,15 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
         )
         if (addedMessage?.status !== "OK") throw addedMessage.errors
 
+        // Send AI response content to contentsafety function
+        const contentSafetyResponse = await performContentAnalysis(addedMessage.response.content)
+
+        // Append the content safety response to data
         data.append({
           id: addedMessage.response.id,
           role: addedMessage.response.role,
           content: addedMessage.response.content,
+          contentFilterResult: JSON.stringify(contentSafetyResponse),
         })
 
         addedMessage.response.content &&
@@ -223,7 +230,7 @@ async function getChatResponse(
   data: StreamData
 ): Promise<{
   response: AsyncGenerator<ChatCompletionChunk> | Stream<ChatCompletionChunk>
-  contentFilterResult?: JSONValue
+  contentFilterResult?: QGovTextCategoriesAnalysisOutput
   updatedThread: ChatThreadModel
 }> {
   let contentFilterTriggerCount = chatThread.contentFilterTriggerCount ?? 0
@@ -241,14 +248,18 @@ async function getChatResponse(
   } catch (exception) {
     if (!(exception instanceof BadRequestError) || exception.code !== "content_filter") throw exception
 
-    const contentFilterResult = exception.error as JSONValue
+    const contentFilterResult = (await performContentAnalysis(
+      userMessage.content || ""
+    )) as QGovTextCategoriesAnalysisOutput
+
+    // const contentFilterResult = exception.error as JSONValue
     contentFilterTriggerCount++
 
     data.append({
       id: addMessage.id,
       content: addMessage.content,
       role: addMessage.role,
-      contentFilterResult,
+      contentFilterResult: JSON.stringify(contentFilterResult),
       contentFilterTriggerCount,
     })
 
@@ -260,7 +271,7 @@ async function getChatResponse(
 
     return {
       response: makeContentFilterResponse(contentFilterTriggerCount >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED),
-      contentFilterResult: contentFilterResult,
+      contentFilterResult: await contentFilterResult,
       updatedThread: updatedThread.response,
     }
   }
