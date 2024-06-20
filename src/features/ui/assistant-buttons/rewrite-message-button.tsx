@@ -17,11 +17,43 @@ export type RewriteMessageButtonProps = {
   message: PromptMessage
   onAssistantButtonClick: (result: string) => void
 }
+
 export const RewriteMessageButton: React.FC<RewriteMessageButtonProps> = ({
   fleschScore,
   message,
   onAssistantButtonClick,
-}) => {
+}) => (
+  <RewriteMessageButtonInternal
+    toolName={getRewriterAction(fleschScore, !!message.contentFilterResult)}
+    context={message}
+    input={message.content}
+    onAssistantButtonClick={onAssistantButtonClick}
+  />
+)
+
+export type CheckTranscriptionButtonProps = {
+  transcription: string
+  onAssistantButtonClick: (result: string) => void
+}
+
+export const CheckTranscriptionButton: React.FC<CheckTranscriptionButtonProps> = ({
+  transcription,
+  onAssistantButtonClick,
+}) => (
+  <RewriteMessageButtonInternal
+    toolName={"checkTranscription"}
+    context={transcription}
+    input={transcription}
+    onAssistantButtonClick={onAssistantButtonClick}
+  />
+)
+
+const RewriteMessageButtonInternal: React.FC<{
+  toolName: SmartGenToolName
+  context: unknown
+  input: string
+  onAssistantButtonClick: (result: string) => void
+}> = ({ toolName, context, input, onAssistantButtonClick }) => {
   const { iconSize, buttonClass } = useButtonStyles()
   const { config } = useSettingsContext()
 
@@ -36,9 +68,9 @@ export const RewriteMessageButton: React.FC<RewriteMessageButtonProps> = ({
 
     try {
       const response = await smartGen({
-        toolName: getRewriterAction(fleschScore, !!message.contentFilterResult),
-        context: { message, uiComponent: "RewriteMessageButton" },
-        input: message.content,
+        toolName: toolName,
+        context: { context, uiComponent: "RewriteMessageButton" },
+        input: input,
       })
       if (!response) throw new Error("Failed to save smart-gen output")
       onAssistantButtonClick(response)

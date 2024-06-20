@@ -22,6 +22,7 @@ export const SmartGenToolNames = [
   "formatToImprove",
   "formatToSimplify",
   "formatToExplain",
+  "checkTranscription",
 ] as const
 
 export type SmartGenToolName = (typeof SmartGenToolNames)[number]

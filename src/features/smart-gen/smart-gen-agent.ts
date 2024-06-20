@@ -24,6 +24,8 @@ export default function SmartGenToolAgent(config: SmartGenToolAgentConfig): Smar
           return { name: tool.name, execute: formatToSimplify(tool.template) }
         case "formatToExplain":
           return { name: tool.name, execute: formatToExplain(tool.template) }
+        case "checkTranscription":
+          return { name: tool.name, execute: formatToExplain(tool.template) }
         default:
           throw new Error("Tool not found")
       }
