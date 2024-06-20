@@ -7,7 +7,7 @@ import {
   ContentSafetyCategory,
 } from "@/features/chat/chat-services/content-safety"
 
-interface ContentSafetyWarningProps {
+export interface ContentSafetyWarningProps {
   categories: Array<{
     category: ContentSafetyCategory
     severity?: number

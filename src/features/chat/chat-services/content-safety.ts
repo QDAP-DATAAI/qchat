@@ -1,4 +1,12 @@
-import { TextCategoriesAnalysisOutput as OriginalTextCategoriesAnalysisOutput } from "@azure-rest/ai-content-safety"
+import { AzureKeyCredential } from "@azure/core-auth"
+import {
+  TextCategoriesAnalysisOutput as OriginalTextCategoriesAnalysisOutput,
+  AnalyzeTextParameters,
+  AnalyzeImageParameters,
+  isUnexpected,
+  ContentSafetyClient,
+} from "@azure-rest/ai-content-safety"
+import createClient from "@azure-rest/ai-content-safety"
 import {
   Angry,
   EqualNot,
@@ -12,6 +20,8 @@ import {
   Award,
   MapPinOff,
 } from "lucide-react"
+
+import logger from "@/features/insights/app-insights"
 
 // Define the categories as an enum
 export enum ContentSafetyCategory {
@@ -33,6 +43,7 @@ export interface QGovTextCategoriesAnalysisOutput extends OriginalTextCategories
     category: ContentSafetyCategory
     severity?: number
   }>
+  category: ContentSafetyCategory
 }
 
 export class QGovCustomTextAnalysis implements QGovTextCategoriesAnalysisOutput {
@@ -40,17 +51,25 @@ export class QGovCustomTextAnalysis implements QGovTextCategoriesAnalysisOutput 
     category: ContentSafetyCategory
     severity?: number
   }>
+  category: ContentSafetyCategory
 
   constructor(categories: Array<{ category: ContentSafetyCategory; severity?: number }>) {
     this.categories = categories
-    this.category = ContentSafetyCategory.Hate
+    this.category = this.determineMainCategory()
+  }
+
+  private determineMainCategory(): ContentSafetyCategory {
+    // Logic to determine the main category based on severity
+    if (this.categories.length > 0) {
+      return this.categories.reduce((prev, curr) => ((curr.severity || 0) > (prev.severity || 0) ? curr : prev))
+        .category
+    }
+    return ContentSafetyCategory.Hate // Default category if none found
   }
 
   generateMessage(): string {
     return this.categories.map(cat => `This message may ${categorySeverityMessageMap[cat.category]};`).join(" ")
   }
-
-  category: ContentSafetyCategory
 }
 
 export const categoryIconMap: Record<ContentSafetyCategory, React.ElementType> = {
@@ -94,4 +113,94 @@ export const categorySeverityMessageMap: Record<ContentSafetyCategory, string> =
   [ContentSafetyCategory.Empathy]: "lack empathy",
   [ContentSafetyCategory.Accountability]: "lack accountability",
   [ContentSafetyCategory.LocalRelevance]: "not be aligned with the Queensland context",
+}
+
+async function analyzeContentSafety(
+  endpoint: string,
+  credential: AzureKeyCredential,
+  content: string | { content: string; blobUrl?: string },
+  categories: string[],
+  contentType: "text" | "image"
+): Promise<QGovTextCategoriesAnalysisOutput | null> {
+  const client = createClient(endpoint, credential) as ContentSafetyClient
+
+  try {
+    if (contentType === "text") {
+      const analyzeTextParameters: AnalyzeTextParameters = {
+        body: {
+          text: content as string,
+          categories,
+          outputType: "FourSeverityLevels",
+        },
+        headers: { "Content-Type": "application/json" },
+      }
+
+      const textResponse = await client.path("/text:analyze").post(analyzeTextParameters)
+
+      if (isUnexpected(textResponse)) {
+        throw new Error(`Unexpected response: ${textResponse.body}`)
+      }
+
+      return {
+        categories: textResponse.body.categoriesAnalysis.map(cat => ({
+          category: ContentSafetyCategory[cat.category as keyof typeof ContentSafetyCategory],
+          severity: cat.severity,
+        })),
+        category: ContentSafetyCategory.Hate, // Dummy assignment, replace as needed
+      }
+    }
+    if (contentType === "image") {
+      const analyzeImageParameters: AnalyzeImageParameters = {
+        body: {
+          image: content as { content: string; blobUrl?: string },
+          categories,
+          outputType: "FourSeverityLevels",
+        },
+        headers: { "Content-Type": "application/json" },
+      }
+
+      const imageResponse = await client.path("/image:analyze").post(analyzeImageParameters)
+
+      if (isUnexpected(imageResponse)) {
+        throw new Error(`Unexpected response: ${imageResponse.body}`)
+      }
+
+      return {
+        categories: imageResponse.body.categoriesAnalysis.map(cat => ({
+          category: ContentSafetyCategory[cat.category as keyof typeof ContentSafetyCategory],
+          severity: cat.severity,
+        })),
+        category: ContentSafetyCategory.Hate, // Dummy assignment, replace as needed
+      }
+    }
+  } catch (error) {
+    logger.error("Error analyzing content:" + error)
+    return null
+  }
+
+  return null
+}
+
+export async function performContentAnalysis(textContent: string): Promise<void> {
+  // const endpoint = "https://<resource-name>.cognitiveservices.azure.com"
+  const endpoint = "https://qdap-dev-apim.azure-api.net/safeai/v2.0/contentsafety"
+  const credential = new AzureKeyCredential("<your-api-key>")
+  const categories = ["Hate", "SelfHarm", "Sexual", "Violence"]
+
+  try {
+    const result = await analyzeContentSafety(endpoint, credential, textContent, categories, "text")
+
+    if (!result) {
+      return
+    }
+
+    if (result.categories) {
+      const analysis = new QGovCustomTextAnalysis(result.categories)
+      logger.info(analysis.generateMessage())
+    } else {
+      logger.warning("Content analysis returned no result or categories.")
+    }
+  } catch (error) {
+    logger.error("An error occurred during content analysis:" + error)
+  }
 }
