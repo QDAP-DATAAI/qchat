@@ -1,11 +1,6 @@
 import { GoogleAnalytics } from "@next/third-parties/google"
 import type { Metadata } from "next"
 import { Noto_Sans } from "next/font/google"
-// import { getServerSession } from "next-auth/next"
-// import { SessionProvider } from "next-auth/react"
-
-import "./globals.css"
-
 import { getServerSession } from "next-auth/next"
 
 import ErrorBoundary from "@/components/error-boundary"
@@ -20,6 +15,8 @@ import { cn } from "@/lib/utils"
 
 import { Footer } from "./footer"
 import { Header } from "./header"
+
+import "./globals.css"
 
 const notoSans = Noto_Sans({ subsets: ["latin"] })
 
