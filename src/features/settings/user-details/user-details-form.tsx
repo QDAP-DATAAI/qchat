@@ -63,6 +63,7 @@ export const UserDetailsForm: React.FC<UserDetailsFormProps> = ({ preferences, n
       logger.error("Error updating context prompt", { error })
     } finally {
       setIsSubmitting(false)
+      setInput("")
     }
   }
 
@@ -106,6 +107,12 @@ ${userPrompt}
     } catch (error) {
       showError(error instanceof Error ? error.message : JSON.stringify(error))
     }
+  }
+
+  const handleTemplateClick = async (): Promise<void> => {
+    await setInput(`Brief Role Description:
+Preferred Communication Style:
+Other Preferences: `)
   }
 
   return (
@@ -154,26 +161,39 @@ ${userPrompt}
           )}
         </Form.Field>
         <div className="mb-4 flex gap-4">
+          <Button
+            type="button"
+            className="w-[14rem]"
+            variant="accent"
+            disabled={isSubmitting}
+            onClick={handleTemplateClick}
+            ariaLabel="Try Template"
+          >
+            {isSubmitting ? "Processing..." : "Try Template"}
+          </Button>
           <Form.Submit asChild>
             <Button
               type="submit"
               className="w-[14rem]"
               variant="default"
               disabled={isSubmitting}
-              ariaLabel="Update context prompt"
+              ariaLabel="Save context prompt"
             >
-              {isSubmitting ? "Updating..." : "Update Context Prompt"}
+              {isSubmitting ? "Processing..." : "Save Context Prompt"}
             </Button>
           </Form.Submit>
           <Button
             type="button"
             className="w-[14rem]"
             variant="destructive"
-            onClick={async () => await submit("")}
+            onClick={async () => {
+              await submit("")
+              setInput("")
+            }}
             disabled={isSubmitting}
             ariaLabel="Clear context prompt"
           >
-            {isSubmitting ? "Clearing..." : "Clear Context Prompt"}
+            {isSubmitting ? "Processing..." : "Clear Context Prompt"}
           </Button>
         </div>
       </Form.Root>
