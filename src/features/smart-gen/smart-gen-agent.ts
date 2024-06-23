@@ -1,5 +1,5 @@
 import { SmartGenRequest, SmartGenTools, SmartGenToolNames, SmartGenToolName } from "./models"
-import { contextPromptSanitiser, formatToImprove, formatToSimplify, formatToExplain } from "./tools"
+import { contextPromptSanitiser, formatToImprove, formatToSimplify, formatToExplain, checkTranscription } from "./tools"
 
 export type SmartGenToolAgentConfig = {
   name: string
@@ -25,7 +25,7 @@ export default function SmartGenToolAgent(config: SmartGenToolAgentConfig): Smar
         case "formatToExplain":
           return { name: tool.name, execute: formatToExplain(tool.template) }
         case "checkTranscription":
-          return { name: tool.name, execute: formatToExplain(tool.template) }
+          return { name: tool.name, execute: checkTranscription(tool.template) }
         default:
           throw new Error("Tool not found")
       }

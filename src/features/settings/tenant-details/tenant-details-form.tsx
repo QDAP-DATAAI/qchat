@@ -75,6 +75,10 @@ ${tenantPrompt}
 `
 
   const sanitisePrompt = async (): Promise<void> => {
+    if (!input || input.length < 1) {
+      setInput("")
+      return
+    }
     try {
       const formatInput = buildInput({ systemPrompt: config.systemPrompt, tenantPrompt: input })
       const res = await smartGen({
