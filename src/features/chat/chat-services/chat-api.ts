@@ -18,7 +18,12 @@ import { mapOpenAIChatMessages } from "@/features/common/mapping-helper"
 import { OpenAIInstance } from "@/features/common/services/open-ai"
 import logger from "@/features/insights/app-insights"
 
-import { buildDataChatMessages, buildSimpleChatMessages, getContextPrompts } from "./chat-api-helper"
+import {
+  buildAudioChatMessages,
+  buildDataChatMessages,
+  buildSimpleChatMessages,
+  getContextPrompts,
+} from "./chat-api-helper"
 import { calculateFleschKincaidScore } from "./chat-flesch"
 import { FindTopChatMessagesForCurrentUser, UpsertChatMessage } from "./chat-message-service"
 import { InitThreadSession, UpsertChatThread } from "./chat-thread-service"
@@ -39,7 +44,8 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
     let userMessage: ChatCompletionMessageParam
     let metaPrompt: ChatCompletionMessageParam
     let context: string = ""
-    let translate: (input: string) => Promise<string>
+    let translate: (input: string) => Promise<string> = async (_input: string): Promise<string> =>
+      await Promise.resolve("")
 
     if (props.chatType === "simple" || !dataChatTypes.includes(props.chatType)) {
       const res = await buildSimpleChatMessages(updatedLastHumanMessage)
@@ -50,12 +56,16 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
         const translatedCompletion = await translator(input)
         return translatedCompletion.status === "OK" ? translatedCompletion.response : ""
       }
+    } else if (props.chatType === "audio") {
+      const res = await buildAudioChatMessages(updatedLastHumanMessage, chatThread.chatThreadId)
+      userMessage = res.userMessage
+      metaPrompt = res.systemMessage
+      context = res.context
     } else {
       const res = await buildDataChatMessages(updatedLastHumanMessage, chatThread.chatThreadId)
       userMessage = res.userMessage
       metaPrompt = res.systemMessage
       context = res.context
-      translate = async (_input: string): Promise<string> => await Promise.resolve("")
     }
 
     if ((chatThread.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED) {
