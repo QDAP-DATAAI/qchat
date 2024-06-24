@@ -99,9 +99,9 @@ export const GroupList: React.FC<{ tenantGroups: string[]; tenantId: string }> =
               variant="default"
               className="mb-4 justify-end"
               disabled={isSubmitting}
-              ariaLabel="Update groups"
+              ariaLabel="Add groups"
             >
-              {isSubmitting ? "Updating..." : "Update Groups"}
+              {isSubmitting ? "Adding..." : "Add groups"}
             </Button>
           </Form.Submit>
         </Form.Root>
@@ -160,11 +160,11 @@ const DeleteGroupDialog: React.FC<{
           </Typography>
         </div>
         <div className="flex justify-end">
-          <Button variant="outline" onClick={onClose} disabled={loading} aria-label="Cancel">
+          <Button variant="destructive" onClick={onClose} disabled={loading} aria-label="Cancel">
             Cancel
           </Button>
           <Button
-            variant="destructive"
+            variant="default"
             className="ml-2"
             onClick={async () => {
               try {

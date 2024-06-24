@@ -48,7 +48,7 @@ export const LoginManagement: React.FC<{ requiresGroupLogin: boolean; tenantId: 
           <SwitchComponent
             id="requires-group-login"
             variant="default"
-            label=""
+            label="Requires Group Login"
             isChecked={isRequiresGroupLogin}
             disabled={isSubmitting}
             onCheckedChange={handleToggle}

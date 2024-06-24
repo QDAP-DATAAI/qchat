@@ -87,7 +87,7 @@ export const SmartToolsConfig = (props: Props): JSX.Element => {
                     id={`${name}Enabled`}
                     name={`${name}Enabled`}
                     variant="default"
-                    label={`${enabled ? "ENABLED" : "DISABLED"}`}
+                    label={`${enabled ? "Enabled" : "Disabled"}`}
                     isChecked={!!enabled}
                     disabled={isSubmitting[name as SmartGenToolName]}
                     onCheckedChange={_checked => {
@@ -121,7 +121,7 @@ export const SmartToolsConfig = (props: Props): JSX.Element => {
                     id={`${name}Template`}
                     className="my-4 w-full rounded-md border-2 p-2"
                     placeholder="Enter new context prompt..."
-                    rows={6}
+                    rows={10}
                     maxLength={900}
                     required
                     aria-label="New context prompt"

@@ -7,8 +7,6 @@ import { Select } from "@/features/ui/select"
 
 export const Selectors = (): JSX.Element => {
   const { tenants, users, selectTenant, selectedTenant, selectUser, selectedUser } = useAdminContext()
-  // const [tenantId, setTenantId] = useState("")
-  // const [userId, setUserId] = useState("")
   const router = useRouter()
   const pathname = usePathname()
 
@@ -20,9 +18,16 @@ export const Selectors = (): JSX.Element => {
 
   const handleSelectTenant = (event: React.ChangeEvent<HTMLSelectElement>): void => {
     const selectedTenantId = event.target.value
-    selectTenant(tenants.find(t => t.id === selectedTenantId))
-    selectUser(undefined)
-    router.push(`/settings/admin/${selectedTenantId}`)
+    if (selectedTenantId === "") {
+      selectTenant(undefined)
+      selectUser(undefined)
+      router.push("/settings/admin")
+    } else {
+      const selectedTenant = tenants.find(t => t.id === selectedTenantId)
+      selectTenant(selectedTenant)
+      selectUser(undefined)
+      router.push(`/settings/admin/${selectedTenantId}`)
+    }
   }
 
   const handleSelectUser = (event: React.ChangeEvent<HTMLSelectElement>): void => {
@@ -32,11 +37,13 @@ export const Selectors = (): JSX.Element => {
     router.push(`/settings/admin/${selectedTenant.id}/${selectedUserId}`)
   }
 
+  const filteredUsers = selectedTenant ? users.filter(u => u.tenantId === selectedTenant.id) : []
+
   return (
     <div className="m-4 flex items-center gap-4">
       <div className="flex flex-1 items-center">
         <Select
-          value={selectedTenant?.id}
+          value={selectedTenant?.id || ""}
           options={tenants.map(t => ({
             value: t.id,
             label: `${t.departmentName || "[DEPARTMENT NAME NOT SET]"} - ${t.primaryDomain}`,
@@ -48,7 +55,7 @@ export const Selectors = (): JSX.Element => {
       <Select
         value={selectedUser?.id}
         className="flex-1"
-        options={users.map(u => ({ value: u.id, label: u.upn }))}
+        options={filteredUsers.map(u => ({ value: u.id, label: `${u.upn} - ${u.name || "[NAME NOT SET]"}` }))}
         label="Select a User"
         onChange={handleSelectUser}
         disabled={!selectedTenant?.id}

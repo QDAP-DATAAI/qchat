@@ -161,7 +161,7 @@ export const GetUsersByTenantId = async (tenantId: string): ServerActionResponse
 
   try {
     const query = {
-      query: "SELECT * FROM c WHERE c.tenantId = @tenantId",
+      query: "SELECT * FROM c WHERE c.tenantId = @tenantId AND c.last_login != null ORDER BY c.name ASC",
       parameters: [{ name: "@tenantId", value: tenantId }],
     }
     const container = await UserContainer()

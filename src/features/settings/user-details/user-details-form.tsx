@@ -12,6 +12,7 @@ import { useSettingsContext } from "@/features/settings/settings-provider"
 import { Button } from "@/features/ui/button"
 import { CardSkeleton } from "@/features/ui/card-skeleton"
 import { SmartGen } from "@/features/ui/smart-gen"
+import { Textarea } from "@/features/ui/textarea"
 import { UserPreferences } from "@/features/user-management/models"
 
 type UserDetailsFormProps = { preferences: UserPreferences; name: string; email: string }
@@ -143,7 +144,7 @@ Other Preferences: `)
             <SmartGen onClick={sanitisePrompt} />
           </Form.Label>
           <Form.Control asChild>
-            <textarea
+            <Textarea
               id="contextPrompt"
               name="contextPrompt"
               className="mt-4 w-full rounded-md border-2 p-2"
@@ -162,7 +163,7 @@ Other Preferences: `)
             </Form.Message>
           )}
         </Form.Field>
-        <div className="mb-4 flex gap-4">
+        <div className="mb-4 flex justify-end gap-4">
           <Button
             type="button"
             className="w-[14rem]"
@@ -179,23 +180,23 @@ Other Preferences: `)
               className="w-[14rem]"
               variant="default"
               disabled={isSubmitting}
-              ariaLabel="Save context prompt"
+              ariaLabel="Save prompt"
             >
-              {isSubmitting ? "Processing..." : "Save Context Prompt"}
+              {isSubmitting ? "Processing..." : "Save prompt"}
             </Button>
           </Form.Submit>
           <Button
             type="button"
-            className="w-[14rem]"
+            className="w-[14rem] overflow-hidden text-ellipsis"
             variant="destructive"
             onClick={async () => {
               await submit("")
               setInput("")
             }}
             disabled={isSubmitting}
-            ariaLabel="Clear context prompt"
+            ariaLabel="Clear prompt"
           >
-            {isSubmitting ? "Processing..." : "Clear Context Prompt"}
+            {isSubmitting ? "Processing..." : "Clear prompt"}
           </Button>
         </div>
       </Form.Root>

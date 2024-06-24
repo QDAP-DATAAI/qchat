@@ -35,7 +35,7 @@ export default async function Home({ params: { tenantId } }: Props): Promise<JSX
         <DepartmentName name={tenant.departmentName} />
         <Administrators administrators={tenant.administrators} tenantId={tenantId} />
         <LoginManagement requiresGroupLogin={!!tenant?.requiresGroupLogin} tenantId={tenantId} />
-        <GroupList tenantGroups={tenant.groups} tenantId={tenantId} />
+        {tenant.requiresGroupLogin && <GroupList tenantGroups={tenant.groups} tenantId={tenantId} />}
       </div>
     </>
   )

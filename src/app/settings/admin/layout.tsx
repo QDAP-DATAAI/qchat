@@ -5,7 +5,7 @@ import { GetTenants } from "@/features/tenant-management/tenant-service"
 import { UserRecord } from "@/features/user-management/models"
 import { GetUsersByTenantId } from "@/features/user-management/user-service"
 
-import { Selectors } from "@/app/settings/admin/selectors"
+import { Selectors } from "./selectors"
 
 const getTenants = async (): Promise<TenantDetails[]> => {
   const result = await GetTenants()

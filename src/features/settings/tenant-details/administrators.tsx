@@ -82,11 +82,11 @@ export const Administrators: React.FC<{ administrators: string[]; tenantId: stri
           <Form.Root className="mt-4" onSubmit={handleNewTenantAdmins}>
             <Form.Field name="newTenantAdmin" serverInvalid={error}>
               <Form.Label htmlFor="newTenantAdmin" className="block">
-                Add new tenant administrator emails (comma-separated):
+                Add new tenant administrator email:
               </Form.Label>
               <Form.Control asChild>
                 <Input
-                  type="text"
+                  type="email"
                   autoComplete="off"
                   id="newTenantAdmin"
                   name="newTenantAdmin"
@@ -109,9 +109,9 @@ export const Administrators: React.FC<{ administrators: string[]; tenantId: stri
                 variant="default"
                 className="mb-4 min-w-[190px]"
                 disabled={isSubmitting}
-                ariaLabel="Update Administrators"
+                ariaLabel="Add Administrator"
               >
-                {isSubmitting ? "Updating..." : "Update Administrators"}
+                {isSubmitting ? "Adding..." : "Add Administrator"}
               </Button>
             </Form.Submit>
           </Form.Root>
@@ -173,11 +173,11 @@ const DeleteAdminDialog: React.FC<{
           </Typography>
         </div>
         <div className="flex justify-end">
-          <Button variant="outline" onClick={onClose} disabled={loading} aria-label="Cancel">
+          <Button variant="destructive" onClick={onClose} disabled={loading} aria-label="Cancel">
             Cancel
           </Button>
           <Button
-            variant="destructive"
+            variant="default"
             className="ml-2"
             onClick={async () => {
               try {

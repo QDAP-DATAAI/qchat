@@ -7,18 +7,20 @@ const menuItems = [
   { url: "/settings/details", icon: <UserRoundCog size={16} />, text: "Your details" },
   { url: "/settings/history", icon: <FileClock size={16} />, text: "Chat history" },
   { url: "/settings/help", icon: <CircleHelp size={16} />, text: "Help & Support" },
-  { url: "/settings/tenant", icon: <Building2 size={16} />, text: "Department details", adminRequired: true },
-  { url: "/settings/admin", icon: <ShieldCheck size={16} />, text: "Admin", globalAdminRequired: true },
+  { url: "/settings/tenant", icon: <Building2 size={16} />, text: "Department details", tenantAdminRequired: true },
+  { url: "/settings/admin", icon: <ShieldCheck size={16} />, text: "Admin", adminRequired: true },
 ]
 
 export const SettingsMenuItems = async (): Promise<JSX.Element> => {
   const tenantAdmin = await isTenantAdmin()
   const admin = await isAdmin()
 
-  const adminFilters = (item: { adminRequired?: boolean; globalAdminRequired?: boolean }): boolean =>
-    (!item.adminRequired && !item.globalAdminRequired) ||
-    (!!item.adminRequired && tenantAdmin) ||
-    (!!item.globalAdminRequired && admin)
+  const adminFilters = (item: { tenantAdminRequired?: boolean; adminRequired?: boolean }): boolean => {
+    if (!item.tenantAdminRequired && !item.adminRequired) return true
+    if (item.tenantAdminRequired && tenantAdmin) return true
+    if (item.adminRequired && admin) return true
+    return false
+  }
 
   return (
     <div className="flex flex-col gap-4">

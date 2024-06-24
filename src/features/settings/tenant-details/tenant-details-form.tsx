@@ -134,27 +134,27 @@ ${tenantPrompt}
             </Form.Message>
           )}
         </Form.Field>
-        <div className="mb-4 flex gap-4">
+        <div className="mb-4 flex justify-end gap-4">
           <Form.Submit asChild>
             <Button
               type="submit"
               className="w-[14rem]"
               variant="default"
               disabled={isSubmitting}
-              ariaLabel="Update context prompt"
+              ariaLabel="Save prompt"
             >
-              {isSubmitting ? "Updating..." : "Update Context Prompt"}
+              {isSubmitting ? "Saving..." : "Save prompt"}
             </Button>
           </Form.Submit>
           <Button
             type="button"
-            className="w-[14rem]"
+            className="w-[14rem] overflow-hidden text-ellipsis whitespace-nowrap"
             variant="destructive"
             onClick={async () => await submit("")}
             disabled={isSubmitting}
-            ariaLabel="Clear context prompt"
+            ariaLabel="Clear prompt"
           >
-            {isSubmitting ? "Clearing..." : "Clear Context Prompt"}
+            {isSubmitting ? "Clearing..." : "Clear prompt"}
           </Button>
         </div>
       </Form.Root>
