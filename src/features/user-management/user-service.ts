@@ -177,3 +177,31 @@ export const GetUsersByTenantId = async (tenantId: string): ServerActionResponse
     }
   }
 }
+
+export const GetUserById = async (tenantId: string, userId: string): ServerActionResponseAsync<UserRecord> => {
+  const query = {
+    query: "SELECT * FROM c WHERE c.tenantId = @tenantId AND c.id = @userId",
+    parameters: [
+      { name: "@tenantId", value: tenantId },
+      { name: "@userId", value: userId },
+    ],
+  }
+  try {
+    const container = await UserContainer()
+    const { resources } = await container.items.query<UserRecord>(query).fetchAll()
+    if (!resources?.[0])
+      return {
+        status: "NOT_FOUND",
+        errors: [{ message: `User with upn ${userId} not found` }],
+      }
+    return {
+      status: "OK",
+      response: resources[0],
+    }
+  } catch (error) {
+    return {
+      status: "ERROR",
+      errors: [{ message: `${error}` }],
+    }
+  }
+}

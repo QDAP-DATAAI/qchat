@@ -120,7 +120,7 @@ Other Preferences: `)
   return (
     <>
       <Typography variant="h4" className="font-bold underline underline-offset-2">
-        Your Details
+        Account Details
       </Typography>
       <Typography variant="h5" className="mt-4">
         Name:
