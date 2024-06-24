@@ -65,10 +65,7 @@ export const SmartToolsConfig = (props: Props): JSX.Element => {
     }
 
     handleUpdate(detectedChanges)
-      .then(() => {
-        toolsRef.current = debouncedTools
-        // here you are
-      })
+      .then(() => (toolsRef.current = debouncedTools))
       .catch(error => showError(error instanceof Error ? error.message : JSON.stringify(error)))
   }, [debouncedTools, props.tenantId])
 

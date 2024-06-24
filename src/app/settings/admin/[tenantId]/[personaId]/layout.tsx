@@ -10,7 +10,7 @@ export default async function Layout({
     personaId: string
   }
 }): Promise<JSX.Element> {
-  return (
+  return await Promise.resolve(
     <div>
       {params.personaId}
       <br />

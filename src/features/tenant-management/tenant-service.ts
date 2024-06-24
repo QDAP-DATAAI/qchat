@@ -178,40 +178,6 @@ export const GetTenantDetails = async (): ServerActionResponseAsync<TenantDetail
   return { status: "OK", response: tenantDetails }
 }
 
-export const GetTenantToolConfig = async (): ServerActionResponseAsync<TenantRecord["smartTools"]> => {
-  const tenantId = await getTenantId()
-  const tenantResponse = await GetTenantById(tenantId)
-  if (tenantResponse.status !== "OK") return tenantResponse
-  return {
-    status: "OK",
-    response: tenantResponse.response.smartTools || [],
-  }
-}
-
-export const GetTenantConfig = async (): ServerActionResponseAsync<TenantConfig> => {
-  const tenantId = await getTenantId()
-  const tenant = await GetTenantById(tenantId)
-  if (tenant.status !== "OK")
-    return {
-      status: "ERROR",
-      errors: [{ message: "Tenant not found" }],
-    }
-  return {
-    status: "OK",
-    response: {
-      systemPrompt: process.env.NEXT_PUBLIC_SYSTEM_PROMPT || "",
-      contextPrompt: tenant.response.preferences?.contextPrompt || "",
-      groups: tenant.response.groups || [],
-      administrators: tenant.response.administrators || [],
-      requiresGroupLogin: tenant.response.requiresGroupLogin,
-      supportEmail: tenant.response.supportEmail,
-      departmentName: tenant.response.departmentName || "",
-      email: tenant.response.email || "",
-      tools: tenant.response.smartTools || [],
-    },
-  }
-}
-
 export const GetTenantPreferences = async (): ServerActionResponseAsync<TenantPreferences> => {
   const user = await userSession()
   if (!user) return { status: "ERROR", errors: [{ message: "User not found" }] }
