@@ -44,18 +44,13 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
     let userMessage: ChatCompletionMessageParam
     let metaPrompt: ChatCompletionMessageParam
     let context: string = ""
-    let translate: (input: string) => Promise<string> = async (_input: string): Promise<string> =>
-      await Promise.resolve("")
+    let shouldTranslate = false
 
     if (props.chatType === "simple" || !dataChatTypes.includes(props.chatType)) {
       const res = await buildSimpleChatMessages(updatedLastHumanMessage)
       userMessage = res.userMessage
       metaPrompt = res.systemMessage
-
-      translate = async (input: string): Promise<string> => {
-        const translatedCompletion = await translator(input)
-        return translatedCompletion.status === "OK" ? translatedCompletion.response : ""
-      }
+      shouldTranslate = true
     } else if (props.chatType === "audio") {
       const res = await buildAudioChatMessages(updatedLastHumanMessage, chatThread.chatThreadId)
       userMessage = res.userMessage
@@ -147,13 +142,20 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       }, 1000)
     }
 
+    const translate = async (input: string, useTranslator: boolean): Promise<string> => {
+      if (!useTranslator) return await Promise.resolve("")
+
+      const translatedCompletion = await translator(input)
+      return translatedCompletion.status === "OK" ? translatedCompletion.response : ""
+    }
+
     const stream = OpenAIStream(response as AsyncIterable<Completion>, {
       onText: handlePartialText,
       async onCompletion(completion: string) {
         completed = true
         clearTimeout(timer)
 
-        const translatedCompletion = await translate(completion)
+        const translatedCompletion = await translate(completion, shouldTranslate)
         const addedMessage = await UpsertChatMessage(
           createAssistantChatRecord(
             translatedCompletion ? translatedCompletion : completion,
