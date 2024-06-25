@@ -87,6 +87,7 @@ export const Administrators: React.FC<{ administrators: string[]; tenantId: stri
               <Form.Control asChild>
                 <Input
                   type="email"
+                  multiple
                   autoComplete="off"
                   id="newTenantAdmin"
                   name="newTenantAdmin"
@@ -103,17 +104,19 @@ export const Administrators: React.FC<{ administrators: string[]; tenantId: stri
                 </Form.Message>
               )}
             </Form.Field>
-            <Form.Submit asChild>
-              <Button
-                type="submit"
-                variant="default"
-                className="mb-4 min-w-[190px]"
-                disabled={isSubmitting}
-                ariaLabel="Add Administrator"
-              >
-                {isSubmitting ? "Adding..." : "Add Administrator"}
-              </Button>
-            </Form.Submit>
+            <div className="flex justify-end">
+              <Form.Submit asChild>
+                <Button
+                  type="submit"
+                  variant="default"
+                  className="mb-4 min-w-[190px]"
+                  disabled={isSubmitting}
+                  ariaLabel="Add Administrator"
+                >
+                  {isSubmitting ? "Adding..." : "Add Administrator"}
+                </Button>
+              </Form.Submit>
+            </div>
           </Form.Root>
         </>
       )}

@@ -37,8 +37,6 @@ export const Selectors = (): JSX.Element => {
     router.push(`/settings/admin/${selectedTenant.id}/${selectedUserId}`)
   }
 
-  const filteredUsers = selectedTenant ? users.filter(u => u.tenantId === selectedTenant.id) : []
-
   return (
     <div className="m-4 flex items-center gap-4">
       <div className="flex flex-1 items-center">
@@ -53,9 +51,9 @@ export const Selectors = (): JSX.Element => {
         />
       </div>
       <Select
-        value={selectedUser?.id}
+        value={selectedUser?.id || ""}
         className="flex-1"
-        options={filteredUsers.map(u => ({ value: u.id, label: `${u.upn} - ${u.name || "[NAME NOT SET]"}` }))}
+        options={users.map(u => ({ value: u.id, label: `${u.name || "[NAME NOT SET]"} - ${u.upn}` }))}
         label="Select a User"
         onChange={handleSelectUser}
         disabled={!selectedTenant?.id}

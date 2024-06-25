@@ -11,20 +11,20 @@ const menuItems = [
   { url: "/settings/admin", icon: <ShieldCheck size={16} />, text: "Admin", adminRequired: true },
 ]
 
+const adminFilters =
+  (isTenantAdmin: boolean, isAdmin: boolean) =>
+  (menuItem: { tenantAdminRequired?: boolean; adminRequired?: boolean }): boolean =>
+    (!menuItem.tenantAdminRequired && !menuItem.adminRequired) || // No restrictions required
+    (!!menuItem.tenantAdminRequired && isTenantAdmin) || // Restricted to tenant admin
+    (!!menuItem.adminRequired && isAdmin) // Admin only
+
 export const SettingsMenuItems = async (): Promise<JSX.Element> => {
   const tenantAdmin = await isTenantAdmin()
   const admin = await isAdmin()
 
-  const adminFilters = (item: { tenantAdminRequired?: boolean; adminRequired?: boolean }): boolean => {
-    if (!item.tenantAdminRequired && !item.adminRequired) return true
-    if (item.tenantAdminRequired && tenantAdmin) return true
-    if (item.adminRequired && admin) return true
-    return false
-  }
-
   return (
     <div className="flex flex-col gap-4">
-      {menuItems.filter(adminFilters).map(item => (
+      {menuItems.filter(adminFilters(tenantAdmin, admin)).map(item => (
         <SettingsMenuItem key={item.url} url={item.url} icon={item.icon} text={item.text} />
       ))}
     </div>

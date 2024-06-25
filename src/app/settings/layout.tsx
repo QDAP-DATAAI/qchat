@@ -24,10 +24,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <div className="col-span-2 size-full overflow-auto">
         <SettingsMenu />
       </div>
-      <div className="col-span-10 size-full overflow-auto">
-        <div className="size-full overflow-auto bg-altBackground">
-          <section className="mx-auto size-full justify-center bg-altBackground">{children}</section>
-        </div>
+      <div className="col-span-10 size-full overflow-auto bg-altBackground">
+        <section className="mx-auto size-full justify-center bg-altBackground">{children}</section>
       </div>
     </SettingsProvider>
   )

@@ -43,12 +43,12 @@ export const LoginManagement: React.FC<{ requiresGroupLogin: boolean; tenantId: 
         Login Management:
       </Typography>
       <div className="my-4 flex flex-col gap-4 rounded-md bg-altBackgroundShade">
-        <div className="flex items-center gap-4 p-2">
-          <Typography variant="h5">Requires Group Login:</Typography>
+        <div className="flex items-center justify-between gap-4 p-2">
+          <Typography variant="h5">Group Login:</Typography>
           <SwitchComponent
             id="requires-group-login"
             variant="default"
-            label="Requires Group Login"
+            label={isRequiresGroupLogin ? "Enabled" : "Disabled"}
             isChecked={isRequiresGroupLogin}
             disabled={isSubmitting}
             onCheckedChange={handleToggle}

@@ -17,6 +17,7 @@ import { Textarea } from "@/features/ui/textarea"
 
 export const TenantDetailsForm: React.FC<{ tenant: TenantDetails }> = ({ tenant }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isClearing, setIsClearing] = useState(false)
   const [error, setError] = useState(false)
   const [contextPrompt, setContextPrompt] = useState(tenant.preferences.contextPrompt)
   const [input, setInput] = useState<string>("")
@@ -30,17 +31,16 @@ export const TenantDetailsForm: React.FC<{ tenant: TenantDetails }> = ({ tenant 
     try {
       await submit(newContextPrompt)
       ;(e.target as HTMLFormElement)?.reset()
+      setInput("")
     } catch (error) {
       logger.error("Error submitting context prompt", { error })
     }
   }
 
   async function submit(newContextPrompt: string): Promise<void> {
-    setIsSubmitting(true)
-    if (contextPrompt === newContextPrompt) {
-      setIsSubmitting(false)
-      return
-    }
+    if (contextPrompt === newContextPrompt) return
+
+    newContextPrompt ? setIsSubmitting(true) : setIsClearing(true)
     const temp = contextPrompt
     setContextPrompt(newContextPrompt)
     const defaultErrorMessage = contextPrompt
@@ -61,7 +61,7 @@ export const TenantDetailsForm: React.FC<{ tenant: TenantDetails }> = ({ tenant 
       showError(defaultErrorMessage)
       logger.error("Error updating context prompt", { error })
     } finally {
-      setIsSubmitting(false)
+      newContextPrompt ? setIsSubmitting(false) : setIsClearing(false)
     }
   }
 
@@ -105,8 +105,20 @@ ${tenantPrompt}
       <Typography variant="h5" className="mt-4">
         Current Prompt:
       </Typography>
-      <div className="mt-4 rounded-md bg-altBackgroundShade p-4">
+      <div className="mt-4 flex items-start justify-between gap-2 rounded-md bg-altBackgroundShade p-4">
         <Markdown content={contextPrompt || "Not set"} />
+        {contextPrompt && (
+          <Button
+            type="button"
+            className="min-w-[10rem]"
+            variant="destructive"
+            onClick={async () => await submit("")}
+            disabled={isSubmitting || isClearing}
+            ariaLabel="Clear prompt"
+          >
+            {isClearing ? "Clearing..." : "Clear prompt"}
+          </Button>
+        )}
       </div>
       <Form.Root onSubmit={handleSubmitContextPrompt} className="mt-4 flex flex-col gap-2">
         <Form.Field name="contextPrompt" serverInvalid={error}>
@@ -134,28 +146,18 @@ ${tenantPrompt}
             </Form.Message>
           )}
         </Form.Field>
-        <div className="mb-4 flex justify-end gap-4">
+        <div className="mb-4 flex justify-end">
           <Form.Submit asChild>
             <Button
               type="submit"
-              className="w-[14rem]"
+              className="w-[10rem]"
               variant="default"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isClearing}
               ariaLabel="Save prompt"
             >
               {isSubmitting ? "Saving..." : "Save prompt"}
             </Button>
           </Form.Submit>
-          <Button
-            type="button"
-            className="w-[14rem] overflow-hidden text-ellipsis whitespace-nowrap"
-            variant="destructive"
-            onClick={async () => await submit("")}
-            disabled={isSubmitting}
-            ariaLabel="Clear prompt"
-          >
-            {isSubmitting ? "Clearing..." : "Clear prompt"}
-          </Button>
         </div>
       </Form.Root>
       <Typography variant="h5" className="my-2">

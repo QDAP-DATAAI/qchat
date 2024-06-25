@@ -93,17 +93,13 @@ export const GroupList: React.FC<{ tenantGroups: string[]; tenantId: string }> =
               </Form.Message>
             )}
           </Form.Field>
-          <Form.Submit asChild>
-            <Button
-              type="submit"
-              variant="default"
-              className="mb-4 justify-end"
-              disabled={isSubmitting}
-              ariaLabel="Add groups"
-            >
-              {isSubmitting ? "Adding..." : "Add groups"}
-            </Button>
-          </Form.Submit>
+          <div className="flex justify-end">
+            <Form.Submit asChild>
+              <Button type="submit" variant="default" className="mb-4" disabled={isSubmitting} ariaLabel="Add groups">
+                {isSubmitting ? "Adding..." : "Add groups"}
+              </Button>
+            </Form.Submit>
+          </div>
         </Form.Root>
         <Typography variant="h5" className="mb-4">
           Current Groups:
