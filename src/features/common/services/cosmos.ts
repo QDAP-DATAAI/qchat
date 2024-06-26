@@ -1,6 +1,6 @@
 import { Container, CosmosClient, PartitionKeyDefinitionVersion, PartitionKeyKind } from "@azure/cosmos"
 
-import { GetCosmosAccessToken } from "./cosmos-auth"
+import { GetCosmosAccessToken, getTokenExpiry } from "./cosmos-auth"
 
 interface AuthToken {
   token: string
@@ -9,23 +9,24 @@ interface AuthToken {
 
 let _cosmosClient: CosmosClient | null = null
 let _authToken: AuthToken | null = null
-let _tokenRefreshTimer: NodeJS.Timeout | null = null
 
+/**
+ * Fetches the Cosmos access token, retrieves its expiry, and sets the authentication token and Cosmos client.
+ * @returns A Promise that resolves to void.
+ */
 const fetchAndSetAuthToken = async (): Promise<void> => {
   const token = await GetCosmosAccessToken()
-  const expiry = Date.now() + 23 * 60 * 60 * 1000
+  const expiry = await getTokenExpiry(token)
   _authToken = { token, expiry }
   _cosmosClient = createCosmosClient(token)
-  scheduleTokenRefresh()
 }
 
-const scheduleTokenRefresh = (): void => {
-  if (_tokenRefreshTimer) {
-    clearTimeout(_tokenRefreshTimer)
-  }
-  _tokenRefreshTimer = setTimeout(fetchAndSetAuthToken, 23 * 60 * 60 * 1000)
-}
-
+/**
+ * Creates a Cosmos DB client with the provided authentication token.
+ * @param authToken - The authentication token used to authorize requests to the Cosmos DB service.
+ * @returns A new instance of the CosmosClient class.
+ * @throws An error if the Azure Cosmos DB endpoint is not configured.
+ */
 const createCosmosClient = (authToken: string): CosmosClient => {
   const endpoint = process.env.APIM_BASE
   const defaultHeaders = {
@@ -38,9 +39,6 @@ const createCosmosClient = (authToken: string): CosmosClient => {
 }
 
 const CosmosInstance = async (): Promise<CosmosClient> => {
-  if (_cosmosClient && _authToken && Date.now() < _authToken.expiry) {
-    return _cosmosClient
-  }
   await fetchAndSetAuthToken()
   return _cosmosClient!
 }

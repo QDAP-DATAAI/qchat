@@ -76,7 +76,9 @@ export async function UpdateChatThreadIfUncategorised(
     }
     return chatThread
   } catch (e) {
-    logger.error("Failed to update chat thread due to an error:", { error: e instanceof Error ? e.message : e })
+    logger.error("Failed to update chat thread due to an error:", {
+      error: e instanceof Error ? JSON.stringify(e.message) : e,
+    })
     throw e
   }
 }
