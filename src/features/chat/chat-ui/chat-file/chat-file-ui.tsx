@@ -5,6 +5,7 @@ import { FC, useEffect, useRef } from "react"
 import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { TranscriptForm } from "@/features/chat/chat-ui/chat-empty-state/chat-transcript-details"
+import { AI_NAME } from "@/features/theme/theme-config"
 import { Button } from "@/features/ui/button"
 import { Input } from "@/features/ui/input"
 
@@ -103,7 +104,7 @@ export const ChatFileUI: FC = () => {
       {chatBody.chatOverFileName.length != 0 && <ChatFilesDisplay files={files} />}
       <Typography variant="span" id="file-upload-description" className="text-muted-foreground">
         {uploadButtonLabel ||
-          "Select a file to upload, please note files are not stored in their original format and may be cleared from the system after thirty days. You can upload up to 3 pdf files, each not exceeding 10mb in size."}
+          `Select a file to upload, please note files are not stored in their original format and may be cleared from the system after thirty days usually. You can upload up to 3 pdf files, each not exceeding 10mb in size. The way you chat with files in ${AI_NAME} is changing, please note that uploaded files will only be available for a gauranteed seven days.`}
       </Typography>
     </div>
   )
