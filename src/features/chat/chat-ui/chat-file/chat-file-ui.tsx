@@ -55,7 +55,7 @@ export const ChatFileUI: FC = () => {
         </div>
       )}
       <Typography variant="span" id="file-upload-description" className="text-muted-foreground">
-        {`The way you chat with files in ${AI_NAME} is changing, please note that uploaded files will only be available for a gauranteed seven days.`}
+        {`From June 28 the way you chat with files in ${AI_NAME} is changing, please note that uploaded files will only be available for a gauranteed seven days while we transition.`}
       </Typography>
       <form onSubmit={onSubmit} className="flex items-center gap-2">
         <label htmlFor="file-upload" className="sr-only">
@@ -107,7 +107,7 @@ export const ChatFileUI: FC = () => {
       {chatBody.chatOverFileName.length != 0 && <ChatFilesDisplay files={files} />}
       <Typography variant="span" id="file-upload-description" className="text-muted-foreground">
         {uploadButtonLabel ||
-          "Select a file to upload, please note files are not stored in their original format and may be cleared from the system after thirty days usually. You can upload up to 3 pdf files, each not exceeding 10mb in size."}
+          "Select a file to upload, please note files are not stored in their original format and may be cleared from the system after thirty days. You can upload up to 3 pdf files, each not exceeding 10mb in size."}
       </Typography>
     </div>
   )
