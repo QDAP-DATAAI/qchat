@@ -18,5 +18,6 @@ declare module "next-auth" {
     userId: string
     groups: string[]
     acceptedTermsDate: string
+    lastVersionSeen: string
   }
 }

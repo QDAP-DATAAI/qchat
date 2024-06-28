@@ -65,6 +65,7 @@ const configureIdentityProvider = (): Provider[] => {
             tenantAdmin: tenantAdmin,
             userId: profile.upn,
             acceptedTermsDate: (user.accepted_terms && user.accepted_terms_date) || null,
+            lastVersionSeen: user.last_version_seen || null,
           }
         },
       })
@@ -110,8 +111,10 @@ export const options: NextAuthOptions = {
         authToken.upn = user.upn
         authToken.userId = user.userId
         authToken.acceptedTermsDate = user.acceptedTermsDate
+        authToken.lastVersionSeen = user.lastVersionSeen
       }
       if (trigger === "update" && session?.acceptedTerms) authToken.acceptedTermsDate = new Date().toISOString()
+      if (trigger === "update" && session?.lastVersionSeen) authToken.lastVersionSeen = session.lastVersionSeen
 
       return authToken
     },
@@ -124,6 +127,7 @@ export const options: NextAuthOptions = {
       session.user.upn = authToken.upn
       session.user.userId = authToken.userId
       session.user.acceptedTermsDate = authToken.acceptedTermsDate
+      session.user.lastVersionSeen = authToken.lastVersionSeen
       return session
     },
   },
