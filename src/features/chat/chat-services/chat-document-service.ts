@@ -83,8 +83,9 @@ export const UploadDocument = async (formData: FormData): ServerActionResponseAs
       fileContent = [splitDocuments, transcription.text, transcription.vtt]
     } else {
       const docs = await LoadFile(formData, chatType)
-      const splitDocuments = chunkDocumentWithOverlap(docs.join("\n"))
-      fileContent = [splitDocuments, undefined]
+      const joined = docs.join("\n")
+      const splitDocuments = chunkDocumentWithOverlap(joined)
+      fileContent = [splitDocuments, joined]
     }
     return {
       status: "OK",
