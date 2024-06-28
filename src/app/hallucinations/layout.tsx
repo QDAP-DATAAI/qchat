@@ -3,8 +3,8 @@ import { AI_NAME } from "@/features/theme/theme-config"
 export const dynamic = "force-dynamic"
 
 export const metadata = {
-  title: AI_NAME + " Factual Errors",
-  description: AI_NAME + " Factual Errors",
+  title: `${AI_NAME} Factual Errors`,
+  description: `${AI_NAME} Factual Errors`,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }): JSX.Element {

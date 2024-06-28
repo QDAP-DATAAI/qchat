@@ -8,8 +8,8 @@ import { AI_NAME } from "@/features/theme/theme-config"
 export const dynamic = "force-dynamic"
 
 export const metadata = {
-  title: AI_NAME + " Settings",
-  description: AI_NAME + " - Settings",
+  title: `${AI_NAME} Thread`,
+  description: `${AI_NAME} - Thread`,
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }): Promise<JSX.Element> {
