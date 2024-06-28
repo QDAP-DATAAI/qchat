@@ -5,6 +5,8 @@ import { getServerSession } from "next-auth/next"
 
 import ErrorBoundary from "@/components/error-boundary"
 import { LogIn } from "@/components/login/login"
+import { GetApplicationSettings } from "@/features/application/application-service"
+import ApplicationProvider from "@/features/globals/application-provider"
 import { Providers } from "@/features/globals/providers"
 import { applicationInsights } from "@/features/insights/app-insights"
 import { AI_AUTHOR, AI_NAME, AI_TAGLINE, APP_URL } from "@/features/theme/theme-config"
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
   title: AI_NAME,
   applicationName: AI_NAME,
   authors: [{ name: AI_AUTHOR, url: APP_URL }],
-  description: AI_NAME + " " + AI_TAGLINE,
+  description: `${AI_NAME} ${AI_TAGLINE}`,
   generator: AI_AUTHOR,
   keywords: ["AI", "Chatbot", "GenerativeAI", "VirtualAssistant", AI_NAME, AI_AUTHOR],
   referrer: "no-referrer",
@@ -46,6 +48,8 @@ if (process.env.NEXT_PUBLIC_APPLICATIONINSIGHTS_CONNECTION_STRING)
 
 export default async function RootLayout({ children }: { children: React.ReactNode }): Promise<JSX.Element> {
   const session = await getServerSession()
+  const settingsResult = await GetApplicationSettings()
+  const settings = settingsResult.status === "OK" ? settingsResult.response : undefined
 
   const isProd = process.env.NODE_ENV === "production"
   const googleAnalyticsId = process.env.NEXT_PUBLIC_GTAG
@@ -56,23 +60,25 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={cn(notoSans.className, "flex size-full min-w-[400px] flex-col bg-background")}>
         <ErrorBoundary>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <Providers>
-              <Header />
-              <NavBar />
-              <main className="grid size-full grid-cols-12 overflow-auto bg-pattern-bg bg-repeat">
-                {!session ? (
-                  <div className="col-span-12 size-full">
-                    <LogIn />
-                  </div>
-                ) : (
-                  children
-                )}
-              </main>
-              <Footer />
-              <Toaster />
-            </Providers>
-          </ThemeProvider>
+          <ApplicationProvider settings={settings}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+              <Providers>
+                <Header />
+                <NavBar />
+                <main className="grid size-full grid-cols-12 overflow-auto bg-pattern-bg bg-repeat">
+                  {!session ? (
+                    <div className="col-span-12 size-full">
+                      <LogIn />
+                    </div>
+                  ) : (
+                    children
+                  )}
+                </main>
+                <Footer />
+                <Toaster />
+              </Providers>
+            </ThemeProvider>
+          </ApplicationProvider>
         </ErrorBoundary>
       </body>
       {isProd && googleAnalyticsId && <GoogleAnalytics gaId={googleAnalyticsId} />}
