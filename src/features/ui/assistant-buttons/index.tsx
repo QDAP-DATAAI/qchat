@@ -10,9 +10,9 @@ import { ChatSentiment, FeedbackType, PromptMessage } from "@/features/chat/mode
 import { showError } from "@/features/globals/global-message-store"
 import { AI_NAME } from "@/features/theme/theme-config"
 import { Button } from "@/features/ui/button"
-import Modal from "@/features/ui/modal"
 import { TooltipProvider } from "@/features/ui/tooltip-provider"
 
+import FeedbackModal from "./feedback-modal"
 import { RewriteMessageButtonProps, RewriteMessageButton } from "./rewrite-message-button"
 import { useButtonStyles } from "./use-button-styles"
 
@@ -182,7 +182,7 @@ const FeedbackButtons: React.FC<FeedbackButtonsProps> = ({
       >
         {thumbsDownClicked ? <CheckIcon size={iconSize} /> : <ThumbsDown size={iconSize} />}
       </Button>
-      <Modal
+      <FeedbackModal
         chatThreadId={chatThreadId}
         chatMessageId={chatMessageId}
         feedbackType={feedbackType}
