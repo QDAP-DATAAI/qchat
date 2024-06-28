@@ -55,7 +55,7 @@ export const ChatFileUI: FC = () => {
         </div>
       )}
       <Typography variant="span" id="file-upload-description" className="text-muted-foreground">
-        {`From June 28 the way you chat with files in ${AI_NAME} is changing, please note that uploaded files will only be available for a gauranteed seven days while we transition.`}
+        {`From June 28 the way you chat with files in ${AI_NAME} is changing, please note that content from uploaded files will only be available for a gauranteed seven days while we transition.`}
       </Typography>
       <form onSubmit={onSubmit} className="flex items-center gap-2">
         <label htmlFor="file-upload" className="sr-only">
