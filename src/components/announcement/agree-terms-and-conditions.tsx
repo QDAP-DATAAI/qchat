@@ -40,8 +40,8 @@ export default function AgreeTermsAndConditions({ onClose }: AgreeTermsAndCondit
       showSuccess({ title: "Terms and conditions agreed" })
       onClose()
     } catch (error) {
-      logger.error("Failed to agree with terms and conditions, please try again later.", { error })
-      showError("Failed to agree with terms and conditions, please try again later.")
+      logger.error("Failed to agree to terms and conditions, please try again later.", { error })
+      showError("Failed to agree to terms and conditions, please try again later.")
     } finally {
       setIsSubmitting(false)
     }
@@ -72,7 +72,7 @@ export default function AgreeTermsAndConditions({ onClose }: AgreeTermsAndCondit
       <DialogFooter>
         {isSubmitting && <Loader className={cn("animate-spin")} size={24} />}
         <Button variant="default" onClick={handleSubmit} disabled={!canSubmit || isLoading || isSubmitting}>
-          Agree with terms and conditions
+          Agree to terms and conditions
         </Button>
       </DialogFooter>
     </Dialog>

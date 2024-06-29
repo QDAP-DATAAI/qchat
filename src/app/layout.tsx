@@ -3,13 +3,15 @@ import type { Metadata } from "next"
 import { Noto_Sans } from "next/font/google"
 import { getServerSession } from "next-auth/next"
 
+import { APP_NAME } from "@/app-global"
+
 import ErrorBoundary from "@/components/error-boundary"
 import { LogIn } from "@/components/login/login"
 import { GetApplicationSettings } from "@/features/application/application-service"
 import ApplicationProvider from "@/features/globals/application-provider"
 import { Providers } from "@/features/globals/providers"
 import { applicationInsights } from "@/features/insights/app-insights"
-import { AI_AUTHOR, AI_NAME, AI_TAGLINE, APP_URL } from "@/features/theme/theme-config"
+import { AI_AUTHOR, AI_TAGLINE, APP_URL } from "@/features/theme/theme-config"
 import { ThemeProvider } from "@/features/theme/theme-provider"
 import { NavBar } from "@/features/ui/navbar"
 import { Toaster } from "@/features/ui/toaster"
@@ -24,12 +26,12 @@ const notoSans = Noto_Sans({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  title: AI_NAME,
-  applicationName: AI_NAME,
+  title: APP_NAME,
+  applicationName: APP_NAME,
   authors: [{ name: AI_AUTHOR, url: APP_URL }],
-  description: `${AI_NAME} ${AI_TAGLINE}`,
+  description: `${APP_NAME} ${AI_TAGLINE}`,
   generator: AI_AUTHOR,
-  keywords: ["AI", "Chatbot", "GenerativeAI", "VirtualAssistant", AI_NAME, AI_AUTHOR],
+  keywords: ["AI", "Chatbot", "GenerativeAI", "VirtualAssistant", APP_NAME, AI_AUTHOR],
   referrer: "no-referrer",
   creator: AI_AUTHOR,
   publisher: AI_AUTHOR,
