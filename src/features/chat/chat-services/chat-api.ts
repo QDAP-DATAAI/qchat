@@ -253,6 +253,7 @@ async function getChatResponse(
       id: addMessage.id,
       content: addMessage.content,
       role: addMessage.role,
+      name: APP_NAME || "Assistant",
       contentFilterResult,
       contentFilterTriggerCount,
     })
