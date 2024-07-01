@@ -24,7 +24,7 @@ export async function POST(request: Request): Promise<Response> {
         .query<ChatMessageModel>(query, { partitionKey: [tenant, user] })
         .fetchAll()
       for (const resource of resources) {
-        const copy = { ...resource }
+        const copy = { ...resource, chatThreadId: resource.threadId }
         delete copy.threadId
         const del = await container.item(resource.id, [tenant, user]).delete()
         if (!del.statusCode.toString().startsWith("2")) {
