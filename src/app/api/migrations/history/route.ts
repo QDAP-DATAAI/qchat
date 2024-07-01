@@ -1,33 +1,32 @@
 import { SqlQuerySpec } from "@azure/cosmos"
 
-import { UserModel, hashValue } from "@/features/auth/helpers"
-import { UserContainer } from "@/features/common/services/cosmos"
-import { UserRecord } from "@/features/user-management/models"
+import { ChatMessageModel } from "@/features/chat/models"
+import { HistoryContainer } from "@/features/common/services/cosmos"
 import logger from "@/features/insights/app-insights"
 
 export type MigrationItem = {
-  wrongUserId: string
-  correctUserId: string
-  upn: string
-  name: string
+  id: string
+  user: string
   tenant: string
+  threadId: string
 }
 export async function POST(request: Request): Promise<Response> {
   try {
     const body = (await request.json()).items as MigrationItem[]
-    const container = await UserContainer()
+    const container = await HistoryContainer()
     let count = 0
-    for (const { wrongUserId, correctUserId, tenant } of body) {
+    for (const { id, user, tenant } of body) {
       const query: SqlQuerySpec = {
         query: "SELECT * FROM root r WHERE r.id=@id",
-        parameters: [{ name: "@id", value: wrongUserId }],
+        parameters: [{ name: "@id", value: id }],
       }
       const { resources } = await container.items
-        .query<UserRecord>(query, { partitionKey: [tenant, wrongUserId] })
+        .query<ChatMessageModel>(query, { partitionKey: [tenant, user] })
         .fetchAll()
       for (const resource of resources) {
-        const copy = { ...resource, id: correctUserId }
-        const del = await container.item(resource.id, [tenant, wrongUserId]).delete()
+        const copy = { ...resource }
+        delete copy.threadId
+        const del = await container.item(resource.id, [tenant, user]).delete()
         if (!del.statusCode.toString().startsWith("2")) {
           logger.error(`Resource ${resource.id} failed to delete.`)
           logger.warning(JSON.stringify(resource))
@@ -41,7 +40,7 @@ export async function POST(request: Request): Promise<Response> {
           await container.items.upsert(resource)
         } else {
           count++
-          logger.info(`Resource ${correctUserId} migrated successfully`)
+          logger.info(`Resource ${id} migrated successfully`)
         }
       }
     }
@@ -62,18 +61,17 @@ export async function POST(request: Request): Promise<Response> {
 
 export async function GET(): Promise<Response> {
   try {
-    const container = await UserContainer()
+    const container = await HistoryContainer()
     const query: SqlQuerySpec = {
-      query: 'SELECT * FROM root r WHERE r.id  LIKE "%@%" ORDER BY r._ts DESC',
+      query: "SELECT * FROM c WHERE IS_DEFINED(c.threadId)",
     }
-    const { resources } = await container.items.query<UserModel & { id: string }>(query).fetchAll()
+    const { resources } = await container.items.query<ChatMessageModel>(query).fetchAll()
 
-    const migrationList = resources.map(user => ({
-      wrongUserId: user.id,
-      correctUserId: hashValue(user.upn),
-      upn: user.upn,
-      name: user.name,
-      tenant: user.tenantId,
+    const migrationList = resources.map(history => ({
+      id: history.id,
+      user: history.userId,
+      tenant: history.tenantId,
+      threadId: history.threadId,
     }))
     return new Response(
       JSON.stringify({

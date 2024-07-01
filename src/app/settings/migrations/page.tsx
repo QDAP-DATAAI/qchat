@@ -14,7 +14,7 @@ export default function Page(): JSX.Element {
 
   const handleMigration = async (items: MigrationItem[]): Promise<void> => {
     setIsLoading({
-      ...items.reduce((acc, item) => ({ ...acc, [item.upn]: true }), {}),
+      ...items.reduce((acc, item) => ({ ...acc, [item.id]: true }), {}),
     })
     try {
       const response = await fetch("/api/migrations/history", {
@@ -29,7 +29,7 @@ export default function Page(): JSX.Element {
       setError(`Error: ${error}`)
     } finally {
       setIsLoading({
-        ...items.reduce((acc, item) => ({ ...acc, [item.upn]: false }), {}),
+        ...items.reduce((acc, item) => ({ ...acc, [item.id]: false }), {}),
       })
     }
   }
@@ -55,20 +55,21 @@ export default function Page(): JSX.Element {
           <table className="mt-4 size-full table-auto border-4">
             <thead className="border-b-4">
               <tr>
-                <th>UPN</th>
-                <th>Wrong user ID</th>
-                <th>Correct user ID</th>
-                <th>Migrate</th>
+                <th>ID</th>
+                <th>Tenant</th>
+                <th>User ID</th>
+                <th>Thread ID</th>
               </tr>
             </thead>
             <tbody>
               {items.map(item => (
-                <tr key={item.upn}>
-                  <td className="border-2">{item.upn}</td>
-                  <td className="border-2">{item.wrongUserId}</td>
-                  <td className="border-2">{item.correctUserId}</td>
+                <tr key={item.id}>
+                  <td className="border-2">{item.id}</td>
+                  <td className="border-2">{item.tenant}</td>
+                  <td className="border-2">{item.user}</td>
+                  <td className="border-2">{item.threadId}</td>
                   <td className="border-2">
-                    <Button onClick={async () => await handleMigration([item])} disabled={isLoading[item.upn]}>
+                    <Button onClick={async () => await handleMigration([item])} disabled={isLoading[item.id]}>
                       Run migration
                     </Button>
                   </td>
@@ -79,7 +80,7 @@ export default function Page(): JSX.Element {
         )}
         <br />
         {!!items.length && (
-          <Button onClick={async () => await handleMigration(items)} disabled={items.some(item => isLoading[item.upn])}>
+          <Button onClick={async () => await handleMigration(items)} disabled={items.some(item => isLoading[item.id])}>
             Run all migrations
           </Button>
         )}
