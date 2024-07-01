@@ -1,16 +1,17 @@
-import { ChatCompletionMessage, ChatCompletionRole } from "openai/resources"
+import { ChatCompletionMessageParam, ChatCompletionRole } from "openai/resources"
 
 import { ChatMessageModel, ChatRole } from "@/features/chat/models"
 
-export function mapOpenAIChatMessages(messages: ChatMessageModel[]): ChatCompletionMessage[] {
+export function mapOpenAIChatMessages(messages: ChatMessageModel[]): ChatCompletionMessageParam[] {
   return messages.map(mapOpenAIChatMessage)
 }
 
-export function mapOpenAIChatMessage(message: ChatMessageModel): ChatCompletionMessage {
+export function mapOpenAIChatMessage(message: ChatMessageModel): ChatCompletionMessageParam {
   return {
     role: message.role,
     content: message.content,
-  }
+    name: message.name,
+  } as ChatCompletionMessageParam
 }
 
 export function mapChatCompletionRoleToChatRole(role: ChatCompletionRole): ChatRole {
