@@ -106,7 +106,7 @@ export const ChatProvider: FC<Prop> = props => {
     setChatBody(prev => ({ ...prev, conversationSensitivity: value }))
 
   const handleSubmit = async (
-    event?: React.FormEvent<HTMLFormElement> | { preventDefault?: (() => void) | undefined } | undefined,
+    event?: { preventDefault?: () => void },
     options: ChatRequestOptions = {}
   ): Promise<void> => {
     if (event && event.preventDefault) {

@@ -10,12 +10,6 @@ import { OpenAIInstance } from "@/features/common/services/open-ai"
 
 import { translator } from "./chat-translator-service"
 
-export interface Message {
-  role: "function" | "system" | "user" | "assistant"
-  content: string
-  name: string
-}
-
 interface GenericChatAPIProps {
   messages: ChatCompletionMessageParam[]
   options?: {
