@@ -26,23 +26,14 @@ export const OpenAIInstance = (options: OpenAIOptions = { contentSafetyOn: true 
   return getOpenAIInstance(deployment, process.env.AZURE_OPENAI_API_VERSION)
 }
 
-export const OpenAIEmbeddingInstance = (): AzureOpenAI => {
-  return getOpenAIInstance(
+export const OpenAIEmbeddingInstance = (): AzureOpenAI =>
+  getOpenAIInstance(
     process.env.AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME,
     process.env.AZURE_OPENAI_API_EMBEDDINGS_VERSION
   )
-}
 
-export const OpenAIDALLEInstance = (): AzureOpenAI => {
-  return getOpenAIInstance(
-    process.env.AZURE_OPENAI_DALLE_API_DEPLOYMENT_NAME,
-    process.env.AZURE_OPENAI_DALLE_API_VERSION
-  )
-}
+export const OpenAIDALLEInstance = (): AzureOpenAI =>
+  getOpenAIInstance(process.env.AZURE_OPENAI_DALLE_API_DEPLOYMENT_NAME, process.env.AZURE_OPENAI_DALLE_API_VERSION)
 
-export const OpenAIVisionInstance = (): AzureOpenAI => {
-  return getOpenAIInstance(
-    process.env.AZURE_OPENAI_VISION_API_DEPLOYMENT_NAME,
-    process.env.AZURE_OPENAI_VISION_API_VERSION
-  )
-}
+export const OpenAIVisionInstance = (): AzureOpenAI =>
+  getOpenAIInstance(process.env.AZURE_OPENAI_VISION_API_DEPLOYMENT_NAME, process.env.AZURE_OPENAI_VISION_API_VERSION)
