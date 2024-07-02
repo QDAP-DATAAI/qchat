@@ -53,6 +53,7 @@ const configureIdentityProvider = (): Provider[] => {
 
           const admin = await isAdmin(profile)
           const tenantAdmin = admin ? true : await isTenantAdmin(profile)
+
           const user = await getUser(profile.tenantId, profile.upn)
 
           return {
@@ -65,8 +66,9 @@ const configureIdentityProvider = (): Provider[] => {
             globalAdmin: globalAdmin,
             tenantAdmin: tenantAdmin,
             userId: profile.upn,
-            acceptedTermsDate: (user.accepted_terms && user.accepted_terms_date) || null,
-            lastVersionSeen: user.last_version_seen || null,
+            accepted_terms: user?.accepted_terms || false,
+            acceptedTermsDate: user?.accepted_terms_date || null,
+            lastVersionSeen: user?.last_version_seen || null,
           }
         },
       })
