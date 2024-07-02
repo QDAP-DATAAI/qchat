@@ -26,7 +26,7 @@ interface Props {
   children: string
 }
 
-const CodeBlock: FC<Props> = memo(({ language, children }): JSX.Element => {
+export const CodeBlock: FC<Props> = memo(({ language, children }): JSX.Element => {
   const handleCopy = async (): Promise<void> => {
     try {
       const detectedLanguage = hljs.highlightAuto(children).language || language
