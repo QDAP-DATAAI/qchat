@@ -14,6 +14,8 @@ export function mapOpenAIChatMessage(message: ChatMessageModel): ChatCompletionM
   } as ChatCompletionMessageParam
 }
 
+//TODO add name and then remove as Type casting
+
 export function mapChatCompletionRoleToChatRole(role: ChatCompletionRole): ChatRole {
   return role as unknown as ChatRole
 }
