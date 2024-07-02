@@ -10,8 +10,8 @@ export function mapOpenAIChatMessage(message: ChatMessageModel): ChatCompletionM
   return {
     role: message.role,
     content: message.content,
-    // name: message.name,
-  } as ChatCompletionMessageParam
+    name: message.name,
+  }
 }
 
 //TODO add name and then remove as Type casting

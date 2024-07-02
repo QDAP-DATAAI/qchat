@@ -58,7 +58,7 @@ export interface ChatMessageModel {
   type: ChatRecordType.Message
   role: ChatRole
   fleschKincaidScore?: number
-  // name: string
+  name: string
 }
 export interface UserChatMessageModel extends ChatMessageModel {
   role: ChatRole.User
@@ -96,6 +96,7 @@ export interface ChatThreadModel {
   internalReference?: string
   isDisabled: boolean
   contentFilterTriggerCount?: number
+  // CWYD: This is a new field that was added to the ChatThreadModel type
 }
 
 export interface PromptBody {

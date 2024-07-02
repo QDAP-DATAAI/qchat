@@ -109,9 +109,8 @@ export const ChatProvider: FC<Prop> = props => {
     event?: { preventDefault?: () => void },
     options: ChatRequestOptions = {}
   ): Promise<void> => {
-    if (event && event.preventDefault) {
-      event.preventDefault()
-    }
+    event?.preventDefault?.()
+
     if (!response.input) return
 
     const nextCompletionId = uniqueId()

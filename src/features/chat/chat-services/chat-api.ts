@@ -32,7 +32,7 @@ import { InitThreadSession, UpsertChatThread } from "./chat-thread-service"
 import { translator } from "./chat-translator-service"
 import { UpdateChatThreadIfUncategorised } from "./chat-utility"
 
-const dataChatTypes = ["data", "mssql", "audio"]
+const dataChatTypes = ["data", "audio"]
 export const MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED = 3
 
 export const ChatApi = async (props: PromptProps): Promise<Response> => {
@@ -100,7 +100,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       userPrompt: contextPrompts.userPrompt,
       contentFilterResult,
       fleschKincaidScore: calculateFleschKincaidScore(updatedLastHumanMessage.content),
-      // name: chatThread.useName,
+      name: chatThread.useName,
     })
     if (chatMessageResponse.status !== "OK") throw chatMessageResponse
 
@@ -124,7 +124,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       sentiment: ChatSentiment.Neutral,
       reason: "",
       fleschKincaidScore: fleschKincaidScore,
-      // name: APP_NAME || "Assistant",
+      name: APP_NAME || "Assistant",
       isPartial: isPartial,
     })
 
