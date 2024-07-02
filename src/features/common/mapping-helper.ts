@@ -10,7 +10,7 @@ export function mapOpenAIChatMessage(message: ChatMessageModel): ChatCompletionM
   return {
     role: message.role,
     content: message.content,
-    name: message.name,
+    // name: message.name,
   } as ChatCompletionMessageParam
 }
 

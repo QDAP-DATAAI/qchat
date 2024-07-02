@@ -100,7 +100,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       userPrompt: contextPrompts.userPrompt,
       contentFilterResult,
       fleschKincaidScore: calculateFleschKincaidScore(updatedLastHumanMessage.content),
-      name: chatThread.useName,
+      // name: chatThread.useName,
     })
     if (chatMessageResponse.status !== "OK") throw chatMessageResponse
 
@@ -124,7 +124,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       sentiment: ChatSentiment.Neutral,
       reason: "",
       fleschKincaidScore: fleschKincaidScore,
-      name: APP_NAME || "Assistant",
+      // name: APP_NAME || "Assistant",
       isPartial: isPartial,
     })
 
@@ -174,7 +174,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
           id: addedMessage.response.id,
           role: addedMessage.response.role,
           content: addedMessage.response.content,
-          name: addedMessage.response.name,
+          // name: addedMessage.response.name,
         })
 
         addedMessage.response.content &&
