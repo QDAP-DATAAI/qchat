@@ -24,6 +24,7 @@ export const GetApplicationSettings = async (): ServerActionResponseAsync<Applic
         version: APP_VERSION,
         termsAndConditionsDate: new Date().toISOString(),
         administratorAccess: [],
+        transcriptionAccess: [],
       })
       if (!resource)
         return {

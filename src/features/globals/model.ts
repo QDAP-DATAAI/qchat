@@ -5,6 +5,7 @@ export type ApplicationSettings = {
   version: string
   termsAndConditionsDate: string
   administratorAccess: AdministratorTenantGroups[]
+  transcriptionAccess: AdministratorTenantGroups[]
 }
 
 export type AdministratorTenantGroups = {
