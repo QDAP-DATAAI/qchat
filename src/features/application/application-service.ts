@@ -5,7 +5,7 @@ import { APP_DESCRIPTION, APP_NAME, APP_VERSION } from "@/app-global"
 
 import { ServerActionResponseAsync } from "@/features/common/server-action-response"
 import { ApplicationContainer } from "@/features/common/services/cosmos"
-import { AdministratorTenantGroups, ApplicationSettings } from "@/features/globals/model"
+import { TenantGroupPairs, ApplicationSettings } from "@/features/globals/model"
 
 export const GetApplicationSettings = async (): ServerActionResponseAsync<ApplicationSettings> => {
   try {
@@ -58,7 +58,7 @@ export async function isAdmin(user: User | AdapterUser): Promise<boolean> {
 
     const appSettings: ApplicationSettings = appSettingsResponse.response
 
-    const administratorAccess: AdministratorTenantGroups[] = appSettings.administratorAccess || []
+    const administratorAccess: TenantGroupPairs[] = appSettings.administratorAccess || []
 
     const tenantAccess = administratorAccess.find(access => access.tenant === user.tenantId)
 
