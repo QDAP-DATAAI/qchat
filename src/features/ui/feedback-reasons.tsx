@@ -10,17 +10,18 @@ interface FeedbackButtonsProps {
 }
 
 const FeedbackButtons: React.FC<FeedbackButtonsProps> = ({ selectedType, onFeedbackTypeChange }) => {
+  const handleValueChange = React.useCallback(
+    (type: string) => {
+      onFeedbackTypeChange(
+        Object.values(FeedbackType).includes(type as FeedbackType) ? (type as FeedbackType) : FeedbackType.None
+      )
+    },
+    [onFeedbackTypeChange]
+  )
+
   return (
     <div className="p-4">
-      <Tabs
-        defaultValue={FeedbackType.None}
-        value={selectedType}
-        onValueChange={type =>
-          onFeedbackTypeChange(
-            Object.values(FeedbackType).includes(type as FeedbackType) ? (type as FeedbackType) : FeedbackType.None
-          )
-        }
-      >
+      <Tabs defaultValue={FeedbackType.None} value={selectedType} onValueChange={handleValueChange}>
         <TabsList className="grid size-full grid-cols-3 items-stretch">
           <TabsTrigger
             value={FeedbackType.HarmfulUnsafe}

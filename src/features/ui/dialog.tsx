@@ -16,32 +16,31 @@ export const useDialogContext = (): DialogContextDefinition => {
   return context
 }
 
-export const Dialog = forwardRef<
-  HTMLDivElement,
-  { children: ReactNode | ReactNode; className?: string; onClose?: () => void }
->(({ children, className, onClose }, ref) => {
-  const modalRef = useRef<HTMLDivElement>(null)
-  useOnClickOutside(modalRef, () => onClose?.())
+export const Dialog = forwardRef<HTMLDivElement, { children: ReactNode; className?: string; onClose?: () => void }>(
+  ({ children, className, onClose }, ref) => {
+    const modalRef = useRef<HTMLDivElement>(null)
+    useOnClickOutside(modalRef, () => onClose?.())
 
-  return (
-    <DialogContext.Provider value={{ onClose: onClose }}>
-      <div ref={modalRef} className={cn("my-[8rem] w-[500px]", className)}>
-        <div
-          ref={ref}
-          className={cn(
-            "flex max-h-[calc(100vh-16rem)] min-h-[16rem] flex-col rounded-md border-2 bg-background",
-            className
-          )}
-        >
-          {children}
+    return (
+      <DialogContext.Provider value={{ onClose }}>
+        <div ref={modalRef} className={cn("my-[8rem] w-[500px]", className)}>
+          <div
+            ref={ref}
+            className={cn(
+              "flex max-h-[calc(100vh-16rem)] min-h-[16rem] flex-col rounded-md border-2 bg-background",
+              className
+            )}
+          >
+            {children}
+          </div>
         </div>
-      </div>
-    </DialogContext.Provider>
-  )
-})
+      </DialogContext.Provider>
+    )
+  }
+)
 Dialog.displayName = "Dialog"
 
-export const DialogHeader = forwardRef<HTMLDivElement, { children: ReactNode | ReactNode; className?: string }>(
+export const DialogHeader = forwardRef<HTMLDivElement, { children: ReactNode; className?: string }>(
   ({ children, className }, ref) => {
     const { onClose } = useDialogContext()
     return (
@@ -54,7 +53,7 @@ export const DialogHeader = forwardRef<HTMLDivElement, { children: ReactNode | R
 )
 DialogHeader.displayName = "DialogHeader"
 
-export const DialogContent = forwardRef<HTMLDivElement, { children: ReactNode | ReactNode; className?: string }>(
+export const DialogContent = forwardRef<HTMLDivElement, { children: ReactNode; className?: string }>(
   ({ children, className }, ref) => {
     useDialogContext()
     return (
@@ -70,7 +69,7 @@ export const DialogContent = forwardRef<HTMLDivElement, { children: ReactNode | 
 )
 DialogContent.displayName = "DialogContent"
 
-export const DialogFooter = forwardRef<HTMLDivElement, { children: ReactNode | ReactNode; className?: string }>(
+export const DialogFooter = forwardRef<HTMLDivElement, { children: ReactNode; className?: string }>(
   ({ children, className }, ref) => {
     useDialogContext()
     return (

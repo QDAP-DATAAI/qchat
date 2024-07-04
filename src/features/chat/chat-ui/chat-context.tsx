@@ -2,7 +2,7 @@
 
 import { ChatRequestOptions, JSONValue } from "ai"
 import { UseChatHelpers, useChat } from "ai/react"
-import React, { FC, createContext, useContext, useRef, useState } from "react"
+import React, { FC, createContext, useContext, useRef, useState, useMemo, useCallback } from "react"
 
 import { MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED } from "@/features/chat/chat-services/chat-api"
 import {
@@ -105,43 +105,49 @@ export const ChatProvider: FC<Prop> = props => {
   const onConversationSensitivityChange = (value: ConversationSensitivity): void =>
     setChatBody(prev => ({ ...prev, conversationSensitivity: value }))
 
-  const handleSubmit = async (
-    event?: { preventDefault?: () => void },
-    options: ChatRequestOptions = {}
-  ): Promise<void> => {
-    if (event && event.preventDefault) {
-      event.preventDefault()
-    }
-    if (!response.input) return
+  const memoizedMessages = useMemo(
+    () =>
+      response.messages.map<PromptMessage>(message => {
+        const dataItem = (response.data as (JSONValue & PromptMessage)[])?.find(
+          data => data?.id === message.id
+        ) as PromptMessage
+        return {
+          ...message,
+          ...dataItem,
+        }
+      }),
+    [response.messages, response.data]
+  )
 
-    const nextCompletionId = uniqueId()
-    setNextId(nextCompletionId)
+  const handleSubmit = useCallback(
+    async (event?: { preventDefault?: () => void }, options: ChatRequestOptions = {}): Promise<void> => {
+      if (event && event.preventDefault) {
+        event.preventDefault()
+      }
+      if (!response.input) return
 
-    await response.append(
-      {
-        id: uniqueId(),
-        content: response.input,
-        role: ChatRole.User,
-      },
-      { ...options, data: { completionId: nextCompletionId } }
-    )
+      const nextCompletionId = uniqueId()
+      setNextId(nextCompletionId)
 
-    response.setInput("")
-  }
+      await response.append(
+        {
+          id: uniqueId(),
+          content: response.input,
+          role: ChatRole.User,
+        },
+        { ...options, data: { completionId: nextCompletionId } }
+      )
+
+      response.setInput("")
+    },
+    [response]
+  )
 
   return (
     <ChatContext.Provider
       value={{
         ...response,
-        messages: response.messages.map<PromptMessage>(message => {
-          const dataItem = (response.data as (JSONValue & PromptMessage)[])?.find(
-            data => data?.id === message.id
-          ) as PromptMessage
-          return {
-            ...message,
-            ...dataItem,
-          }
-        }),
+        messages: memoizedMessages,
         documents: props.documents,
         tenantPreferences: props.tenantPreferences,
         chatThreadLocked:

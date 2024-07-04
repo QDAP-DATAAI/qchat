@@ -1,6 +1,6 @@
 import { Loader } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useMemo } from "react"
 
 import { APP_VERSION } from "@/app-global"
 
@@ -15,6 +15,7 @@ type WhatsNewModalProps = {
   targetVersion: string
   onClose: () => void
 }
+
 export default function WhatsNewModal({ targetVersion, onClose }: WhatsNewModalProps): JSX.Element {
   const { update } = useSession()
   const [content, setContent] = useState<string>("Loading the latest news...")
@@ -42,10 +43,10 @@ export default function WhatsNewModal({ targetVersion, onClose }: WhatsNewModalP
     }
   }, [onClose, targetVersion, update])
 
-  const handleClickOutside = (): void => {
+  const handleClickOutside = useCallback((): void => {
     sessionStorage.setItem("whats-new-dismissed", new Date().toISOString())
     onClose()
-  }
+  }, [onClose])
 
   useEffect(() => {
     fetch("/api/application/whats-new")
@@ -58,13 +59,15 @@ export default function WhatsNewModal({ targetVersion, onClose }: WhatsNewModalP
       .finally(() => setIsLoading(false))
   }, [onClose])
 
+  const loadingMessage = useMemo(() => "Loading terms and conditions...", [])
+
   return (
     <Dialog onClose={handleClickOutside}>
       <DialogHeader>What&apos;s new</DialogHeader>
       <DialogContent>
         <div className="prose prose-slate max-w-4xl break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0">
           <Typography variant="h3">App Version {APP_VERSION}</Typography>
-          {isLoading ? "Loading terms and conditions..." : <Markdown content={content} />}
+          {isLoading ? loadingMessage : <Markdown content={content} />}
         </div>
       </DialogContent>
       <DialogFooter>

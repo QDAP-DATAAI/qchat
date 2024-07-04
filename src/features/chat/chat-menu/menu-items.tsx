@@ -1,7 +1,7 @@
 "use client"
 import { FileText, MessageCircle, Trash, Pencil, AudioLines } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
-import React, { FC, useState, useEffect, useRef } from "react"
+import React, { FC, useState, useEffect, useRef, useCallback } from "react"
 
 import { MenuItem } from "@/components/menu"
 import Typography from "@/components/typography"
@@ -31,19 +31,17 @@ const ChatMenuModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAft
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
-    if (isOpen) {
-      if (type === "edit") {
-        inputRef.current?.focus()
-      }
+    if (isOpen && type === "edit") {
+      inputRef.current?.focus()
     } else if (focusAfterClose) {
       focusAfterClose.focus()
     }
   }, [isOpen, focusAfterClose, type])
 
-  const handleSave = (): void => {
+  const handleSave = useCallback((): void => {
     onSave(inputValue)
     onClose()
-  }
+  }, [inputValue, onClose, onSave])
 
   return (
     <div
@@ -103,103 +101,121 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
   const [modalType, setModalType] = useState<"edit" | "delete" | null>(null)
   const [items, setItems] = useState<ChatThreadModel[]>(menuItems)
 
-  const handleOpenModal = (chatThreadId: string, type: "edit" | "delete"): void => {
+  const handleOpenModal = useCallback((chatThreadId: string, type: "edit" | "delete"): void => {
     setSelectedThreadId(chatThreadId)
     setModalType(type)
-  }
+  }, [])
 
-  const handleCloseModal = (): void => {
+  const handleCloseModal = useCallback((): void => {
     setSelectedThreadId(null)
     setModalType(null)
-  }
+  }, [])
 
-  const handleSaveModal = async (inputValue?: string): Promise<void> => {
-    if (modalType === "edit" && (inputValue ?? "").trim() !== "" && selectedThreadId) {
-      try {
-        await UpdateChatThreadTitle(selectedThreadId, inputValue || "")
-        setItems(prevItems =>
-          prevItems.map(item =>
-            item.chatThreadId === selectedThreadId ? { ...item, name: inputValue || item.name } : item
+  const handleSaveModal = useCallback(
+    async (inputValue?: string): Promise<void> => {
+      if (modalType === "edit" && (inputValue ?? "").trim() !== "" && selectedThreadId) {
+        try {
+          await UpdateChatThreadTitle(selectedThreadId, inputValue || "")
+          setItems(prevItems =>
+            prevItems.map(item =>
+              item.chatThreadId === selectedThreadId ? { ...item, name: inputValue || item.name } : item
+            )
           )
-        )
-      } catch (e) {
-        showError("" + e)
-      } finally {
-        handleCloseModal()
+        } catch (e) {
+          showError("" + e)
+        } finally {
+          handleCloseModal()
+        }
+      } else if (modalType === "delete" && selectedThreadId) {
+        try {
+          await SoftDeleteChatThreadForCurrentUser(selectedThreadId)
+          setItems(prev => prev.filter(item => item.chatThreadId !== selectedThreadId))
+          router.replace("/chat")
+        } catch (e) {
+          showError("" + e)
+        } finally {
+          handleCloseModal()
+        }
       }
-    } else if (modalType === "delete" && selectedThreadId) {
-      try {
-        await SoftDeleteChatThreadForCurrentUser(selectedThreadId)
-        setItems(prev => prev.filter(item => item.chatThreadId !== selectedThreadId))
-        router.replace("/chat") // This is where you navigate to the "/chat" route
-      } catch (e) {
-        showError("" + e)
-      } finally {
-        handleCloseModal()
-      }
-    }
-    router.refresh()
-  }
+      router.refresh()
+    },
+    [modalType, selectedThreadId, handleCloseModal, showError, router]
+  )
+
+  const handleEditButtonClick = useCallback(
+    (threadId: string) => () => handleOpenModal(threadId, "edit"),
+    [handleOpenModal]
+  )
+
+  const handleDeleteButtonClick = useCallback(
+    (threadId: string) => () => handleOpenModal(threadId, "delete"),
+    [handleOpenModal]
+  )
+
+  const renderMenuItem = useCallback(
+    (thread: ChatThreadModel) => (
+      <MenuItem
+        href={`/chat/${thread.chatThreadId}`}
+        isSelected={chatThreadId === thread.chatThreadId}
+        key={thread.chatThreadId}
+        className="hover:item group relative justify-between"
+      >
+        {thread.chatType === "data" ? (
+          <FileText
+            size={16}
+            className={chatThreadId === thread.chatThreadId ? "hidden text-brand sm:block" : "hidden sm:block"}
+          />
+        ) : thread.chatType === "audio" ? (
+          <AudioLines
+            size={16}
+            className={chatThreadId === thread.chatThreadId ? "hidden text-brand sm:block" : "hidden sm:block"}
+          />
+        ) : (
+          <MessageCircle
+            size={16}
+            className={chatThreadId === thread.chatThreadId ? "hidden text-brand sm:block" : "hidden sm:block"}
+          />
+        )}
+        <Typography variant="span" className="flex flex-1 items-center gap-1 overflow-hidden">
+          {thread.name}
+        </Typography>
+        <div className="hidden gap-1 sm:grid">
+          <Button
+            className="opacity-20 group-hover:opacity-100"
+            size="sm"
+            variant="accent"
+            ariaLabel={`Rename ${thread.name}`}
+            onClick={handleEditButtonClick(thread.chatThreadId)}
+          >
+            <Pencil size={16} />
+          </Button>
+          <Button
+            className="opacity-20 group-hover:opacity-100"
+            size="sm"
+            variant="destructive"
+            ariaLabel={`Delete ${thread.name}`}
+            onClick={handleDeleteButtonClick(thread.chatThreadId)}
+          >
+            <Trash size={16} />
+          </Button>
+        </div>
+      </MenuItem>
+    ),
+    [chatThreadId, handleEditButtonClick, handleDeleteButtonClick]
+  )
 
   return (
     <>
-      {items.map(thread => (
-        <MenuItem
-          href={`/chat/${thread.chatThreadId}`}
-          isSelected={chatThreadId === thread.chatThreadId}
-          key={thread.chatThreadId}
-          className="hover:item group relative justify-between"
-        >
-          {thread.chatType === "data" ? (
-            <FileText
-              size={16}
-              className={chatThreadId === thread.chatThreadId ? "hidden text-brand sm:block" : "hidden sm:block"}
-            />
-          ) : thread.chatType === "audio" ? (
-            <AudioLines
-              size={16}
-              className={chatThreadId === thread.chatThreadId ? "hidden text-brand sm:block" : "hidden sm:block"}
-            />
-          ) : (
-            <MessageCircle
-              size={16}
-              className={chatThreadId === thread.chatThreadId ? "hidden text-brand sm:block" : "hidden sm:block"}
-            />
-          )}
-          <Typography variant="span" className="flex flex-1 items-center gap-1 overflow-hidden">
-            {thread.name}
-          </Typography>
-          <div className="hidden gap-1 sm:grid">
-            <Button
-              className="opacity-20 group-hover:opacity-100"
-              size="sm"
-              variant="accent"
-              ariaLabel={`Rename ${thread.name}`}
-              onClick={() => handleOpenModal(thread.chatThreadId, "edit")}
-            >
-              <Pencil size={16} />
-            </Button>
-            <Button
-              className="opacity-20 group-hover:opacity-100"
-              size="sm"
-              variant="destructive"
-              ariaLabel={`Delete ${thread.name}`}
-              onClick={() => handleOpenModal(thread.chatThreadId, "delete")}
-            >
-              <Trash size={16} />
-            </Button>
-            {selectedThreadId === thread.chatThreadId && modalType && (
-              <ChatMenuModal
-                isOpen={true}
-                onClose={handleCloseModal}
-                onSave={handleSaveModal}
-                focusAfterClose={null}
-                type={modalType}
-              />
-            )}
-          </div>
-        </MenuItem>
-      ))}
+      {items.map(renderMenuItem)}
+      {selectedThreadId && modalType && (
+        <ChatMenuModal
+          isOpen={true}
+          onClose={handleCloseModal}
+          onSave={handleSaveModal}
+          focusAfterClose={null}
+          type={modalType}
+        />
+      )}
     </>
   )
 }

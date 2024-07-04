@@ -1,6 +1,6 @@
 import * as Tooltip from "@radix-ui/react-tooltip"
 import { AudioLines, FileText, MessageCircle } from "lucide-react"
-import React, { useEffect, useState, FC } from "react"
+import React, { useEffect, useState, FC, useCallback } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -27,17 +27,19 @@ export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
     }
   }, [chatBody])
 
+  const handleValueChange = useCallback(
+    (value: string) => {
+      onChatTypeChange(value as ChatType)
+    },
+    [onChatTypeChange]
+  )
+
   return (
     <TooltipProvider>
       <Tooltip.Root>
         <Tooltip.Trigger asChild>
           <div>
-            <Tabs
-              defaultValue={chatBody.chatType}
-              onValueChange={value => {
-                onChatTypeChange(value as ChatType)
-              }}
-            >
+            <Tabs defaultValue={chatBody.chatType} onValueChange={handleValueChange}>
               <TabsList aria-label="Conversation Type" className="grid size-full grid-cols-3 items-stretch">
                 <TabsTrigger
                   value="simple"
