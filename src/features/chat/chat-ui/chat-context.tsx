@@ -17,7 +17,7 @@ import {
   UserChatMessageModel,
   ChatDocumentModel,
 } from "@/features/chat/models"
-import { useGlobalMessageContext } from "@/features/globals/global-message-context"
+import { showError } from "@/features/globals/global-message-store"
 import { TenantPreferences } from "@/features/tenant-management/models"
 import { uniqueId } from "@/lib/utils"
 
@@ -52,7 +52,6 @@ interface Prop {
 }
 
 export const ChatProvider: FC<Prop> = props => {
-  const { showError } = useGlobalMessageContext()
   const fileState = useFileState()
 
   const [chatBody, setChatBody] = useState<PromptBody>({
@@ -89,10 +88,6 @@ export const ChatProvider: FC<Prop> = props => {
     },
     sendExtraMessageFields: true,
   })
-
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const openModal = (): void => setIsModalOpen(true)
-  const closeModal = (): void => setIsModalOpen(false)
 
   const onChatTypeChange = (value: ChatType): void => {
     fileState.setIsFileNull(true)
@@ -154,9 +149,6 @@ export const ChatProvider: FC<Prop> = props => {
         onConversationSensitivityChange,
         fileState,
         id: props.id,
-        isModalOpen,
-        openModal,
-        closeModal,
       }}
     >
       {props.children}
