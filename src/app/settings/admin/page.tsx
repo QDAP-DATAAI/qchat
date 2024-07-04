@@ -59,7 +59,7 @@ function FancyQuote({
   )
 
   return (
-    <div className="animate-scale scale-95 italic">
+    <div className="scale-95 animate-scale italic">
       <b>{memoizedQuoteWords}</b>
       <i>{memoizedAuthorWords}</i>
     </div>
