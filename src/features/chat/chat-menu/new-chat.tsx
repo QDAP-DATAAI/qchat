@@ -2,6 +2,7 @@
 
 import { MessageSquarePlus } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useCallback } from "react"
 
 import {
   CreateChatThread,
@@ -11,11 +12,11 @@ import {
 import { useGlobalMessageContext } from "@/features/globals/global-message-context"
 import { Button } from "@/features/ui/button"
 
-export const NewChat = (): JSX.Element => {
+const useStartNewChat = (): (() => Promise<void>) => {
   const router = useRouter()
   const { showError } = useGlobalMessageContext()
 
-  const startNewChat = async (): Promise<void> => {
+  return useCallback(async (): Promise<void> => {
     const title = "New Chat"
 
     try {
@@ -37,13 +38,20 @@ export const NewChat = (): JSX.Element => {
     } catch (_error) {
       showError("Failed to start a new chat. Please try again later.")
     }
-  }
+  }, [router, showError])
+}
 
-  const handleKeyDown = async (e: React.KeyboardEvent): Promise<void> => {
-    if (e.key === "Enter") {
-      await startNewChat()
-    }
-  }
+const NewChatButton = (): JSX.Element => {
+  const startNewChat = useStartNewChat()
+
+  const handleKeyDown = useCallback(
+    async (e: React.KeyboardEvent) => {
+      if (e.key === "Enter") {
+        await startNewChat()
+      }
+    },
+    [startNewChat]
+  )
 
   return (
     <Button
@@ -58,3 +66,38 @@ export const NewChat = (): JSX.Element => {
     </Button>
   )
 }
+
+// const MiniNewChatButton = (): JSX.Element => {
+//   const startNewChat = useStartNewChat()
+
+//   const handleKeyDown = useCallback(
+//     async (e: React.KeyboardEvent) => {
+//       if (e.key === "Enter") {
+//         await startNewChat()
+//       }
+//     },
+//     [startNewChat]
+//   )
+
+//   return (
+//     <div className="absolute right-4 top-4 z-50 lg:hidden">
+//       <Button
+//         className="size-[40px] gap-2 rounded-md p-1"
+//         variant="default"
+//         onClick={startNewChat}
+//         ariaLabel="Start a new chat"
+//         onKeyDown={handleKeyDown}
+//       >
+//         <MessageSquarePlus size={40} strokeWidth={1.2} aria-hidden="true" />
+//       </Button>
+//     </div>
+//   )
+// }
+
+export const NewChat = (): JSX.Element => {
+  return <NewChatButton />
+}
+
+// export const MiniNewChat = (): JSX.Element => {
+//   return <MiniNewChatButton />
+// }

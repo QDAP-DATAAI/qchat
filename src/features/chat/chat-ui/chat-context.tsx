@@ -67,7 +67,7 @@ export const ChatProvider: FC<Prop> = props => {
     chatThreadName: props.chatThread.name,
   })
 
-  const onError = (error: Error): void => showError(error.message)
+  const onError = useCallback((error: Error): void => showError(error.message), [showError])
 
   const [nextId, setNextId] = useState<string | undefined>(undefined)
   const nextIdRef = useRef(nextId)
@@ -91,19 +91,26 @@ export const ChatProvider: FC<Prop> = props => {
   })
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const openModal = (): void => setIsModalOpen(true)
-  const closeModal = (): void => setIsModalOpen(false)
+  const openModal = useCallback((): void => setIsModalOpen(true), [])
+  const closeModal = useCallback((): void => setIsModalOpen(false), [])
 
-  const onChatTypeChange = (value: ChatType): void => {
-    fileState.setIsFileNull(true)
-    setChatBody(prev => ({ ...prev, chatType: value }))
-  }
+  const onChatTypeChange = useCallback(
+    (value: ChatType): void => {
+      fileState.setIsFileNull(true)
+      setChatBody(prev => ({ ...prev, chatType: value }))
+    },
+    [fileState]
+  )
 
-  const onConversationStyleChange = (value: ConversationStyle): void =>
-    setChatBody(prev => ({ ...prev, conversationStyle: value }))
+  const onConversationStyleChange = useCallback(
+    (value: ConversationStyle): void => setChatBody(prev => ({ ...prev, conversationStyle: value })),
+    []
+  )
 
-  const onConversationSensitivityChange = (value: ConversationSensitivity): void =>
-    setChatBody(prev => ({ ...prev, conversationSensitivity: value }))
+  const onConversationSensitivityChange = useCallback(
+    (value: ConversationSensitivity): void => setChatBody(prev => ({ ...prev, conversationSensitivity: value })),
+    []
+  )
 
   const memoizedMessages = useMemo(
     () =>
@@ -143,31 +150,46 @@ export const ChatProvider: FC<Prop> = props => {
     [response]
   )
 
-  return (
-    <ChatContext.Provider
-      value={{
-        ...response,
-        messages: memoizedMessages,
-        documents: props.documents,
-        tenantPreferences: props.tenantPreferences,
-        chatThreadLocked:
-          (props.chatThread?.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED,
-        handleSubmit,
-        setChatBody,
-        chatBody,
-        onChatTypeChange,
-        onConversationStyleChange,
-        onConversationSensitivityChange,
-        fileState,
-        id: props.id,
-        isModalOpen,
-        openModal,
-        closeModal,
-      }}
-    >
-      {props.children}
-    </ChatContext.Provider>
+  const providerValue = useMemo(
+    () => ({
+      ...response,
+      messages: memoizedMessages,
+      documents: props.documents,
+      tenantPreferences: props.tenantPreferences,
+      chatThreadLocked: (props.chatThread?.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED,
+      handleSubmit,
+      setChatBody,
+      chatBody,
+      onChatTypeChange,
+      onConversationStyleChange,
+      onConversationSensitivityChange,
+      fileState,
+      id: props.id,
+      isModalOpen,
+      openModal,
+      closeModal,
+    }),
+    [
+      response,
+      memoizedMessages,
+      props.documents,
+      props.tenantPreferences,
+      props.chatThread?.contentFilterTriggerCount,
+      handleSubmit,
+      setChatBody,
+      chatBody,
+      onChatTypeChange,
+      onConversationStyleChange,
+      onConversationSensitivityChange,
+      fileState,
+      props.id,
+      isModalOpen,
+      openModal,
+      closeModal,
+    ]
   )
+
+  return <ChatContext.Provider value={providerValue}>{props.children}</ChatContext.Provider>
 }
 
 export const useChatContext = (): ChatContextProps => {

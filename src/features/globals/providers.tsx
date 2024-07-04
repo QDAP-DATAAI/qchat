@@ -3,7 +3,6 @@
 import { SessionProvider } from "next-auth/react"
 
 import { MenuProvider } from "@/features/main-menu/menu-context"
-import { MiniMenuProvider } from "@/features/main-menu/mini-menu-context"
 import { TooltipProvider } from "@/features/ui/tooltip-provider"
 
 import Announcements from "./announcements"
@@ -15,9 +14,7 @@ export const Providers = ({ children }: { children: React.ReactNode }): JSX.Elem
       <GlobalMessageProvider>
         <Announcements />
         <MenuProvider>
-          <MiniMenuProvider>
-            <TooltipProvider>{children}</TooltipProvider>
-          </MiniMenuProvider>
+          <TooltipProvider>{children}</TooltipProvider>
         </MenuProvider>
       </GlobalMessageProvider>
     </SessionProvider>

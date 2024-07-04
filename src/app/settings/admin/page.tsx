@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import { useMemo } from "react"
 
 import { APP_VERSION } from "@/app-global"
 
@@ -31,28 +32,36 @@ type FancyQuoteProps = {
   author?: string
   initialDelay?: number
 }
+
 function FancyQuote({
   quote = "With great power comes great responsibility.",
   author = " ~ Uncle Ben",
   initialDelay = 2,
 }: FancyQuoteProps): JSX.Element {
-  const quoteWords = quote.split(" ")
-  const authorWords = author.split(" ")
+  const quoteWords = useMemo(() => quote.split(" "), [quote])
+  const authorWords = useMemo(() => author.split(" "), [author])
 
   const renderWords = (words: string[], baseDelay: number): JSX.Element[] =>
     words.map((word, index) => (
       <span
         key={index}
-        className="animate-[blurOut_0.8s_forwards_cubic-bezier(0.11,0,0.5,0)] opacity-0 blur-sm"
+        className="animate-blurOut opacity-0 blur-sm"
         style={{ animationDelay: `${((index + 1) / 10 + baseDelay).toFixed(1)}s` }}
       >
         {word + " "}
       </span>
     ))
+
+  const memoizedQuoteWords = useMemo(() => renderWords(quoteWords, initialDelay), [quoteWords, initialDelay])
+  const memoizedAuthorWords = useMemo(
+    () => renderWords(authorWords, initialDelay + (quoteWords.length * 2) / 10),
+    [authorWords, initialDelay, quoteWords.length]
+  )
+
   return (
-    <div className="scale-95 animate-[scale_3s_forwards_cubic-bezier(0.5,1,0.89,1)] italic">
-      <b>{renderWords(quoteWords, initialDelay)}</b>
-      <i>{renderWords(authorWords, initialDelay + (quoteWords.length * 2) / 10)}</i>
+    <div className="animate-scale scale-95 italic">
+      <b>{memoizedQuoteWords}</b>
+      <i>{memoizedAuthorWords}</i>
     </div>
   )
 }
