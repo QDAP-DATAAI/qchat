@@ -20,6 +20,7 @@ interface ChatRowProps {
   chatThreadId: string
   showAssistantButtons: boolean
   threadLocked?: boolean
+  disableButtons?: boolean // Add this prop
 }
 
 const ChatRow: FC<ChatRowProps> = ({
@@ -62,7 +63,8 @@ const ChatRow: FC<ChatRowProps> = ({
                 {name}
               </Typography>
               <div className="flex items-center gap-4">
-                {showAssistantButtons && (
+
+                {showAssistantButtons && !disableButtons && (
                   <AssistantButtons
                     fleschScore={fleschScore}
                     message={message}
@@ -81,7 +83,8 @@ const ChatRow: FC<ChatRowProps> = ({
           >
             <div className="size-full items-center justify-between">
               <Markdown content={content} />
-              {message.contentFilterResult && (
+
+              {message.contentFilterResult && !disableButtons && (
                 <RewriteMessageButton
                   fleschScore={fleschScore}
                   message={message}

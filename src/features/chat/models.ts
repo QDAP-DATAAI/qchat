@@ -16,7 +16,6 @@ export enum ConversationSensitivity {
 export enum ChatType {
   Simple = "simple",
   Data = "data",
-  MSSQL = "mssql",
   Audio = "audio",
 }
 
