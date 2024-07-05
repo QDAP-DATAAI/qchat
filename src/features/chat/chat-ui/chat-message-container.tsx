@@ -1,6 +1,8 @@
+"use client"
+
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useMemo, useCallback } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -44,16 +46,23 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
     }
   }, [isLoading])
 
-  const onScroll = (e: React.UIEvent<HTMLDivElement>): void => {
-    if (isLoading) {
-      if (e.currentTarget.scrollTop < previousScrollTop) {
-        setSuppressScrolling(true)
+  const onScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>): void => {
+      if (isLoading) {
+        if (e.currentTarget.scrollTop < previousScrollTop) {
+          setSuppressScrolling(true)
+        }
+        setPreviousScrollTop(e.currentTarget.scrollTop)
       }
-      setPreviousScrollTop(e.currentTarget.scrollTop)
-    }
-  }
+    },
+    [isLoading, previousScrollTop]
+  )
 
-  const chatFiles = documents.filter(document => document.contents)
+  const chatFiles = useMemo(() => {
+    return documents.filter(document => document.contents)
+  }, [documents])
+
+  if (!messages || !documents) return <div>Error loading messages or documents</div>
 
   return (
     <div className="h-full overflow-y-auto" ref={scrollRef} onScroll={onScroll}>

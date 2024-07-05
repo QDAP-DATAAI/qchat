@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight, FileDown } from "lucide-react"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useCallback, useMemo } from "react"
 
 import Typography from "@/components/typography"
 import { convertUserListToWordDocument } from "@/features/common/user-export"
@@ -23,24 +23,79 @@ export type UserListProps = {
 
 export const UserList = (props: UserListProps): JSX.Element => {
   const { users, selectedTenant } = useAdminContext()
+
+  const [showFailedLogins, setShowFailedLogins] = useState(false)
+
+  const filteredUsers = useMemo(() => {
+    return showFailedLogins
+      ? users?.filter(user => user.failed_login_attempts >= HIGH_FAILED_LOGINS) || []
+      : users || []
+  }, [showFailedLogins, users])
+
+  const handleExport = useCallback(async (): Promise<void> => {
+    await convertUserListToWordDocument(filteredUsers, "UserList.docx")
+  }, [filteredUsers])
+
+  const toggleShowFailedLogins = useCallback(() => {
+    setShowFailedLogins(prevState => !prevState)
+  }, [])
+
+  const renderTableRow = useCallback(
+    (user: (typeof users)[0], rowIndex: number) => (
+      <TableRow key={user.id} data-row-index={rowIndex + 1}>
+        <TableCell data-col-index={0}>
+          <Link
+            href={`/settings/admin/${selectedTenant?.id}/${user.id}`}
+            className="hover:underline"
+            aria-label={`View details for ${user.name || "user"}`}
+          >
+            {user.name || "-"}
+          </Link>
+        </TableCell>
+        <TableCell data-col-index={1}>{user.email || "-"}</TableCell>
+        <TableCell data-col-index={2}>
+          {user.last_login ? new Date(user.last_login).toLocaleString("en-AU") : "-"}
+        </TableCell>
+        <TableCell data-col-index={3}>
+          {user.last_failed_login ? new Date(user.last_failed_login).toLocaleString("en-AU") : "-"}
+        </TableCell>
+        <TableCell
+          data-col-index={4}
+          className={user.failed_login_attempts >= HIGH_FAILED_LOGINS ? "bg-alert text-black" : ""}
+        >
+          {user.failed_login_attempts !== null && user.failed_login_attempts !== undefined
+            ? user.failed_login_attempts.toString()
+            : "-"}
+        </TableCell>
+      </TableRow>
+    ),
+    [selectedTenant]
+  )
+
   const _pageNumber = Number(props.searchParams.pageNumber ?? 0)
   const pageSize = Number(props.searchParams.pageSize ?? 20)
   const pageNumber = _pageNumber < 0 ? 0 : _pageNumber
   const nextPage = Number(pageNumber) + 1
   const previousPage = Number(pageNumber) - 1
-
-  const [showFailedLogins, setShowFailedLogins] = useState(false)
-
-  if (!users) return <div>Error loading users</div>
-
-  const filteredUsers = showFailedLogins
-    ? users.filter(user => user.failed_login_attempts >= HIGH_FAILED_LOGINS)
-    : users
   const hasMoreResults = filteredUsers.length === pageSize
 
-  const handleExport = async (): Promise<void> => {
-    await convertUserListToWordDocument(filteredUsers, "UserList.docx")
-  }
+  const previousPageLink = useMemo(
+    () => ({
+      pathname: "/settings/users",
+      search: `?pageNumber=${previousPage}`,
+    }),
+    [previousPage]
+  )
+
+  const nextPageLink = useMemo(
+    () => ({
+      pathname: "/settings/users",
+      search: `?pageNumber=${nextPage}`,
+    }),
+    [nextPage]
+  )
+
+  if (!users) return <div>Error loading users</div>
 
   return (
     <div className="flex size-full overflow-y-auto pt-8">
@@ -55,11 +110,7 @@ export const UserList = (props: UserListProps): JSX.Element => {
             </Typography>
           </div>
           <div className="flex items-center space-x-2">
-            <Button
-              onClick={() => setShowFailedLogins(prevState => !prevState)}
-              variant="outline"
-              aria-label="Toggle failed login attempts"
-            >
+            <Button onClick={toggleShowFailedLogins} variant="outline" aria-label="Toggle failed login attempts">
               {showFailedLogins ? "Show all Users" : "Show failed login attempts"}
             </Button>
             <Button onClick={handleExport} variant="outline" aria-label="Export user list">
@@ -89,58 +140,19 @@ export const UserList = (props: UserListProps): JSX.Element => {
                   </TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user, rowIndex) => (
-                  <TableRow key={user.id} data-row-index={rowIndex + 1}>
-                    <TableCell data-col-index={0}>
-                      <Link
-                        href={`/settings/admin/${selectedTenant?.id}/${user.id}`}
-                        className="hover:underline"
-                        aria-label={`View details for ${user.name || "user"}`}
-                      >
-                        {user.name || "-"}
-                      </Link>
-                    </TableCell>
-                    <TableCell data-col-index={1}>{user.email || "-"}</TableCell>
-                    <TableCell data-col-index={2}>
-                      {user.last_login ? new Date(user.last_login).toLocaleString("en-AU") : "-"}
-                    </TableCell>
-                    <TableCell data-col-index={3}>
-                      {user.last_failed_login ? new Date(user.last_failed_login).toLocaleString("en-AU") : "-"}
-                    </TableCell>
-                    <TableCell
-                      data-col-index={4}
-                      className={user.failed_login_attempts >= HIGH_FAILED_LOGINS ? "bg-alert text-black" : ""}
-                    >
-                      {user.failed_login_attempts !== null && user.failed_login_attempts !== undefined
-                        ? user.failed_login_attempts.toString()
-                        : "-"}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+              <TableBody>{filteredUsers.map(renderTableRow)}</TableBody>
             </Table>
             <div className="flex justify-end gap-2 p-2">
               {previousPage >= 0 && (
                 <Button asChild size="icon" variant="outline" aria-label="Previous page">
-                  <Link
-                    href={{
-                      pathname: "/settings/users",
-                      search: `?pageNumber=${previousPage}`,
-                    }}
-                  >
+                  <Link href={previousPageLink}>
                     <ChevronLeft />
                   </Link>
                 </Button>
               )}
               {hasMoreResults && (
                 <Button asChild size="icon" variant="outline" aria-label="Next page">
-                  <Link
-                    href={{
-                      pathname: "/settings/users",
-                      search: `?pageNumber=${nextPage}`,
-                    }}
-                  >
+                  <Link href={nextPageLink}>
                     <ChevronRight />
                   </Link>
                 </Button>

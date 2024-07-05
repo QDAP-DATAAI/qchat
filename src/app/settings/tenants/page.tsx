@@ -14,7 +14,9 @@ const TenantsPageContent: React.FC = () => {
     }
   }, [tenants, selectTenant])
 
-  return <TenantList searchParams={{ pageSize: 10, pageNumber: 0 }} />
+  const searchParams = { pageSize: 10, pageNumber: 0 }
+  const tenantListProps = { searchParams }
+  return <TenantList {...tenantListProps} />
 }
 
 const TenantsPage: React.FC = () => {
