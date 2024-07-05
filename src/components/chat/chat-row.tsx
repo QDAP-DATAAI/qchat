@@ -20,7 +20,7 @@ interface ChatRowProps {
   chatThreadId: string
   showAssistantButtons: boolean
   threadLocked?: boolean
-  disableButtons?: boolean // Add this prop
+  disableButtons?: boolean
 }
 
 const ChatRow: FC<ChatRowProps> = ({
@@ -31,6 +31,7 @@ const ChatRow: FC<ChatRowProps> = ({
   chatThreadId,
   showAssistantButtons,
   threadLocked,
+  disableButtons,
 }) => {
   const { setInput } = useChatContext()
   const [feedbackMessage, setFeedbackMessage] = useState<string>("")
@@ -63,7 +64,6 @@ const ChatRow: FC<ChatRowProps> = ({
                 {name}
               </Typography>
               <div className="flex items-center gap-4">
-
                 {showAssistantButtons && !disableButtons && (
                   <AssistantButtons
                     fleschScore={fleschScore}
