@@ -68,13 +68,13 @@ export const ReportingMessageContainer: FC<Props> = ({ chatThreadId }) => {
   return (
     <div className="h-full overflow-y-auto" ref={scrollRef} onScroll={onScroll}>
       <div className="my-4 flex flex-1 flex-col">
-        <div className="container mx-auto grid grid-cols-3 items-center">
+        <div className="container mx-auto grid grid-cols-5 items-center">
           <div className="col-span-1 justify-start">
             <Button variant="outline" onClick={handleBackToReporting}>
               Back to Reporting
             </Button>
           </div>
-          <div className="col-span-1 justify-center">
+          <div className="col-span-3 justify-center">
             <ChatHeader />
           </div>
           <div className="col-span-1 justify-self-end">
