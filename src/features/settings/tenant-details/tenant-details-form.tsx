@@ -1,7 +1,7 @@
 "use client"
 
 import * as Form from "@radix-ui/react-form"
-import React, { useState, FormEvent } from "react"
+import React, { useState, useCallback, FormEvent } from "react"
 
 import useSmartGen from "@/components/hooks/use-smart-gen"
 import { Markdown } from "@/components/markdown/markdown"
@@ -24,48 +24,55 @@ export const TenantDetailsForm: React.FC<{ tenant: TenantDetails }> = ({ tenant 
   const { config } = useSettingsContext()
   const { smartGen } = useSmartGen(config.tools || [])
 
-  const handleSubmitContextPrompt = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
-    e.preventDefault()
-    const form = new FormData(e.currentTarget)
-    const newContextPrompt = form.get("contextPrompt") as string
-    try {
-      await submit(newContextPrompt)
-      ;(e.target as HTMLFormElement)?.reset()
-      setInput("")
-    } catch (error) {
-      logger.error("Error submitting context prompt", { error })
-    }
-  }
+  const submit = useCallback(
+    async (newContextPrompt: string): Promise<void> => {
+      if (contextPrompt === newContextPrompt) return
 
-  async function submit(newContextPrompt: string): Promise<void> {
-    if (contextPrompt === newContextPrompt) return
+      newContextPrompt ? setIsSubmitting(true) : setIsClearing(true)
+      const temp = contextPrompt
+      setContextPrompt(newContextPrompt)
+      const defaultErrorMessage = contextPrompt
+        ? "Context prompt could not be updated. Please try again later."
+        : "Context prompt could not be cleared. Please try again later."
+      try {
+        const response = await fetch(`/api/tenant/${tenant.id}/details`, {
+          method: "POST",
+          cache: "no-store",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ contextPrompt: newContextPrompt }),
+        })
+        if (!response.ok) throw new Error(defaultErrorMessage)
+        showSuccess({ title: "Success", description: "Context prompt updated successfully!" })
+      } catch (error) {
+        setContextPrompt(temp)
+        setError(true)
+        showError(defaultErrorMessage)
+        logger.error("Error updating context prompt", { error })
+      } finally {
+        newContextPrompt ? setIsSubmitting(false) : setIsClearing(false)
+      }
+    },
+    [contextPrompt, tenant.id]
+  )
 
-    newContextPrompt ? setIsSubmitting(true) : setIsClearing(true)
-    const temp = contextPrompt
-    setContextPrompt(newContextPrompt)
-    const defaultErrorMessage = contextPrompt
-      ? "Context prompt could not be updated. Please try again later."
-      : "Context prompt could not be cleared. Please try again later."
-    try {
-      const response = await fetch(`/api/tenant/${tenant.id}/details`, {
-        method: "POST",
-        cache: "no-store",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contextPrompt: newContextPrompt }),
-      })
-      if (!response.ok) throw new Error(defaultErrorMessage)
-      showSuccess({ title: "Success", description: "Context prompt updated successfully!" })
-    } catch (error) {
-      setContextPrompt(temp)
-      setError(true)
-      showError(defaultErrorMessage)
-      logger.error("Error updating context prompt", { error })
-    } finally {
-      newContextPrompt ? setIsSubmitting(false) : setIsClearing(false)
-    }
-  }
+  const handleSubmitContextPrompt = useCallback(
+    async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+      e.preventDefault()
+      const form = new FormData(e.currentTarget)
+      const newContextPrompt = form.get("contextPrompt") as string
+      try {
+        await submit(newContextPrompt)
+        ;(e.target as HTMLFormElement)?.reset()
+        setInput("")
+      } catch (error) {
+        logger.error("Error submitting context prompt", { error })
+      }
+    },
+    [submit]
+  )
 
-  const buildInput = ({ systemPrompt, tenantPrompt }: { systemPrompt: string; tenantPrompt: string }): string => `
+  const buildInput = useCallback(
+    ({ systemPrompt, tenantPrompt }: { systemPrompt: string; tenantPrompt: string }): string => `
 ===System Prompt===
 ${systemPrompt}
 ===End of System Prompt===
@@ -73,9 +80,11 @@ ${systemPrompt}
 ===Tenant Prompt===
 ${tenantPrompt}
 ===End of Tenant Prompt===
-`
+`,
+    []
+  )
 
-  const sanitisePrompt = async (): Promise<void> => {
+  const sanitisePrompt = useCallback(async (): Promise<void> => {
     if (input?.length < 1) return
 
     try {
@@ -91,7 +100,11 @@ ${tenantPrompt}
     } catch (error) {
       showError(error instanceof Error ? error.message : JSON.stringify(error))
     }
-  }
+  }, [input, buildInput, config.systemPrompt, smartGen])
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value)
+  }, [])
 
   return (
     <>
@@ -137,7 +150,7 @@ ${tenantPrompt}
               required
               aria-label="New context prompt"
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={handleInputChange}
             />
           </Form.Control>
           {error && (
