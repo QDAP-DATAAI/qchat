@@ -1,6 +1,6 @@
 "use client"
 import { usePathname, useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useCallback } from "react"
 
 import { useAdminContext } from "@/features/settings/admin/admin-provider"
 import { Select } from "@/features/ui/select"
@@ -16,26 +16,32 @@ export const Selectors = (): JSX.Element => {
     selectUser(users.find(u => u?.id === userId))
   }, [pathname, selectTenant, selectUser, tenants, users])
 
-  const handleSelectTenant = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-    const selectedTenantId = event.target.value
-    if (selectedTenantId === "") {
-      selectTenant(undefined)
-      selectUser(undefined)
-      router.push("/settings/admin")
-    } else {
-      const selectedTenant = tenants.find(t => t.id === selectedTenantId)
-      selectTenant(selectedTenant)
-      selectUser(undefined)
-      router.push(`/settings/admin/${selectedTenantId}`)
-    }
-  }
+  const handleSelectTenant = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>): void => {
+      const selectedTenantId = event.target.value
+      if (selectedTenantId === "") {
+        selectTenant(undefined)
+        selectUser(undefined)
+        router.push("/settings/admin")
+      } else {
+        const selectedTenant = tenants.find(t => t.id === selectedTenantId)
+        selectTenant(selectedTenant)
+        selectUser(undefined)
+        router.push(`/settings/admin/${selectedTenantId}`)
+      }
+    },
+    [router, selectTenant, selectUser, tenants]
+  )
 
-  const handleSelectUser = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-    if (!selectedTenant?.id) return
-    const selectedUserId = event.target.value
-    selectUser(users.find(u => u.id === selectedUserId))
-    router.push(`/settings/admin/${selectedTenant.id}/${selectedUserId}`)
-  }
+  const handleSelectUser = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>): void => {
+      if (!selectedTenant?.id) return
+      const selectedUserId = event.target.value
+      selectUser(users.find(u => u.id === selectedUserId))
+      router.push(`/settings/admin/${selectedTenant?.id}/${selectedUserId}`)
+    },
+    [router, selectUser, selectedTenant, users]
+  )
 
   return (
     <div className="m-4 flex items-center gap-4">
