@@ -71,6 +71,10 @@ export const TenantDetailsForm: React.FC<{ tenant: TenantDetails }> = ({ tenant 
     [submit]
   )
 
+  const handleClearPrompt = useCallback(async (): Promise<void> => {
+    await submit("")
+  }, [submit])
+
   const buildInput = useCallback(
     ({ systemPrompt, tenantPrompt }: { systemPrompt: string; tenantPrompt: string }): string => `
 ===System Prompt===
@@ -125,7 +129,7 @@ ${tenantPrompt}
             type="button"
             className="min-w-[10rem]"
             variant="destructive"
-            onClick={async () => await submit("")}
+            onClick={handleClearPrompt}
             disabled={isSubmitting || isClearing}
             ariaLabel="Clear prompt"
           >
