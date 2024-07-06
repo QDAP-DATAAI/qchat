@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react"
 import { ReactNode, createContext, forwardRef, useContext, useRef } from "react"
+import React from "react"
 
 import useOnClickOutside from "@/components/hooks/use-on-click-outside"
 import { cn } from "@/lib/utils"
@@ -22,7 +23,7 @@ export const Dialog = forwardRef<HTMLDivElement, { children: ReactNode; classNam
     useOnClickOutside(modalRef, () => onClose?.())
 
     return (
-      <DialogContext.Provider value={{ onClose }}>
+      <DialogContext.Provider value={React.useMemo(() => ({ onClose }), [onClose])}>
         <div ref={modalRef} className={cn("my-[8rem] w-[500px]", className)}>
           <div
             ref={ref}
