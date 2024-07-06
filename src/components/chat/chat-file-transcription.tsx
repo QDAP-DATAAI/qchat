@@ -1,5 +1,5 @@
 import { DownloadIcon, CaptionsIcon, FileTextIcon } from "lucide-react"
-import { FC, useState } from "react"
+import { FC, useState, useCallback, useMemo } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -24,20 +24,20 @@ interface ChatFileTranscriptionProps {
 export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   const { chatBody, setInput } = useChatContext()
   const [feedbackMessage, setFeedbackMessage] = useState("")
-  const fileTitle = props.name.replace(/[^a-zA-Z0-9]/g, " ").trim()
+  const fileTitle = useMemo(() => props.name.replace(/[^a-zA-Z0-9]/g, " ").trim(), [props.name])
 
-  const onDownloadTranscription = async (): Promise<void> => {
+  const onDownloadTranscription = useCallback(async (): Promise<void> => {
     const fileName = `${fileTitle}-transcription.docx`
     await convertTranscriptionToWordDocument([props.contents], fileName)
-  }
+  }, [fileTitle, props.contents])
 
-  const onDownloadReport = async (): Promise<void> => {
+  const onDownloadReport = useCallback(async (): Promise<void> => {
     const fileName = `${fileTitle}-report.docx`
     const chatThreadName = chatBody.chatThreadName || `${APP_NAME} ${fileName}`
     await convertTranscriptionReportToWordDocument([props.contents], props.name, fileName, APP_NAME, chatThreadName)
-  }
+  }, [fileTitle, chatBody.chatThreadName, props.contents, props.name])
 
-  const onDownloadVttFile = (): void => {
+  const onDownloadVttFile = useCallback((): void => {
     const element = document.createElement("a")
     element.setAttribute("href", `data:text/plain;base64,${toBinaryBase64(props.vtt ?? "")}`)
     element.setAttribute("download", `${fileTitle}-transcription.vtt`)
@@ -46,19 +46,23 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
     element.click()
 
     document.body.removeChild(element)
-  }
+  }, [fileTitle, props.vtt])
 
   const { width } = useWindowSize()
-  let iconSize = 10
-  let buttonClass = "h-9"
+  const { iconSize, buttonClass } = useMemo(() => {
+    let iconSize = 10
+    let buttonClass = "h-9"
 
-  if (width < 768) {
-    buttonClass = "h-7"
-  } else if (width >= 768 && width < 1024) {
-    iconSize = 12
-  } else if (width >= 1024) {
-    iconSize = 16
-  }
+    if (width < 768) {
+      buttonClass = "h-7"
+    } else if (width >= 768 && width < 1024) {
+      iconSize = 12
+    } else if (width >= 1024) {
+      iconSize = 16
+    }
+
+    return { iconSize, buttonClass }
+  }, [width])
 
   return (
     <article className="container mx-auto flex flex-col py-1 pb-4">
