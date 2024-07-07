@@ -7,10 +7,10 @@ interface SeparatorProps {
   title: string
   description: string
   linkSets: string[][]
-  titleId: string // Required for accessibility
-  descriptionId: string // Required for accessibility
+  titleId: string
+  descriptionId: string
   variant: "full-width-horizontal" | "full-width-vertical" | "custom-width-horizontal" | "custom-width-vertical"
-  width?: string // Only used if variant is 'custom-width-horizontal' or 'custom-width-vertical'
+  width?: string
 }
 
 const Separator: React.FC<SeparatorProps> = memo(
