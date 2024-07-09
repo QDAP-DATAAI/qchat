@@ -1,4 +1,3 @@
-// /Users/keith/GitHub/qchat/src/app/reporting/[chatThreadId]/page.tsx
 import { notFound } from "next/navigation"
 
 import { FindAllChatDocumentsForCurrentUser } from "@/features/chat/chat-services/chat-document-service"

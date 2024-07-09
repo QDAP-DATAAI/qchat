@@ -2,7 +2,7 @@
 
 import { ChatRequestOptions, JSONValue } from "ai"
 import { UseChatHelpers, useChat } from "ai/react"
-import React, { FC, createContext, useContext, useRef, useState } from "react"
+import React, { FC, createContext, useContext, useRef, useState, useMemo, useCallback } from "react"
 
 import { MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED } from "@/features/chat/chat-services/chat-api"
 import {
@@ -22,7 +22,6 @@ import { TenantPreferences } from "@/features/tenant-management/models"
 import { uniqueId } from "@/lib/utils"
 
 import { FileState, useFileState } from "./chat-file/use-file-state"
-
 interface ChatContextProps extends UseChatHelpers {
   id: string
   setChatBody: (body: PromptBody) => void
@@ -39,7 +38,6 @@ interface ChatContextProps extends UseChatHelpers {
   documents: ChatDocumentModel[]
   tenantPreferences?: TenantPreferences
 }
-
 const ChatContext = createContext<ChatContextProps | null>(null)
 interface Prop {
   children: React.ReactNode
@@ -50,11 +48,9 @@ interface Prop {
   chatThreadName?: ChatThreadModel["name"]
   tenantPreferences?: TenantPreferences
 }
-
 export const ChatProvider: FC<Prop> = props => {
   const { showError } = useGlobalMessageContext()
   const fileState = useFileState()
-
   const [chatBody, setChatBody] = useState<PromptBody>({
     id: props.chatThread.id,
     chatType: props.chatThread.chatType,
@@ -67,12 +63,11 @@ export const ChatProvider: FC<Prop> = props => {
     chatThreadName: props.chatThread.name,
   })
 
-  const onError = (error: Error): void => showError(error.message)
+  const onError = useCallback((error: Error): void => showError(error.message), [showError])
 
   const [nextId, setNextId] = useState<string | undefined>(undefined)
   const nextIdRef = useRef(nextId)
   nextIdRef.current = nextId
-
   const response = useChat({
     onError,
     id: props.id,
@@ -84,84 +79,111 @@ export const ChatProvider: FC<Prop> = props => {
         setNextId(undefined)
         return returnValue
       }
-
       return uniqueId()
     },
     sendExtraMessageFields: true,
   })
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const openModal = (): void => setIsModalOpen(true)
-  const closeModal = (): void => setIsModalOpen(false)
+  const openModal = useCallback((): void => setIsModalOpen(true), [])
+  const closeModal = useCallback((): void => setIsModalOpen(false), [])
 
-  const onChatTypeChange = (value: ChatType): void => {
-    fileState.setIsFileNull(true)
-    setChatBody(prev => ({ ...prev, chatType: value }))
-  }
-
-  const onConversationStyleChange = (value: ConversationStyle): void =>
-    setChatBody(prev => ({ ...prev, conversationStyle: value }))
-
-  const onConversationSensitivityChange = (value: ConversationSensitivity): void =>
-    setChatBody(prev => ({ ...prev, conversationSensitivity: value }))
-
-  const handleSubmit = async (
-    event?: { preventDefault?: () => void },
-    options: ChatRequestOptions = {}
-  ): Promise<void> => {
-    if (event && event.preventDefault) {
-      event.preventDefault()
-    }
-    if (!response.input) return
-
-    const nextCompletionId = uniqueId()
-    setNextId(nextCompletionId)
-
-    await response.append(
-      {
-        id: uniqueId(),
-        content: response.input,
-        role: ChatRole.User,
-      },
-      { ...options, data: { completionId: nextCompletionId } }
-    )
-
-    response.setInput("")
-  }
-
-  return (
-    <ChatContext.Provider
-      value={{
-        ...response,
-        messages: response.messages.map<PromptMessage>(message => {
-          const dataItem = (response.data as (JSONValue & PromptMessage)[])?.find(
-            data => data?.id === message.id
-          ) as PromptMessage
-          return {
-            ...message,
-            ...dataItem,
-          }
-        }),
-        documents: props.documents,
-        tenantPreferences: props.tenantPreferences,
-        chatThreadLocked:
-          (props.chatThread?.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED,
-        handleSubmit,
-        setChatBody,
-        chatBody,
-        onChatTypeChange,
-        onConversationStyleChange,
-        onConversationSensitivityChange,
-        fileState,
-        id: props.id,
-        isModalOpen,
-        openModal,
-        closeModal,
-      }}
-    >
-      {props.children}
-    </ChatContext.Provider>
+  const onChatTypeChange = useCallback(
+    (value: ChatType): void => {
+      fileState.setIsFileNull(true)
+      setChatBody(prev => ({ ...prev, chatType: value }))
+    },
+    [fileState]
   )
+
+  const onConversationStyleChange = useCallback(
+    (value: ConversationStyle): void => setChatBody(prev => ({ ...prev, conversationStyle: value })),
+    []
+  )
+  const onConversationSensitivityChange = useCallback(
+    (value: ConversationSensitivity): void => setChatBody(prev => ({ ...prev, conversationSensitivity: value })),
+
+    []
+  )
+
+  const memoizedMessages = useMemo(
+    () =>
+      response.messages.map<PromptMessage>(message => {
+        const dataItem = (response.data as (JSONValue & PromptMessage)[])?.find(
+          data => data?.id === message.id
+        ) as PromptMessage
+        return {
+          ...message,
+          ...dataItem,
+        }
+      }),
+    [response.messages, response.data]
+  )
+
+  const handleSubmit = useCallback(
+    async (event?: { preventDefault?: () => void }, options: ChatRequestOptions = {}): Promise<void> => {
+      if (event && event.preventDefault) {
+        event.preventDefault()
+      }
+      if (!response.input) return
+
+      const nextCompletionId = uniqueId()
+      setNextId(nextCompletionId)
+
+      await response.append(
+        {
+          id: uniqueId(),
+          content: response.input,
+          role: ChatRole.User,
+        },
+        { ...options, data: { completionId: nextCompletionId } }
+      )
+
+      response.setInput("")
+    },
+    [response]
+  )
+
+  const providerValue = useMemo(
+    () => ({
+      ...response,
+      messages: memoizedMessages,
+      documents: props.documents,
+      tenantPreferences: props.tenantPreferences,
+      chatThreadLocked: (props.chatThread?.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED,
+      handleSubmit,
+      setChatBody,
+      chatBody,
+      onChatTypeChange,
+      onConversationStyleChange,
+      onConversationSensitivityChange,
+      fileState,
+      id: props.id,
+      isModalOpen,
+      openModal,
+      closeModal,
+    }),
+    [
+      response,
+      memoizedMessages,
+      props.documents,
+      props.tenantPreferences,
+      props.chatThread?.contentFilterTriggerCount,
+      handleSubmit,
+      setChatBody,
+      chatBody,
+      onChatTypeChange,
+      onConversationStyleChange,
+      onConversationSensitivityChange,
+      fileState,
+      props.id,
+      isModalOpen,
+      openModal,
+      closeModal,
+    ]
+  )
+
+  return <ChatContext.Provider value={providerValue}>{props.children}</ChatContext.Provider>
 }
 
 export const useChatContext = (): ChatContextProps => {

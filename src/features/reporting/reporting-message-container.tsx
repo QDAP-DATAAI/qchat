@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { FC, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState, useCallback } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -16,11 +16,9 @@ import { ChatHeader } from "@/features/chat/chat-ui/chat-header"
 import { ChatRole } from "@/features/chat/models"
 import { Button } from "@/features/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/features/ui/tabs"
-
 interface Props {
   chatThreadId: string
 }
-
 export const ReportingMessageContainer: FC<Props> = ({ chatThreadId }) => {
   const { data: session } = useSession()
   const router = useRouter()
@@ -28,10 +26,7 @@ export const ReportingMessageContainer: FC<Props> = ({ chatThreadId }) => {
   const { messages, documents, isLoading, chatThreadLocked } = useChatContext()
   const [selectedTab, setSelectedTab] = useState<SectionTabsProps["selectedTab"]>("chat")
 
-  const [previousScrollTop, setPreviousScrollTop] = useState(0)
-  const [suppressScrolling, setSuppressScrolling] = useState(false)
-
-  useChatScrollAnchor(messages, scrollRef, !suppressScrolling)
+  useChatScrollAnchor(messages, scrollRef, true)
 
   useEffect(() => {
     if (!isLoading) {
@@ -41,32 +36,22 @@ export const ReportingMessageContainer: FC<Props> = ({ chatThreadId }) => {
 
   useEffect(() => {
     if (!isLoading) {
-      setSuppressScrolling(false)
       setSelectedTab("chat")
     }
   }, [isLoading])
 
-  const onScroll = (e: React.UIEvent<HTMLDivElement>): void => {
-    if (isLoading) {
-      if (e.currentTarget.scrollTop < previousScrollTop) {
-        setSuppressScrolling(true)
-      }
-      setPreviousScrollTop(e.currentTarget.scrollTop)
-    }
-  }
-
   const chatFiles = documents.filter(document => document.contents)
 
-  const handleBackToReporting = (): void => {
+  const handleBackToReporting = useCallback((): void => {
     router.push("/settings/history")
-  }
+  }, [router])
 
-  const handleBackToChat = (): void => {
+  const handleBackToChat = useCallback((): void => {
     router.push(`/chat/${chatThreadId}`)
-  }
+  }, [router, chatThreadId])
 
   return (
-    <div className="h-full overflow-y-auto" ref={scrollRef} onScroll={onScroll}>
+    <div className="h-full overflow-y-auto" ref={scrollRef}>
       <div className="my-4 flex flex-1 flex-col">
         <div className="container mx-auto grid grid-cols-5 items-center">
           <div className="col-span-1 justify-start">
@@ -84,9 +69,7 @@ export const ReportingMessageContainer: FC<Props> = ({ chatThreadId }) => {
           </div>
         </div>
       </div>
-
       {chatFiles.length ? <SectionTabs selectedTab={selectedTab} onSelectedTabChange={setSelectedTab} /> : undefined}
-
       <div className="flex flex-1 flex-col justify-end pb-[140px]">
         {selectedTab === "chat"
           ? messages.map((message, index) => (
@@ -121,15 +104,12 @@ export const ReportingMessageContainer: FC<Props> = ({ chatThreadId }) => {
     </div>
   )
 }
-
 interface SectionTabsProps {
   selectedTab: "chat" | "transcription" | "document"
   onSelectedTabChange: (value: SectionTabsProps["selectedTab"]) => void
 }
-
 const SectionTabs: FC<SectionTabsProps> = ({ selectedTab, onSelectedTabChange }) => {
   const { chatBody } = useChatContext()
-
   return (
     <Tabs value={selectedTab} onValueChange={onSelectedTabChange as (x: string) => void} className="container pb-2">
       <TabsList aria-label="Conversation Type" className="grid size-full grid-cols-2 items-stretch">
