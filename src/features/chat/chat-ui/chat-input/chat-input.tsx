@@ -1,6 +1,8 @@
+"use client"
+
 import { Loader, Send, StopCircle } from "lucide-react"
 import { getSession } from "next-auth/react"
-import { FC, FormEvent, useRef, useMemo } from "react"
+import React, { FC, FormEvent, useRef, useMemo, useCallback } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -11,24 +13,25 @@ import { Button } from "@/features/ui/button"
 import { Textarea } from "@/features/ui/textarea"
 
 import ChatInputMenu from "./chat-input-menu"
-
 interface Props {}
-
 const ChatInput: FC<Props> = () => {
   const { setInput, handleSubmit, isLoading, input, chatBody, isModalOpen, messages, fileState, stop } =
     useChatContext()
   const buttonRef = useRef<HTMLButtonElement>(null)
   const isDataChat = useMemo(() => chatBody.chatType === "data" || chatBody.chatType === "audio", [chatBody.chatType])
-  const fileChatVisible = (chatBody.chatType === "data" || chatBody.chatType === "audio") && chatBody.chatOverFileName
+  const fileChatVisible = useMemo(
+    () => (chatBody.chatType === "data" || chatBody.chatType === "audio") && chatBody.chatOverFileName,
+    [chatBody.chatType, chatBody.chatOverFileName]
+  )
 
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Australia/Brisbane"
-  const getNameInline = async (): Promise<string> => {
+  const timeZone = useMemo(() => Intl.DateTimeFormat().resolvedOptions().timeZone || "Australia/Brisbane", [])
+
+  const getNameInline = useCallback(async (): Promise<string> => {
     const session = await getSession()
-    const name = session?.user?.name || "You"
-    return name
-  }
+    return session?.user?.name || "You"
+  }, [])
 
-  const getFormattedDateTime = (): string => {
+  const getFormattedDateTime = useCallback((): string => {
     const date = new Date()
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
@@ -41,43 +44,51 @@ const ChatInput: FC<Props> = () => {
     }
     const formattedDate = new Intl.DateTimeFormat("en-AU", options).format(date)
     return formattedDate.split(",").join("_").split(" ").join("_").split(":").join("_")
-  }
+  }, [timeZone])
 
-  const exportDocument = async (): Promise<void> => {
+  const exportDocument = useCallback(async (): Promise<void> => {
     const fileName = APP_NAME + ` Export_${getFormattedDateTime()}.docx`
     const userName = await getNameInline()
     const chatThreadName = chatBody.chatThreadName || APP_NAME + ` Export_${getFormattedDateTime()}.docx`
     await convertMarkdownToWordDocument(messages, fileName, APP_NAME, userName, chatThreadName)
-  }
+  }, [getFormattedDateTime, getNameInline, chatBody.chatThreadName, messages])
 
-  const submit = (e: FormEvent<HTMLFormElement>): void => {
-    e.preventDefault()
-    if (isLoading) {
-      stop()
-    } else if (!isModalOpen && !fileState.isUploadingFile) {
-      handleSubmit(e)
-      setInput("")
-    }
-  }
-
-  const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
-    setInput(event.target.value)
-  }
-
-  const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>): void => {
-    if (event.key === "Enter" && !event.shiftKey && !isModalOpen) {
-      event.preventDefault()
-      if (!isLoading && !fileState.isUploadingFile) {
-        handleSubmit(event as unknown as FormEvent<HTMLFormElement>)
+  const submit = useCallback(
+    (e: FormEvent<HTMLFormElement>): void => {
+      e.preventDefault()
+      if (isLoading) {
+        stop()
+      } else if (!isModalOpen && !fileState.isUploadingFile) {
+        handleSubmit(e)
         setInput("")
       }
-    }
-  }
+    },
+    [isLoading, isModalOpen, fileState.isUploadingFile, handleSubmit, setInput, stop]
+  )
+
+  const onChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
+      setInput(event.target.value)
+    },
+    [setInput]
+  )
+
+  const onKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLTextAreaElement>): void => {
+      if (event.key === "Enter" && !event.shiftKey && !isModalOpen) {
+        event.preventDefault()
+        if (!isLoading && !fileState.isUploadingFile) {
+          handleSubmit(event as unknown as FormEvent<HTMLFormElement>)
+          setInput("")
+        }
+      }
+    },
+    [isLoading, isModalOpen, fileState.isUploadingFile, handleSubmit, setInput]
+  )
 
   if (isModalOpen) {
     return null
   }
-
   return (
     <form onSubmit={submit} className="absolute bottom-0 z-70 flex w-full items-center">
       <div className="container relative mx-auto flex items-end gap-2 py-2">
@@ -123,5 +134,4 @@ const ChatInput: FC<Props> = () => {
     </form>
   )
 }
-
 export default ChatInput

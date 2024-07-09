@@ -1,7 +1,8 @@
 "use client"
-import { FileText, MessageCircle, Trash, Pencil, AudioLines } from "lucide-react"
+
+import { FileText, MessageCircle, AudioLines } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
-import React, { FC, useState, useEffect, useRef } from "react"
+import React, { FC, useState, useEffect, useRef, useCallback } from "react"
 
 import { MenuItem } from "@/components/menu"
 import Typography from "@/components/typography"
@@ -14,7 +15,9 @@ import { useGlobalMessageContext } from "@/features/globals/global-message-conte
 import { Button } from "@/features/ui/button"
 import { Input } from "@/features/ui/input"
 
-interface Prop {
+import MenuItemActions from "./menu-item-actions"
+
+interface MenuItemsProps {
   menuItems: Array<ChatThreadModel>
 }
 
@@ -26,28 +29,30 @@ interface ModalProps {
   type: "edit" | "delete"
 }
 
-const ChatMenuModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose, type }): JSX.Element => {
+const ChatMenuModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAfterClose, type }) => {
   const [inputValue, setInputValue] = useState("")
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
-    if (isOpen) {
-      if (type === "edit") {
-        inputRef.current?.focus()
-      }
+    if (isOpen && type === "edit") {
+      inputRef.current?.focus()
     } else if (focusAfterClose) {
       focusAfterClose.focus()
     }
   }, [isOpen, focusAfterClose, type])
 
-  const handleSave = (): void => {
+  const handleSave = useCallback(() => {
     onSave(inputValue)
     onClose()
-  }
+  }, [inputValue, onClose, onSave])
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value)
+  }, [])
 
   return (
     <div
-      className={`bg-opacity/50 fixed inset-0 z-80 flex items-center justify-center bg-black bg-opacity-80 ${isOpen ? "block" : "hidden"}`}
+      className={`fixed inset-0 z-80 flex items-center justify-center bg-black bg-opacity-80 ${isOpen ? "block" : "hidden"}`}
     >
       <div className="mx-auto w-full max-w-lg overflow-hidden rounded-lg bg-background p-4">
         <div className="mb-4">
@@ -64,7 +69,7 @@ const ChatMenuModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAft
               id="newChatName"
               type="text"
               value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
+              onChange={handleInputChange}
               maxLength={120}
               ref={inputRef}
               className="mt-1 w-full rounded-md border-altBackground bg-background p-2"
@@ -83,10 +88,10 @@ const ChatMenuModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAft
           </div>
         )}
         <div className="mt-4 flex justify-end gap-4">
-          <Button variant="default" onClick={handleSave} ariaLabel="Save">
+          <Button variant="default" onClick={handleSave} aria-label="Save">
             {type === "edit" ? "Save" : "Confirm"}
           </Button>
-          <Button variant="secondary" onClick={onClose} ariaLabel="Cancel">
+          <Button variant="secondary" onClick={onClose} aria-label="Cancel">
             Cancel
           </Button>
         </div>
@@ -95,7 +100,7 @@ const ChatMenuModal: React.FC<ModalProps> = ({ isOpen, onClose, onSave, focusAft
   )
 }
 
-export const MenuItems: FC<Prop> = ({ menuItems }) => {
+export const MenuItems: FC<MenuItemsProps> = ({ menuItems }) => {
   const { chatThreadId } = useParams()
   const router = useRouter()
   const { showError } = useGlobalMessageContext()
@@ -103,43 +108,60 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
   const [modalType, setModalType] = useState<"edit" | "delete" | null>(null)
   const [items, setItems] = useState<ChatThreadModel[]>(menuItems)
 
-  const handleOpenModal = (chatThreadId: string, type: "edit" | "delete"): void => {
+  const handleOpenModal = useCallback((chatThreadId: string, type: "edit" | "delete") => {
     setSelectedThreadId(chatThreadId)
     setModalType(type)
-  }
+  }, [])
 
-  const handleCloseModal = (): void => {
+  const handleCloseModal = useCallback(() => {
     setSelectedThreadId(null)
     setModalType(null)
-  }
+  }, [])
 
-  const handleSaveModal = async (inputValue?: string): Promise<void> => {
-    if (modalType === "edit" && (inputValue ?? "").trim() !== "" && selectedThreadId) {
-      try {
-        await UpdateChatThreadTitle(selectedThreadId, inputValue || "")
-        setItems(prevItems =>
-          prevItems.map(item =>
-            item.chatThreadId === selectedThreadId ? { ...item, name: inputValue || item.name } : item
+  const handleSaveModal = useCallback(
+    async (inputValue?: string) => {
+      if (modalType === "edit" && (inputValue ?? "").trim() !== "" && selectedThreadId) {
+        try {
+          await UpdateChatThreadTitle(selectedThreadId, inputValue || "")
+          setItems(prevItems =>
+            prevItems.map(item =>
+              item.chatThreadId === selectedThreadId ? { ...item, name: inputValue || item.name } : item
+            )
           )
-        )
-      } catch (e) {
-        showError("" + e)
-      } finally {
-        handleCloseModal()
+        } catch (e) {
+          showError("" + e)
+        } finally {
+          handleCloseModal()
+        }
+      } else if (modalType === "delete" && selectedThreadId) {
+        try {
+          await SoftDeleteChatThreadForCurrentUser(selectedThreadId)
+          setItems(prev => prev.filter(item => item.chatThreadId !== selectedThreadId))
+          router.replace("/chat")
+        } catch (e) {
+          showError("" + e)
+        } finally {
+          handleCloseModal()
+        }
       }
-    } else if (modalType === "delete" && selectedThreadId) {
-      try {
-        await SoftDeleteChatThreadForCurrentUser(selectedThreadId)
-        setItems(prev => prev.filter(item => item.chatThreadId !== selectedThreadId))
-        router.replace("/chat") // This is where you navigate to the "/chat" route
-      } catch (e) {
-        showError("" + e)
-      } finally {
-        handleCloseModal()
-      }
-    }
-    router.refresh()
-  }
+      router.refresh()
+    },
+    [modalType, selectedThreadId, handleCloseModal, showError, router]
+  )
+
+  const handleEditButtonClick = useCallback(
+    (threadId: string) => {
+      handleOpenModal(threadId, "edit")
+    },
+    [handleOpenModal]
+  )
+
+  const handleDeleteButtonClick = useCallback(
+    (threadId: string) => {
+      handleOpenModal(threadId, "delete")
+    },
+    [handleOpenModal]
+  )
 
   return (
     <>
@@ -170,36 +192,24 @@ export const MenuItems: FC<Prop> = ({ menuItems }) => {
             {thread.name}
           </Typography>
           <div className="hidden gap-1 sm:grid">
-            <Button
-              className="opacity-20 group-hover:opacity-100"
-              size="sm"
-              variant="accent"
-              ariaLabel={`Rename ${thread.name}`}
-              onClick={() => handleOpenModal(thread.chatThreadId, "edit")}
-            >
-              <Pencil size={16} />
-            </Button>
-            <Button
-              className="opacity-20 group-hover:opacity-100"
-              size="sm"
-              variant="destructive"
-              ariaLabel={`Delete ${thread.name}`}
-              onClick={() => handleOpenModal(thread.chatThreadId, "delete")}
-            >
-              <Trash size={16} />
-            </Button>
-            {selectedThreadId === thread.chatThreadId && modalType && (
-              <ChatMenuModal
-                isOpen={true}
-                onClose={handleCloseModal}
-                onSave={handleSaveModal}
-                focusAfterClose={null}
-                type={modalType}
-              />
-            )}
+            <MenuItemActions
+              threadId={thread.chatThreadId}
+              threadName={thread.name}
+              onEdit={handleEditButtonClick}
+              onDelete={handleDeleteButtonClick}
+            />
           </div>
         </MenuItem>
       ))}
+      {selectedThreadId && modalType && (
+        <ChatMenuModal
+          isOpen={true}
+          onClose={handleCloseModal}
+          onSave={handleSaveModal}
+          focusAfterClose={null}
+          type={modalType}
+        />
+      )}
     </>
   )
 }

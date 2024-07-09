@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -27,7 +27,7 @@ const ErrorPage: React.FC = () => {
         break
       case SignInErrorType.SignInFailed:
       default:
-        message = `It appears we ran into an error while logging you in to ${APP_NAME} if you believe your agency has been setup and continue to receive these errors, please contact our support team.`
+        message = `It appears we ran into an error while logging you in to ${APP_NAME}. If you believe your agency has been set up and continue to receive these errors, please contact our support team.`
         setDisplaySupportButton(true)
         break
     }
@@ -35,13 +35,13 @@ const ErrorPage: React.FC = () => {
     setErrorMessage(message)
   }, [])
 
-  const handleSupportRedirect = (): void => {
+  const handleSupportRedirect = useCallback((): void => {
     router.push("/support")
-  }
+  }, [router])
 
-  const handleIntranetRedirect = (): void => {
+  const handleIntranetRedirect = useCallback((): void => {
     window.location.href = INTRANET_URL
-  }
+  }, [])
 
   return (
     <div className="flex size-full items-center justify-center">

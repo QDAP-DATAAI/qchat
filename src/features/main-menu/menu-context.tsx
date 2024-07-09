@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState } from "react"
+"use client"
+
+import React, { createContext, useContext, useState, useMemo } from "react"
 
 interface MenuContextProps {
   isMenuOpen: boolean
@@ -6,18 +8,26 @@ interface MenuContextProps {
 }
 
 export const MenuContext = createContext<MenuContextProps>({
-  isMenuOpen: true,
+  isMenuOpen: false,
   toggleMenu: () => {},
 })
 
 export const MenuProvider = ({ children }: { children: React.ReactNode }): React.JSX.Element => {
-  const [isMenuOpen, setIsMenuOpen] = useState(true)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const toggleMenu = (): void => {
-    setIsMenuOpen(!isMenuOpen)
+    setIsMenuOpen(prevIsMenuOpen => !prevIsMenuOpen)
   }
 
-  return <MenuContext.Provider value={{ isMenuOpen, toggleMenu }}>{children}</MenuContext.Provider>
+  const value = useMemo(
+    () => ({
+      isMenuOpen,
+      toggleMenu,
+    }),
+    [isMenuOpen]
+  )
+
+  return <MenuContext.Provider value={value}>{children}</MenuContext.Provider>
 }
 
 export const useMenuContext = (): MenuContextProps => useContext(MenuContext)

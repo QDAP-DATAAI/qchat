@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import React from "react"
+import React, { useCallback } from "react"
 
 import Typography from "@/components/typography"
 import logger from "@/features/insights/app-insights"
@@ -11,14 +11,14 @@ import { Card } from "@/features/ui/card"
 const Home: React.FC = () => {
   const router = useRouter()
 
-  const handleRedirectHome = async (): Promise<void> => {
+  const handleRedirectHome = useCallback(async (): Promise<void> => {
     try {
       await router.push("/")
       router.refresh()
     } catch (error) {
       logger.error("Redirect failed", { error: error instanceof Error ? error.message : "Unknown error" })
     }
-  }
+  }, [router])
 
   return (
     <div className="flex h-full items-center justify-center">

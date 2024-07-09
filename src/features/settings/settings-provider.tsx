@@ -1,12 +1,13 @@
 "use client"
 
-import { PropsWithChildren, createContext, useContext } from "react"
+import { PropsWithChildren, createContext, useContext, useMemo } from "react"
 
 import { TenantConfig } from "@/features/tenant-management/models"
 
 type SettingsContextDefinition = {
   config: TenantConfig
 }
+
 const SettingsContext = createContext<SettingsContextDefinition | undefined>(undefined)
 
 export const useSettingsContext = (): SettingsContextDefinition => {
@@ -17,7 +18,9 @@ export const useSettingsContext = (): SettingsContextDefinition => {
 
 export default function SettingsProvider({
   children,
-  ...rest
+  config,
 }: PropsWithChildren<SettingsContextDefinition>): JSX.Element | null {
-  return <SettingsContext.Provider value={{ ...rest }}>{children}</SettingsContext.Provider>
+  const value = useMemo(() => ({ config }), [config])
+
+  return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>
 }

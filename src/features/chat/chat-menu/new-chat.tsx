@@ -2,6 +2,7 @@
 
 import { MessageSquarePlus } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useCallback } from "react"
 
 import {
   CreateChatThread,
@@ -11,11 +12,11 @@ import {
 import { useGlobalMessageContext } from "@/features/globals/global-message-context"
 import { Button } from "@/features/ui/button"
 
-export const NewChat = (): JSX.Element => {
+const useStartNewChat = (): (() => Promise<void>) => {
   const router = useRouter()
   const { showError } = useGlobalMessageContext()
 
-  const startNewChat = async (): Promise<void> => {
+  return useCallback(async (): Promise<void> => {
     const title = "New Chat"
 
     try {
@@ -24,26 +25,31 @@ export const NewChat = (): JSX.Element => {
         showError("Failed to start a new chat. Please try again later.")
         return
       }
-
       if (!existingThread.response) {
         const newChatThread = await CreateChatThread()
         if (newChatThread.status !== "OK") throw newChatThread
         router.push(`/chat/${newChatThread.response.chatThreadId}`)
         return
       }
-
       await UpdateChatThreadCreatedAt(existingThread.response.chatThreadId)
       router.push(`/chat/${existingThread.response.chatThreadId}`)
     } catch (_error) {
       showError("Failed to start a new chat. Please try again later.")
     }
-  }
+  }, [router, showError])
+}
 
-  const handleKeyDown = async (e: React.KeyboardEvent): Promise<void> => {
-    if (e.key === "Enter") {
-      await startNewChat()
-    }
-  }
+const NewChatButton = (): JSX.Element => {
+  const startNewChat = useStartNewChat()
+
+  const handleKeyDown = useCallback(
+    async (e: React.KeyboardEvent) => {
+      if (e.key === "Enter") {
+        await startNewChat()
+      }
+    },
+    [startNewChat]
+  )
 
   return (
     <Button
@@ -57,4 +63,7 @@ export const NewChat = (): JSX.Element => {
       <MessageSquarePlus size={30} strokeWidth={1.2} className="hidden sm:block" />
     </Button>
   )
+}
+export const NewChat = (): JSX.Element => {
+  return <NewChatButton />
 }
