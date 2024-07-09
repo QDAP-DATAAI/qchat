@@ -7,14 +7,13 @@ interface AuthToken {
   expiry: number
 }
 
-let _cosmosClient: CosmosClient | null = null
 let _authToken: AuthToken | null = null
 
-const fetchAndSetAuthToken = async (): Promise<void> => {
+const fetchAndSetAuthToken = async (): Promise<CosmosClient> => {
   const token = await GetCosmosAccessToken()
-  const expiry = await getTokenExpiry(token)
+  const expiry = getTokenExpiry(token)
   _authToken = { token, expiry }
-  _cosmosClient = createCosmosClient(token)
+  return createCosmosClient(token)
 }
 
 const createCosmosClient = (authToken: string): CosmosClient => {
@@ -29,8 +28,8 @@ const createCosmosClient = (authToken: string): CosmosClient => {
 }
 
 const CosmosInstance = async (): Promise<CosmosClient> => {
-  await fetchAndSetAuthToken()
-  return _cosmosClient!
+  const client = await fetchAndSetAuthToken()
+  return client
 }
 
 let _historyContainer: Container | null = null
