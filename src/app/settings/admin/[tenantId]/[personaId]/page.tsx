@@ -11,6 +11,8 @@ const getPersona = async (tenantId: string, personaId: string): Promise<UserReco
   return result.response
 }
 
+const defaultPreferences = { contextPrompt: "" }
+
 type Props = {
   params: {
     tenantId: string
@@ -22,7 +24,7 @@ export default async function Home({ params: { tenantId, personaId } }: Props): 
   return (
     <div>
       <UserDetailsForm
-        preferences={persona.preferences || { contextPrompt: "" }}
+        preferences={persona.preferences || defaultPreferences}
         name={persona.name || ""}
         email={persona.email || ""}
       />

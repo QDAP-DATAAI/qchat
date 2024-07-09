@@ -49,8 +49,13 @@ export interface SwitchProps extends React.ComponentPropsWithoutRef<typeof Switc
 
 const SwitchComponent = React.forwardRef<HTMLButtonElement, SwitchProps>(
   ({ label, labelClassName, className, thumbClassName, variant = "default", isChecked = false, ...props }, ref) => {
-    const state =
-      variant === "destructive" ? (isChecked ? "destructiveOn" : "destructiveOff") : isChecked ? "on" : "off"
+    const getState = React.useCallback(() => {
+      return variant === "destructive" ? (isChecked ? "destructiveOn" : "destructiveOff") : isChecked ? "on" : "off"
+    }, [variant, isChecked])
+
+    const state = getState()
+
+    const switchStyle = React.useMemo(() => ({ WebkitTapHighlightColor: "rgba(0, 0, 0, 0)" }), [])
 
     return (
       <div className="flex items-center">
@@ -64,7 +69,7 @@ const SwitchComponent = React.forwardRef<HTMLButtonElement, SwitchProps>(
           role="switch"
           aria-checked={isChecked}
           aria-labelledby={`${props.id}-label`}
-          style={{ WebkitTapHighlightColor: "rgba(0, 0, 0, 0)" }}
+          style={switchStyle}
         >
           <Switch.Thumb className={cn(thumbVariants({ state }), thumbClassName)} />
         </Switch.Root>

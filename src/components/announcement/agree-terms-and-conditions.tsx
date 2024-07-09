@@ -1,6 +1,6 @@
 import { Loader } from "lucide-react"
 import { useSession } from "next-auth/react"
-import { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react"
 
 import { APP_VERSION } from "@/app-global"
 
@@ -25,7 +25,7 @@ export default function AgreeTermsAndConditions({ onClose }: AgreeTermsAndCondit
   const endOfScrollRef = useRef<HTMLDivElement>(null)
   const isEndOfScroll = useOnScreen(endOfScrollRef)
 
-  const handleSubmit = async (): Promise<void> => {
+  const handleSubmit = useCallback(async (): Promise<void> => {
     try {
       setIsSubmitting(true)
       const response = await fetch("/api/user/terms-and-conditions", {
@@ -45,7 +45,7 @@ export default function AgreeTermsAndConditions({ onClose }: AgreeTermsAndCondit
     } finally {
       setIsSubmitting(false)
     }
-  }
+  }, [update, onClose])
 
   useEffect(() => {
     fetch("/api/application/terms")
@@ -57,10 +57,11 @@ export default function AgreeTermsAndConditions({ onClose }: AgreeTermsAndCondit
       })
       .finally(() => setIsLoading(false))
   }, [onClose])
-
   useEffect(() => {
     if (isEndOfScroll) setCanSubmit(true)
   }, [isEndOfScroll])
+
+  const loadingMessage = useMemo(() => "Loading terms and conditions...", [])
 
   return (
     <Dialog>
@@ -68,7 +69,7 @@ export default function AgreeTermsAndConditions({ onClose }: AgreeTermsAndCondit
       <DialogContent>
         <div className="prose prose-slate max-w-4xl break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0">
           <Typography variant="h3">App Version {APP_VERSION}</Typography>
-          {isLoading ? "Loading terms and conditions..." : <Markdown content={content} />}
+          {isLoading ? loadingMessage : <Markdown content={content} />}
           <div ref={endOfScrollRef} id="sentinel" />
         </div>
       </DialogContent>

@@ -15,7 +15,8 @@ import ChatInputMenu from "./chat-input-menu"
 interface Props {}
 
 const ChatInput: FC<Props> = () => {
-  const { setInput, handleSubmit, isLoading, input, chatBody, messages, fileState, stop } = useChatContext()
+  const { setInput, handleSubmit, isLoading, input, chatBody, isModalOpen, messages, fileState, stop } =
+    useChatContext()
   const buttonRef = useRef<HTMLButtonElement>(null)
   const isDataChat = useMemo(() => chatBody.chatType === "data" || chatBody.chatType === "audio", [chatBody.chatType])
   const fileChatVisible = (chatBody.chatType === "data" || chatBody.chatType === "audio") && chatBody.chatOverFileName
@@ -53,7 +54,7 @@ const ChatInput: FC<Props> = () => {
     e.preventDefault()
     if (isLoading) {
       stop()
-    } else if (!fileState.isUploadingFile) {
+    } else if (!isModalOpen && !fileState.isUploadingFile) {
       handleSubmit(e)
       setInput("")
     }
@@ -64,13 +65,17 @@ const ChatInput: FC<Props> = () => {
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>): void => {
-    if (event.key === "Enter" && !event.shiftKey) {
+    if (event.key === "Enter" && !event.shiftKey && !isModalOpen) {
       event.preventDefault()
       if (!isLoading && !fileState.isUploadingFile) {
         handleSubmit(event as unknown as FormEvent<HTMLFormElement>)
         setInput("")
       }
     }
+  }
+
+  if (isModalOpen) {
+    return null
   }
 
   return (

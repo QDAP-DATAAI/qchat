@@ -1,6 +1,8 @@
+"use client"
+
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useMemo, useCallback } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -14,29 +16,23 @@ import { Tabs, TabsList, TabsTrigger } from "@/features/ui/tabs"
 
 import { useChatContext } from "./chat-context"
 import { ChatHeader } from "./chat-header"
-
 interface Props {
   chatThreadId: string
 }
-
 export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
   const { data: session } = useSession()
   const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
   const { messages, documents, isLoading, chatThreadLocked } = useChatContext()
   const [selectedTab, setSelectedTab] = useState<SectionTabsProps["selectedTab"]>("chat")
-
   const [previousScrollTop, setPreviousScrollTop] = useState(0)
   const [suppressScrolling, setSuppressScrolling] = useState(false)
-
   useChatScrollAnchor(messages, scrollRef, !suppressScrolling)
-
   useEffect(() => {
     if (!isLoading) {
       router.refresh()
     }
   }, [isLoading, router])
-
   useEffect(() => {
     if (!isLoading) {
       setSuppressScrolling(false)
@@ -44,16 +40,23 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
     }
   }, [isLoading])
 
-  const onScroll = (e: React.UIEvent<HTMLDivElement>): void => {
-    if (isLoading) {
-      if (e.currentTarget.scrollTop < previousScrollTop) {
-        setSuppressScrolling(true)
+  const onScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>): void => {
+      if (isLoading) {
+        if (e.currentTarget.scrollTop < previousScrollTop) {
+          setSuppressScrolling(true)
+        }
+        setPreviousScrollTop(e.currentTarget.scrollTop)
       }
-      setPreviousScrollTop(e.currentTarget.scrollTop)
-    }
-  }
+    },
+    [isLoading, previousScrollTop]
+  )
 
-  const chatFiles = documents.filter(document => document.contents)
+  const chatFiles = useMemo(() => {
+    return documents.filter(document => document.contents)
+  }, [documents])
+
+  if (!messages || !documents) return <div>Error loading messages or documents</div>
 
   return (
     <div className="h-full overflow-y-auto" ref={scrollRef} onScroll={onScroll}>
