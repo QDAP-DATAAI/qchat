@@ -1,6 +1,7 @@
 import { Container, CosmosClient, PartitionKeyDefinitionVersion, PartitionKeyKind } from "@azure/cosmos"
 
 import { GetCosmosAccessToken, getTokenExpiry } from "./cosmos-auth"
+import logger from "@/features/insights/app-insights"
 
 interface AuthToken {
   token: string
@@ -28,6 +29,7 @@ const createCosmosClient = (authToken: string): CosmosClient => {
 }
 
 const CosmosInstance = async (): Promise<CosmosClient> => {
+  logger.info("Fetching Cosmos DB client")
   const client = await fetchAndSetAuthToken()
   return client
 }
