@@ -7,7 +7,7 @@ import { APP_NAME } from "@/app-global"
 import { FindAllChatDocumentsForCurrentUser } from "@/features/chat/chat-services/chat-document-service"
 import { FindAllChatMessagesForCurrentUser } from "@/features/chat/chat-services/chat-message-service"
 import { FindChatThreadForCurrentUser } from "@/features/chat/chat-services/chat-thread-service"
-import { ChatProvider } from "@/features/chat/chat-ui/chat-context"
+import ChatProvider from "@/features/chat/chat-ui/chat-context"
 import { GetTenantPreferences } from "@/features/tenant-management/tenant-service"
 
 export const dynamic = "force-dynamic"

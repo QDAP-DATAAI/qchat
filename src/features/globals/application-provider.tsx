@@ -79,4 +79,4 @@ function applicationReducer(state: State, action: ACTION): State {
   }
 }
 
-export type ACTION = ActionBase<"SET_APP_SETTINGS", { payload: ApplicationSettings }>
+type ACTION = ActionBase<"SET_APP_SETTINGS", { payload: ApplicationSettings }>
