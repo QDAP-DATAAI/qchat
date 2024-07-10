@@ -12,3 +12,12 @@ export type TenantGroupPairs = {
   tenant: string
   groups: string[]
 }
+
+type ApplicationIndexSettings = {
+  id: string
+  name: string
+  description: string
+  isActive: boolean
+  isPublic: boolean
+  tenantAccess: string[]
+}
