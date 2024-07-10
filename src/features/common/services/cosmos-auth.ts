@@ -39,7 +39,7 @@ export const GetCosmosAccessToken = async (): Promise<string> => {
  * @param authToken Authorization Access Token
  * @returns Expiry date time of the token
  */
-const getTokenExpiry = (authToken: string): number => {
+const _getTokenExpiry = (authToken: string): number => {
   try {
     const expiry = JSON.parse(Buffer.from(authToken.split(".")[1], "base64").toString()).exp
     return expiry
@@ -48,7 +48,7 @@ const getTokenExpiry = (authToken: string): number => {
   }
 }
 
-export const isTokenExpired = (authToken: string | null): boolean => {
+export const isTokenExpired = (_authToken: string | null): boolean => {
   return true
   // if (!authToken) return true
   // const currentTime = Date.now()
