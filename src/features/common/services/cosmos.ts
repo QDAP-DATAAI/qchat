@@ -3,11 +3,6 @@ import { Container, CosmosClient, PartitionKeyDefinitionVersion, PartitionKeyKin
 import { GetCosmosAccessToken, isTokenExpired } from "./cosmos-auth"
 import logger from "@/features/insights/app-insights"
 
-interface AuthToken {
-  token: string
-  expiry: number
-}
-
 let _cosmosClient: CosmosClient | null = null
 let _cosmosAuthToken: string | null = null
 
