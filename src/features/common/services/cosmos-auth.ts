@@ -11,6 +11,7 @@
  *
  * @returns The authorization access token.
  */
+// cosmos-auth.ts
 export const GetCosmosAccessToken = async (): Promise<string> => {
   try {
     const response = await fetch(`${process.env.APIM_BASE}/cosmos`, {
@@ -18,7 +19,7 @@ export const GetCosmosAccessToken = async (): Promise<string> => {
       headers: {
         "api-key": process.env.APIM_KEY!,
       },
-      cache: "no-store",
+      cache: "reload", // <-- SEE IF THIS MAKE A DIFF
     })
 
     if (!response.ok) {
@@ -38,11 +39,17 @@ export const GetCosmosAccessToken = async (): Promise<string> => {
  * @param authToken Authorization Access Token
  * @returns Expiry date time of the token
  */
-export const getTokenExpiry = (authToken: string): number => {
+const getTokenExpiry = (authToken: string): number => {
   try {
     const expiry = JSON.parse(Buffer.from(authToken.split(".")[1], "base64").toString()).exp
     return expiry
   } catch (error) {
     throw new Error(`Failed to check token expiry: ${error}`)
   }
+}
+
+export const isTokenExpired = (authToken: string): boolean => {
+  if (!authToken) return true
+  const currentTime = Date.now()
+  return getTokenExpiry(authToken) <= currentTime
 }

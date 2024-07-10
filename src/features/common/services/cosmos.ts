@@ -1,6 +1,6 @@
 import { Container, CosmosClient, PartitionKeyDefinitionVersion, PartitionKeyKind } from "@azure/cosmos"
 
-import { GetCosmosAccessToken, getTokenExpiry } from "./cosmos-auth"
+import { GetCosmosAccessToken, isTokenExpired } from "./cosmos-auth"
 import logger from "@/features/insights/app-insights"
 
 interface AuthToken {
@@ -8,30 +8,27 @@ interface AuthToken {
   expiry: number
 }
 
-let _authToken: AuthToken | null = null
+let _cosmosClient: CosmosClient | null = null
+let _cosmosAuthToken: string | null = null
 
-const fetchAndSetAuthToken = async (): Promise<CosmosClient> => {
-  const token = await GetCosmosAccessToken()
-  const expiry = getTokenExpiry(token)
-  _authToken = { token, expiry }
-  return createCosmosClient(token)
-}
-
-const createCosmosClient = (authToken: string): CosmosClient => {
+const createCosmosClient = async (authToken: string): Promise<CosmosClient> => {
   const endpoint = process.env.APIM_BASE
   const defaultHeaders = {
     "api-key": process.env.APIM_KEY || "",
     Authorization: `type=aad&ver=1.0&sig=${authToken}`,
   }
   if (!endpoint) throw new Error("Azure Cosmos DB is not configured. Please configure it in the .env file.")
-
   return new CosmosClient({ endpoint: endpoint, defaultHeaders: defaultHeaders })
 }
 
 const CosmosInstance = async (): Promise<CosmosClient> => {
-  logger.info("Fetching Cosmos DB client")
-  const client = await fetchAndSetAuthToken()
-  return client
+  if (_cosmosAuthToken && _cosmosClient && !isTokenExpired(_cosmosAuthToken)) return _cosmosClient
+
+  console.log("🚀 > CosmosInstance > isTokenExpired")
+  const token = await GetCosmosAccessToken()
+  _cosmosAuthToken = token
+  _cosmosClient = await createCosmosClient(token)
+  return _cosmosClient
 }
 
 let _historyContainer: Container | null = null
