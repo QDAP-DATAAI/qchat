@@ -25,7 +25,7 @@ const useApplicationHook = (settings?: ApplicationSettings): State => {
 
   useEffect(() => {
     if (!settings)
-      fetch("/api/application", { method: "GET", cache: "no-store" })
+      fetch("/api/application", { method: "GET" })
         .then(async response => {
           if (!response.ok) throw new Error("Error fetching application settings")
           const result = await response.json()

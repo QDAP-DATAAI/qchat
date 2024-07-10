@@ -23,7 +23,7 @@ const useChatThreadsHook = (threads?: ChatThreadModel[]): State => {
 
   useEffect(() => {
     if (threads) return
-    fetch("/api/chat/threads", { method: "GET", cache: "no-store" })
+    fetch("/api/chat/threads", { method: "GET" })
       .then(async response => {
         if (!response.ok) throw new Error("Error fetching chat threads")
         const result = await response.json()
@@ -158,6 +158,3 @@ type ACTION =
   | ActionBase<"REMOVE_THREAD", { payload: string }>
   | ActionBase<"UPDATE_THREAD_TITLE", { payload: { chatThreadId: string; name: string } }>
   | ActionBase<"CREATE_THREAD", { payload: ChatThreadModel }>
-// | ActionBase<"PIN_THREAD", string>
-// | ActionBase<"UNPIN_THREAD", string>
-// | ActionBase<"ORDER_PINNED_THREADS", string[]>
