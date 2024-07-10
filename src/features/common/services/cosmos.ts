@@ -17,9 +17,8 @@ const createCosmosClient = async (authToken: string): Promise<CosmosClient> => {
 }
 
 const CosmosInstance = async (): Promise<CosmosClient> => {
-  if (_cosmosAuthToken && _cosmosClient && !isTokenExpired(_cosmosAuthToken)) return _cosmosClient
+  if (_cosmosClient && !isTokenExpired(_cosmosAuthToken)) return _cosmosClient
 
-  logger.info("🚀 > CosmosInstance > isTokenExpired")
   const token = await GetCosmosAccessToken()
   _cosmosAuthToken = token
   _cosmosClient = await createCosmosClient(token)
@@ -29,7 +28,8 @@ const CosmosInstance = async (): Promise<CosmosClient> => {
 
 let _historyContainer: Container | null = null
 export const HistoryContainer = async (): Promise<Container> => {
-  if (_historyContainer) return _historyContainer
+  if (_historyContainer && !isTokenExpired(_cosmosAuthToken)) return _historyContainer
+  logger.info("🚀 > CosmosInstance > HistoryContainer")
 
   const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
   const containerName = process.env.AZURE_COSMOSDB_CHAT_CONTAINER_NAME || "history"
@@ -52,6 +52,7 @@ export const HistoryContainer = async (): Promise<Container> => {
 let _userContainer: Container | null = null
 export const UserContainer = async (): Promise<Container> => {
   if (_userContainer) return _userContainer
+  logger.info("🚀 > CosmosInstance > UserContainer")
 
   const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
   const containerName = process.env.AZURE_COSMOSDB_USER_CONTAINER_NAME || "users"
@@ -74,6 +75,7 @@ export const UserContainer = async (): Promise<Container> => {
 let _tenantContainer: Container | null = null
 export const TenantContainer = async (): Promise<Container> => {
   if (_tenantContainer) return _tenantContainer
+  logger.info("🚀 > CosmosInstance > TenantContainer")
 
   const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
   const containerName = process.env.AZURE_COSMOSDB_TENANT_CONTAINER_NAME || "tenants"
@@ -96,6 +98,7 @@ export const TenantContainer = async (): Promise<Container> => {
 let _smartGenContainer: Container | null = null
 export const SmartGenContainer = async (): Promise<Container> => {
   if (_smartGenContainer) return _smartGenContainer
+  logger.info("🚀 > CosmosInstance > SmartGenContainer")
 
   const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
   const containerName = process.env.AZURE_COSMOSDB_SMART_GEN_CONTAINER_NAME || "smart-gen"
@@ -118,6 +121,7 @@ export const SmartGenContainer = async (): Promise<Container> => {
 let _applicationContainer: Container | null = null
 export const ApplicationContainer = async (): Promise<Container> => {
   if (_applicationContainer) return _applicationContainer
+  logger.info("🚀 > CosmosInstance > ApplicationContainer")
 
   const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
   const containerName = process.env.AZURE_COSMOSDB_APPLICATION_CONTAINER_NAME || "applications"
