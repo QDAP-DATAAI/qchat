@@ -49,6 +49,7 @@ const getTokenExpiry = (authToken: string): number => {
 }
 
 export const isTokenExpired = (authToken: string): boolean => {
+  return true
   if (!authToken) return true
   const currentTime = Date.now()
   return getTokenExpiry(authToken) <= currentTime
