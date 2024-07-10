@@ -28,6 +28,7 @@ const CosmosInstance = async (): Promise<CosmosClient> => {
   const token = await GetCosmosAccessToken()
   _cosmosAuthToken = token
   _cosmosClient = await createCosmosClient(token)
+  logger.info("CosmosInstance: Created CosmosClient instance")
   return _cosmosClient
 }
 
