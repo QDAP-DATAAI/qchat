@@ -19,7 +19,7 @@ const createCosmosClient = async (authToken: string): Promise<CosmosClient> => {
 const CosmosInstance = async (): Promise<CosmosClient> => {
   if (_cosmosAuthToken && _cosmosClient && !isTokenExpired(_cosmosAuthToken)) return _cosmosClient
 
-  console.log("🚀 > CosmosInstance > isTokenExpired")
+  logger.info("🚀 > CosmosInstance > isTokenExpired")
   const token = await GetCosmosAccessToken()
   _cosmosAuthToken = token
   _cosmosClient = await createCosmosClient(token)
