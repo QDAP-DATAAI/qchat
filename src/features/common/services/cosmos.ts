@@ -1,13 +1,52 @@
-import { Container, CosmosClient, PartitionKeyDefinitionVersion, PartitionKeyKind } from "@azure/cosmos"
+import {
+  Container,
+  CosmosClient,
+  PartitionKeyDefinition,
+  PartitionKeyDefinitionVersion,
+  PartitionKeyKind,
+} from "@azure/cosmos"
 
-import { GetCosmosAccessToken, isTokenExpired } from "./cosmos-auth"
 import logger from "@/features/insights/app-insights"
 
-let _cosmosClient: CosmosClient | null = null
 let _cosmosAuthToken: string | null = null
+const GetCosmosAccessToken = async (): Promise<string> => {
+  try {
+    if (!process.env.APIM_KEY || !process.env.APIM_BASE)
+      throw new Error("Azure API Management is not configured. Please configure it in the .env file.")
 
-const createCosmosClient = async (authToken: string): Promise<CosmosClient> => {
+    if (_cosmosAuthToken && !isTokenExpired(_cosmosAuthToken)) return _cosmosAuthToken
+
+    const response = await fetch(`${process.env.APIM_BASE}/cosmos`, {
+      method: "GET",
+      headers: {
+        "api-key": process.env.APIM_KEY,
+      },
+      cache: "reload",
+    })
+
+    if (!response.ok) throw new Error(`${response.statusText}`)
+
+    _cosmosAuthToken = await response.text()
+    return _cosmosAuthToken
+  } catch (error) {
+    throw new Error(`Failed to fetch Cosmos Auth Token: ${error}`)
+  }
+}
+
+const isTokenExpired = (authToken: string | null): boolean => {
+  try {
+    if (!authToken) return true
+    const expiry = JSON.parse(Buffer.from(authToken.split(".")[1], "base64").toString()).exp
+    const currentTime = Date.now()
+    return expiry <= currentTime
+  } catch (error) {
+    throw new Error(`Failed to check token expiry: ${error}`)
+  }
+}
+
+async function createCosmosClient(): Promise<CosmosClient> {
   const endpoint = process.env.APIM_BASE
+  const authToken = await GetCosmosAccessToken()
   const defaultHeaders = {
     "api-key": process.env.APIM_KEY || "",
     Authorization: `type=aad&ver=1.0&sig=${authToken}`,
@@ -16,127 +55,75 @@ const createCosmosClient = async (authToken: string): Promise<CosmosClient> => {
   return new CosmosClient({ endpoint: endpoint, defaultHeaders: defaultHeaders })
 }
 
-const CosmosInstance = async (): Promise<CosmosClient> => {
-  if (_cosmosClient && !isTokenExpired(_cosmosAuthToken)) return _cosmosClient
+const _cache: Map<string, Container> = new Map()
 
-  const token = await GetCosmosAccessToken()
-  _cosmosAuthToken = token
-  _cosmosClient = await createCosmosClient(token)
-  logger.info("CosmosInstance: Created CosmosClient instance")
-  return _cosmosClient
+async function containerFactory(containerName: string, partitionKey: PartitionKeyDefinition): Promise<Container> {
+  if (_cache.has(containerName) && !isTokenExpired(_cosmosAuthToken)) return _cache.get(containerName) as Container
+  logger.info(`🚀 > containerFactory > ${containerName}`)
+
+  const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
+  const client = await createCosmosClient()
+  const { database } = await client.databases.createIfNotExists({ id: dbName })
+  const { container } = await database.containers.createIfNotExists({
+    id: containerName,
+    partitionKey,
+  })
+
+  _cache.set(containerName, container)
+  return container
 }
 
-let _historyContainer: Container | null = null
 export const HistoryContainer = async (): Promise<Container> => {
-  if (_historyContainer && !isTokenExpired(_cosmosAuthToken)) return _historyContainer
-  logger.info("🚀 > CosmosInstance > HistoryContainer")
-
-  const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
   const containerName = process.env.AZURE_COSMOSDB_CHAT_CONTAINER_NAME || "history"
-
-  const client = await CosmosInstance()
-  const { database } = await client.databases.createIfNotExists({ id: dbName })
-  const { container } = await database.containers.createIfNotExists({
-    id: containerName,
-    partitionKey: {
-      paths: ["/tenantId", "/userId"],
-      kind: PartitionKeyKind.MultiHash,
-      version: PartitionKeyDefinitionVersion.V2,
-    },
-  })
-
-  _historyContainer = container
-  return _historyContainer
+  const partitionKey = {
+    paths: ["/tenantId", "/userId"],
+    kind: PartitionKeyKind.MultiHash,
+    version: PartitionKeyDefinitionVersion.V2,
+  }
+  const container = await containerFactory(containerName, partitionKey)
+  return container
 }
 
-let _userContainer: Container | null = null
 export const UserContainer = async (): Promise<Container> => {
-  if (_userContainer) return _userContainer
-  logger.info("🚀 > CosmosInstance > UserContainer")
-
-  const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
   const containerName = process.env.AZURE_COSMOSDB_USER_CONTAINER_NAME || "users"
-
-  const client = await CosmosInstance()
-  const { database } = await client.databases.createIfNotExists({ id: dbName })
-  const { container } = await database.containers.createIfNotExists({
-    id: containerName,
-    partitionKey: {
-      paths: ["/tenantId", "/userId"],
-      kind: PartitionKeyKind.MultiHash,
-      version: PartitionKeyDefinitionVersion.V2,
-    },
-  })
-
-  _userContainer = container
-  return _userContainer
+  const partitionKey = {
+    paths: ["/tenantId", "/userId"],
+    kind: PartitionKeyKind.MultiHash,
+    version: PartitionKeyDefinitionVersion.V2,
+  }
+  const container = await containerFactory(containerName, partitionKey)
+  return container
 }
 
-let _tenantContainer: Container | null = null
 export const TenantContainer = async (): Promise<Container> => {
-  if (_tenantContainer) return _tenantContainer
-  logger.info("🚀 > CosmosInstance > TenantContainer")
-
-  const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
   const containerName = process.env.AZURE_COSMOSDB_TENANT_CONTAINER_NAME || "tenants"
-
-  const client = await CosmosInstance()
-  const { database } = await client.databases.createIfNotExists({ id: dbName })
-  const { container } = await database.containers.createIfNotExists({
-    id: containerName,
-    partitionKey: {
-      paths: ["/tenantId"],
-      kind: PartitionKeyKind.MultiHash,
-      version: PartitionKeyDefinitionVersion.V2,
-    },
-  })
-
-  _tenantContainer = container
-  return _tenantContainer
+  const partitionKey = {
+    paths: ["/tenantId"],
+    kind: PartitionKeyKind.MultiHash,
+    version: PartitionKeyDefinitionVersion.V2,
+  }
+  const container = await containerFactory(containerName, partitionKey)
+  return container
 }
 
-let _smartGenContainer: Container | null = null
 export const SmartGenContainer = async (): Promise<Container> => {
-  if (_smartGenContainer) return _smartGenContainer
-  logger.info("🚀 > CosmosInstance > SmartGenContainer")
-
-  const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
   const containerName = process.env.AZURE_COSMOSDB_SMART_GEN_CONTAINER_NAME || "smart-gen"
-
-  const client = await CosmosInstance()
-  const { database } = await client.databases.createIfNotExists({ id: dbName })
-  const { container } = await database.containers.createIfNotExists({
-    id: containerName,
-    partitionKey: {
-      paths: ["/tenantId", "/userId"],
-      kind: PartitionKeyKind.MultiHash,
-      version: PartitionKeyDefinitionVersion.V2,
-    },
-  })
-
-  _smartGenContainer = container
-  return _smartGenContainer
+  const partitionKey = {
+    paths: ["/tenantId", "/userId"],
+    kind: PartitionKeyKind.MultiHash,
+    version: PartitionKeyDefinitionVersion.V2,
+  }
+  const container = await containerFactory(containerName, partitionKey)
+  return container
 }
 
-let _applicationContainer: Container | null = null
 export const ApplicationContainer = async (): Promise<Container> => {
-  if (_applicationContainer) return _applicationContainer
-  logger.info("🚀 > CosmosInstance > ApplicationContainer")
-
-  const dbName = process.env.AZURE_COSMOSDB_DB_NAME || "localdev"
-  const containerName = process.env.AZURE_COSMOSDB_APPLICATION_CONTAINER_NAME || "applications"
-
-  const client = await CosmosInstance()
-  const { database } = await client.databases.createIfNotExists({ id: dbName })
-  const { container } = await database.containers.createIfNotExists({
-    id: containerName,
-    partitionKey: {
-      paths: ["/applicationId"],
-      kind: PartitionKeyKind.MultiHash,
-      version: PartitionKeyDefinitionVersion.V2,
-    },
-  })
-
-  _applicationContainer = container
-  return _applicationContainer
+  const containerName = process.env.AZURE_COSMOSDB_TENANT_CONTAINER_NAME || "applications"
+  const partitionKey = {
+    paths: ["/applicationId"],
+    kind: PartitionKeyKind.MultiHash,
+    version: PartitionKeyDefinitionVersion.V2,
+  }
+  const container = await containerFactory(containerName, partitionKey)
+  return container
 }
