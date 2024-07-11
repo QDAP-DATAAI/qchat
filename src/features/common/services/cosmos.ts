@@ -37,7 +37,7 @@ const isTokenExpired = (authToken: string | null): boolean => {
   try {
     if (!authToken) return true
     const expiry = JSON.parse(Buffer.from(authToken.split(".")[1], "base64").toString()).exp
-    const currentTime = Date.now()
+    const currentTime = Math.floor(Date.now() / 1000)
     return expiry <= currentTime
   } catch (error) {
     throw new Error(`Failed to check token expiry: ${error}`)
