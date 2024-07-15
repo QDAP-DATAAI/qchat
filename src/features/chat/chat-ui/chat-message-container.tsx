@@ -84,7 +84,7 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
                   documentId={document.id}
                   name={document.name}
                   contents={document.contents || ""}
-                  updatedContents={document.updatedContents || "hello"}
+                  updatedContents={document.updatedContents || ""}
                   vtt={document.extraContents || ""}
                 />
               ))

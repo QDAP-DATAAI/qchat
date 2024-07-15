@@ -105,7 +105,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
             )}
             <CheckTranscriptionButton transcription={currentContents} onAssistantButtonClick={setInput} />
             <CopyButton message={currentContents} onFeedbackChange={setFeedbackMessage} />
-            <SaveButton documentId={props.documentId} updatedContents={"hello"} />
+            <SaveButton documentId={props.documentId} updatedContents={props.updatedContents} />
           </div>
         </header>
         <div className="prose prose-slate max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
