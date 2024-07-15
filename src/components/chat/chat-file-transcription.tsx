@@ -28,19 +28,18 @@ interface ChatFileTranscriptionProps {
 export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   const { chatBody, setInput } = useChatContext()
   const [feedbackMessage, setFeedbackMessage] = useState("")
+  const [editorContents, setEditorContents] = useState(props.updatedContents || props.contents)
   const fileTitle = props.name.replace(/[^a-zA-Z0-9]/g, " ").trim()
-
-  const currentContents = props.updatedContents || props.contents
 
   const onDownloadTranscription = async (): Promise<void> => {
     const fileName = `${fileTitle}-transcription.docx`
-    await convertTranscriptionToWordDocument([currentContents], fileName)
+    await convertTranscriptionToWordDocument([editorContents], fileName)
   }
 
   const onDownloadReport = async (): Promise<void> => {
     const fileName = `${fileTitle}-report.docx`
     const chatThreadName = chatBody.chatThreadName || `${APP_NAME} ${fileName}`
-    await convertTranscriptionReportToWordDocument([currentContents], props.name, fileName, APP_NAME, chatThreadName)
+    await convertTranscriptionReportToWordDocument([editorContents], props.name, fileName, APP_NAME, chatThreadName)
   }
 
   const onDownloadVttFile = (): void => {
@@ -103,13 +102,27 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
                 <CaptionsIcon size={iconSize} />
               </Button>
             )}
-            <CheckTranscriptionButton transcription={currentContents} onAssistantButtonClick={setInput} />
-            <CopyButton message={currentContents} onFeedbackChange={setFeedbackMessage} />
-            <SaveButton documentId={props.documentId} updatedContents={props.updatedContents} />
+            <CheckTranscriptionButton transcription={editorContents} onAssistantButtonClick={setInput} />
+            <CopyButton message={editorContents} onFeedbackChange={setFeedbackMessage} />
+            <SaveButton documentId={props.documentId} updatedContents={editorContents} />
           </div>
         </header>
-        <div className="prose prose-slate max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
-          <Markdown content={currentContents.replaceAll("\n", "\n\n") || ""} />
+        <div>
+          {" "}
+          <textarea
+            title="Editor Contents"
+            value={editorContents}
+            onChange={e => setEditorContents(e.target.value)}
+            className="h-64 w-1/2 rounded border border-gray-300 p-2"
+          />
+        </div>
+        <div className="flex gap-4">
+          <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
+            <Markdown content={props.contents.replace(/\n/g, "\n\n")} />
+          </div>
+          <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
+            <Markdown content={props.updatedContents.replace(/\n/g, "\n\n")} />
+          </div>
         </div>
         <div className="sr-only" aria-live="assertive">
           {feedbackMessage}
