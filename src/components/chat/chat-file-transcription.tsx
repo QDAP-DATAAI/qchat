@@ -1,5 +1,6 @@
+import { diffWords } from "diff"
 import { DownloadIcon, CaptionsIcon, FileTextIcon } from "lucide-react"
-import { FC, useCallback, useState } from "react"
+import { FC, useCallback, useState, useEffect } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -13,29 +14,46 @@ import {
 import { CopyButton } from "@/features/ui/assistant-buttons"
 import { CheckTranscriptionButton } from "@/features/ui/assistant-buttons/rewrite-message-button"
 import { Button } from "@/features/ui/button"
+import { Textarea } from "@/features/ui/textarea"
 import { useWindowSize } from "@/features/ui/windowsize"
 
+import { ChangeTranscriptButton } from "./chat-transcript-change"
+
 interface ChatFileTranscriptionProps {
+  chatThreadId: string
+  documentId: string
   name: string
   contents: string
+  updatedContents: string
+  accuracy: number
   vtt: string
 }
 
 export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   const { chatBody, setInput } = useChatContext()
   const [feedbackMessage, setFeedbackMessage] = useState("")
+  const [editorContents, setEditorContents] = useState(props.updatedContents || props.contents)
+  const [displayedContents, setDisplayedContents] = useState(props.updatedContents || props.contents)
+  const [accuracy, setAccuracy] = useState(props.accuracy)
   const fileTitle = props.name.replace(/[^a-zA-Z0-9]/g, " ").trim()
+
+  useEffect(() => {
+    setEditorContents(props.updatedContents || props.contents)
+    setDisplayedContents(props.updatedContents || props.contents)
+  }, [props.updatedContents, props.contents])
+
+  const showTranscriptWithSpeakers = "**Speaker:** " + displayedContents.replace(/\n/g, "\n\n**Speaker:** ")
 
   const onDownloadTranscription = useCallback(async (): Promise<void> => {
     const fileName = `${fileTitle}-transcription.docx`
-    await convertTranscriptionToWordDocument([props.contents], fileName)
-  }, [props.contents, fileTitle])
+    const chatThreadName = chatBody.chatThreadName || `${APP_NAME} ${fileName}`
+    await convertTranscriptionToWordDocument([displayedContents], props.name, fileName, APP_NAME, chatThreadName)
+  }, [displayedContents, props.name, chatBody.chatThreadName, fileTitle])
 
   const onDownloadReport = useCallback(async (): Promise<void> => {
     const fileName = `${fileTitle}-report.docx`
-    const chatThreadName = chatBody.chatThreadName || `${APP_NAME} ${fileName}`
-    await convertTranscriptionReportToWordDocument([props.contents], props.name, fileName, APP_NAME, chatThreadName)
-  }, [fileTitle, chatBody.chatThreadName, props.contents, props.name])
+    await convertTranscriptionReportToWordDocument([displayedContents], fileName)
+  }, [fileTitle, displayedContents])
 
   const onDownloadVttFile = useCallback((): void => {
     const element = document.createElement("a")
@@ -43,19 +61,52 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
     element.setAttribute("download", `${fileTitle}-transcription.vtt`)
     document.body.appendChild(element)
     element.click()
-
     document.body.removeChild(element)
   }, [fileTitle, props.vtt])
 
   const { width } = useWindowSize()
   const { iconSize, buttonClass } = getIconSize(width)
 
+  const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+    const newEditorContents = e.target.value
+    setEditorContents(newEditorContents)
+    const newAccuracy = calculateAccuracy(newEditorContents)
+    setAccuracy(newAccuracy)
+  }
+
+  const handleSave = (): void => {
+    const newDisplayedContents = editorContents
+    setDisplayedContents(newDisplayedContents)
+    const newAccuracy = calculateAccuracy(newDisplayedContents)
+    setAccuracy(newAccuracy)
+  }
+
+  const calculateAccuracy = (updatedContents: string): number => {
+    const normalize = (str: string): string => str.trim().replace(/\s+/g, " ")
+    const normalizedOriginal = normalize(props.contents)
+    const normalizedUpdated = normalize(updatedContents)
+
+    if (normalizedOriginal === normalizedUpdated) {
+      return 100
+    }
+
+    const originalWords = normalizedOriginal.split(/\s+/).length
+    const diff = diffWords(normalizedOriginal, normalizedUpdated)
+    const changedWords = diff
+      .filter(part => part.added || part.removed)
+      .reduce((acc, part) => acc + part.value.split(/\s+/).length, 0)
+
+    return ((originalWords - changedWords) / originalWords) * 100
+  }
+
   return (
-    <article className="container mx-auto flex flex-col py-1 pb-4">
-      <section className="flex-col gap-4 overflow-hidden rounded-md bg-background p-4">
-        <header className="flex w-full items-center justify-between">
-          <Typography variant="h3">{fileTitle}</Typography>
-          <div className="container flex w-full gap-4 p-2">
+    <div className="container mx-auto flex flex-col py-1 pb-4">
+      <div className="flex-col gap-4 overflow-hidden rounded-md bg-background p-4">
+        <div className="flex w-full items-center justify-end">
+          <Typography variant="h3" className="w-full">
+            Transcription of: {fileTitle}
+          </Typography>
+          <div className="container flex w-full justify-end gap-4 p-2">
             <Button
               ariaLabel="Download Transcription"
               variant={"ghost"}
@@ -76,7 +127,6 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
             >
               <FileTextIcon size={iconSize} />
             </Button>
-
             {props.vtt.length > 0 && (
               <Button
                 ariaLabel="Download WebVTT subtitles file"
@@ -89,19 +139,51 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
                 <CaptionsIcon size={iconSize} />
               </Button>
             )}
-
-            <CheckTranscriptionButton transcription={props.contents} onAssistantButtonClick={setInput} />
-            <CopyButton message={props.contents} onFeedbackChange={setFeedbackMessage} />
+            <CheckTranscriptionButton transcription={showTranscriptWithSpeakers} onAssistantButtonClick={setInput} />
+            <CopyButton message={showTranscriptWithSpeakers} onFeedbackChange={setFeedbackMessage} />
           </div>
-        </header>
-        <div className="prose prose-slate max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
-          <Markdown content={props.contents.replaceAll("\n", "\n\n") || ""} />
         </div>
-        <div className="sr-only" aria-live="assertive">
-          {feedbackMessage}
+        <div className="mt-4 flex justify-end">
+          <Textarea
+            title="Editor Contents"
+            value={editorContents}
+            onChange={handleEditorChange}
+            className="h-64 w-full rounded border border-gray-300 p-2"
+          />
         </div>
-      </section>
-    </article>
+        <div className="m-4 flex justify-end p-2">
+          <ChangeTranscriptButton
+            documentId={props.documentId}
+            chatThreadId={props.chatThreadId}
+            updatedContents={editorContents}
+            accuracy={accuracy}
+            onSave={handleSave}
+          />
+        </div>
+        {accuracy !== null ? (
+          <div className="m-4 flex justify-end p-2">
+            <Typography variant="h4">Accuracy: {accuracy.toFixed(2)}%</Typography>
+          </div>
+        ) : (
+          <div className="m-4 flex justify-end p-2">
+            <Typography variant="h4">Accuracy: Not calculated</Typography>
+          </div>
+        )}
+        <div className="flex gap-4">
+          <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
+            <Typography variant="h4">Original Transcription</Typography>
+            <Markdown content={props.contents.replace(/\n/g, "\n\n")} />
+          </div>
+          <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
+            <Typography variant="h4">Updated Transcription with Speaker Preview</Typography>
+            <Markdown content={showTranscriptWithSpeakers} />
+          </div>
+          <div className="sr-only" aria-live="assertive">
+            {feedbackMessage}
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }
 

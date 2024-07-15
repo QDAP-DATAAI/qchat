@@ -2,7 +2,7 @@
 
 import { UrlObject } from "url"
 
-import { CloudUpload, SpellCheck2, X, LogIn, LogOut, Moon, Sun, Home, Bookmark, UserCog } from "lucide-react"
+import { X, LogIn, LogOut, Moon, Sun } from "lucide-react"
 import Link from "next/link"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { useTheme } from "next-themes"
@@ -12,6 +12,8 @@ import { signInProvider } from "@/app-global"
 
 import Typography from "@/components/typography"
 import { cn } from "@/lib/utils"
+
+import { menuItems } from "@/app/menus"
 
 interface MiniMenuItemProps extends React.HTMLAttributes<HTMLAnchorElement> {
   href: UrlObject | string
@@ -57,39 +59,40 @@ export const MiniMenu: React.FC = () => {
     setIsMenuOpen(false)
   }, [])
 
-  const menuItems = [
-    { name: "Home", href: "/chat", icon: Home, ariaLabel: "Navigate to home page" },
-    { name: "Settings", href: "/settings", icon: UserCog, ariaLabel: "Navigate to settings" },
-    { name: "Prompt Guide", href: "/prompt-guide", icon: Bookmark, ariaLabel: "Navigate to prompt guide" },
-    { name: "What's New", href: "/whats-new", icon: CloudUpload, ariaLabel: "Navigate to what's new page" },
-    {
-      name: "Factual Errors",
-      href: "/hallucinations",
-      icon: SpellCheck2,
-      ariaLabel: "Help with factual errors",
-    },
-  ]
+  const filteredMenuItems = session
+    ? menuItems.filter(item => item.condition !== "unauthenticated")
+    : menuItems.filter(item => item.condition !== "authenticated")
 
   return (
     <>
-      <div
-        onClick={toggleMenu}
-        className="h-full cursor-pointer flex-col items-center justify-center border-accent text-darkAltButton hover:bg-background hover:underline"
-        aria-expanded="false"
-        aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-        role="button"
-        tabIndex={0}
-      >
-        {isMenuOpen ? (
+      {isMenuOpen ? (
+        <div
+          onClick={toggleMenu}
+          className="h-full cursor-pointer flex-col items-center justify-center border-accent text-darkAltButton hover:bg-background hover:underline"
+          aria-expanded="true"
+          aria-label="Close menu"
+          role="button"
+          tabIndex={0}
+        >
           <X className="items-center hover:bg-link" aria-hidden="true" />
-        ) : (
+          Menu
+        </div>
+      ) : (
+        <div
+          onClick={toggleMenu}
+          className="h-full cursor-pointer flex-col items-center justify-center border-accent text-darkAltButton hover:bg-background hover:underline"
+          aria-expanded="false"
+          aria-label="Open menu"
+          role="button"
+          tabIndex={0}
+        >
           <div
             className="hover:text-darkAltButtonHover rounded-md pl-2 text-darkAltButton hover:bg-buttonHover"
             aria-hidden="true"
           />
-        )}
-        Menu
-      </div>
+          Menu
+        </div>
+      )}
       {isMenuOpen && (
         <div className="fixed inset-0 z-[99999] bg-altBackground text-link" role="dialog" aria-modal="true">
           <div className="absolute right-0 top-0 m-4 h-2/6">
@@ -107,7 +110,7 @@ export const MiniMenu: React.FC = () => {
             Menu
           </Typography>
           <div className="mt-16 p-2">
-            {menuItems.map(item => (
+            {filteredMenuItems.map(item => (
               <MiniMenuItem key={item.name} closeMenu={toggleMenu} {...item} />
             ))}
             <div

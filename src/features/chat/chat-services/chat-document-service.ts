@@ -12,7 +12,7 @@ import logger from "@/features/insights/app-insights"
 import { APP_URL } from "@/features/theme/theme-config"
 import { uniqueId } from "@/lib/utils"
 
-import { AzureCogDocumentIndex, indexDocuments } from "./azure-cog-search/azure-cog-vector-store"
+import { AzureCogDocumentIndex, deleteDocumentById, indexDocuments } from "./azure-cog-search/azure-cog-vector-store"
 import { transcribeAudio } from "./chat-audio-helper"
 import { arrayBufferToBase64, customBeginAnalyzeDocument } from "./chat-document-helper"
 import { chunkDocumentWithOverlap } from "./text-chunk"
@@ -103,6 +103,7 @@ export const IndexDocuments = async (
   fileName: string,
   docs: string[],
   chatThreadId: string,
+  documentId: string,
   contentsToSave?: string,
   extraContents?: string
 ): ServerActionResponseAsync<AzureCogDocumentIndex[]> => {
@@ -115,7 +116,7 @@ export const IndexDocuments = async (
       userId,
       pageContent: docContent,
       order: index + 1,
-      metadata: fileName,
+      metadata: documentId,
       tenantId,
       createdDate: new Date().toISOString(),
       fileName,
@@ -128,7 +129,7 @@ export const IndexDocuments = async (
 
     const modelToSave: ChatDocumentModel = {
       chatThreadId,
-      id: uniqueId(),
+      id: documentId,
       userId,
       createdAt: new Date(),
       type: ChatRecordType.Document,
@@ -187,6 +188,82 @@ export const FindAllChatDocumentsForCurrentUser = async (
     return {
       status: "OK",
       response: resources,
+    }
+  } catch (error) {
+    return {
+      status: "ERROR",
+      errors: [{ message: `${error}` }],
+    }
+  }
+}
+
+export const UpdateChatDocument = async (
+  documentId: string,
+  chatThreadId: string,
+  updatedContents: string,
+  accuracy: number
+): ServerActionResponseAsync<ChatDocumentModel> => {
+  try {
+    const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
+
+    const container = await HistoryContainer()
+    const { resource } = await container.item(documentId, [tenantId, userId]).read<ChatDocumentModel>()
+
+    if (!resource) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Document not found" }],
+      }
+    }
+    const updatedDocument: ChatDocumentModel = {
+      ...resource,
+      updatedContents: updatedContents,
+      accuracy: accuracy,
+    }
+
+    const { resource: updatedResource } = await container.items.upsert<ChatDocumentModel>(updatedDocument)
+    //TOOO Move to only upserting the updated contents
+
+    if (!updatedResource) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Failed to update document" }],
+      }
+    }
+
+    await deleteDocumentById(documentId, chatThreadId, userId, tenantId)
+
+    const splitDocuments = chunkDocumentWithOverlap(updatedContents)
+
+    if (splitDocuments.length === 0) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "No split documents found for indexing" }],
+      }
+    }
+
+    const path = `${APP_URL}/chat/${chatThreadId}`
+    const documentsToIndex: AzureCogDocumentIndex[] = splitDocuments.map((docContent, index) => ({
+      id: uniqueId(),
+      chatThreadId: chatThreadId,
+      userId,
+      pageContent: docContent,
+      order: index + 1,
+      metadata: documentId,
+      tenantId,
+      createdDate: new Date().toISOString(),
+      fileName: resource.title,
+      filePath: path,
+      url: path,
+      title: resource.title,
+      embedding: [],
+    }))
+
+    await indexDocuments(documentsToIndex)
+
+    return {
+      status: "OK",
+      response: updatedResource,
     }
   } catch (error) {
     return {
