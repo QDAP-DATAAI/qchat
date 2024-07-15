@@ -1,11 +1,12 @@
 "use client"
 
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
 import { FC } from "react"
 import { useFormState } from "react-dom"
 
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { Button } from "@/features/ui/button"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/features/ui/sheet"
+import { Sheet, SheetContent, SheetTitle, SheetTrigger, SheetDescription } from "@/features/ui/sheet"
 
 import { CitationAction } from "./citation-action"
 
@@ -43,7 +44,7 @@ export const CitationSlider: FC<SliderProps> = props => {
       <Sheet>
         <SheetTrigger asChild>
           <Button
-            ariaLabel={`Citation number ${props.order}`}
+            aria-label={`Open citation number ${props.order}`}
             variant="outline"
             onClick={handleButtonClick}
             type="button"
@@ -52,10 +53,11 @@ export const CitationSlider: FC<SliderProps> = props => {
             {props.order}
           </Button>
         </SheetTrigger>
-        <SheetContent aria-modal="true" role="dialog" aria-labelledby={"Section" + props.order}>
-          <SheetHeader>
-            <SheetTitle id={"Section" + props.order}>Citation for Section {props.order}</SheetTitle>
-          </SheetHeader>
+        <SheetContent aria-modal="true" role="dialog" aria-labelledby={undefined} aria-describedby={undefined}>
+          <SheetTitle>Citation for Section {props.order}</SheetTitle>
+          <VisuallyHidden.Root>
+            <SheetDescription>Detailed information about citation number {props.order}.</SheetDescription>
+          </VisuallyHidden.Root>
           {node}
         </SheetContent>
       </Sheet>

@@ -14,24 +14,26 @@ export const CitationAction = async (_previousState: unknown, formData: FormData
   const tenantId = formData.get("tenantId") as string
   const name = formData.get("name") as string
 
-  const filter = {
-    filter: `id eq '${id}' and chatThreadId eq '${chatThreadId}' and userId eq '${userId}' and tenantId eq '${tenantId}'`,
+  const baseFilter = `chatThreadId eq '${chatThreadId}' and userId eq '${userId}' and tenantId eq '${tenantId}'`
+
+  const idFilter = {
+    filter: `${baseFilter} and id eq '${id}'`,
   }
 
-  let result = await simpleSearch(userId, chatThreadId, tenantId, filter)
+  let result = await simpleSearch(userId, chatThreadId, tenantId, idFilter)
 
   if (result.length === 0) {
     const documentIdFilter = {
-      filter: `metadata eq '${id}'`,
+      filter: `${baseFilter} and metadata eq '${id}'`,
     }
     result = await simpleSearch(userId, chatThreadId, tenantId, documentIdFilter)
   }
 
   if (result.length === 0) {
-    const nameFilter = {
-      filter: `name eq '${name}'`,
+    const fileNameFilter = {
+      filter: `${baseFilter} and fileName eq '${name}'`,
     }
-    result = await simpleSearch(userId, chatThreadId, tenantId, nameFilter)
+    result = await simpleSearch(userId, chatThreadId, tenantId, fileNameFilter)
   }
 
   if (result.length === 0) return <div>Not found</div>
