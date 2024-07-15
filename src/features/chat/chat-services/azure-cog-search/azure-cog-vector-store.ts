@@ -150,6 +150,23 @@ export const deleteDocuments = async (chatThreadId: string, userId: string, tena
     body: JSON.stringify({ value: documentsToDelete }),
   })
 }
+export const deleteDocumentById = async (documentId: string, userId: string, tenantId: string): Promise<void> => {
+  const filter: AzureCogFilter = {
+    filter: `search.in(metadata, '${documentId}') and search.in(userId, '${userId}') and search.in(tenantId, '${tenantId}')`,
+  }
+
+  const documents = await simpleSearch(userId, "", tenantId, filter)
+
+  const documentsToDelete: DocumentDeleteModel[] = documents.map(document => ({
+    "@search.action": "delete",
+    id: document.id,
+  }))
+
+  await fetcher(`${baseIndexUrl()}/docs/index?api-version=${process.env.AZURE_SEARCH_API_VERSION}`, {
+    method: "POST",
+    body: JSON.stringify({ value: documentsToDelete }),
+  })
+}
 
 export const embedDocuments = async (documents: Array<AzureCogDocumentIndex>): Promise<void> => {
   const openai = OpenAIEmbeddingInstance()

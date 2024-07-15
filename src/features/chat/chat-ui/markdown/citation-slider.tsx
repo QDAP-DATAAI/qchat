@@ -3,9 +3,6 @@
 import { FC } from "react"
 import { useFormState } from "react-dom"
 
-import { APP_NAME } from "@/app-global"
-
-import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { Button } from "@/features/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/features/ui/sheet"
@@ -36,6 +33,7 @@ export const CitationSlider: FC<SliderProps> = props => {
     formData.append("tenantId", tenantId)
     formData.append("chatThreadId", chatThreadId)
     formData.append("order", props.order.toString())
+    formData.append("name", props.name)
     formAction(formData)
   }
 
@@ -58,19 +56,7 @@ export const CitationSlider: FC<SliderProps> = props => {
           <SheetHeader>
             <SheetTitle id={"Section" + props.order}>Citation for Section {props.order}</SheetTitle>
           </SheetHeader>
-          <Typography variant="p" className="">
-            {node}
-          </Typography>
-          <Typography variant="h2" className="p-2">
-            Understanding Citations
-          </Typography>
-          <Typography variant="p" className="p-2">
-            The citation presented is a specific snippet from your document, selected by {APP_NAME} through
-            Retrieval-Augmented Generation (RAG) for its relevance to your question. If the snippets seem unrelated, it
-            might suggest that {APP_NAME} needs more context or clearer questions to accurately pinpoint the right
-            information. This method aims to deliver focused and relevant insights, but sometimes it may need further
-            clarification to match your question precisely.
-          </Typography>
+          {node}
         </SheetContent>
       </Sheet>
     </form>

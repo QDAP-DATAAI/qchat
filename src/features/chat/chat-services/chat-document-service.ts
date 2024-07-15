@@ -12,7 +12,7 @@ import logger from "@/features/insights/app-insights"
 import { APP_URL } from "@/features/theme/theme-config"
 import { uniqueId } from "@/lib/utils"
 
-import { AzureCogDocumentIndex, indexDocuments } from "./azure-cog-search/azure-cog-vector-store"
+import { AzureCogDocumentIndex, deleteDocumentById, indexDocuments } from "./azure-cog-search/azure-cog-vector-store"
 import { transcribeAudio } from "./chat-audio-helper"
 import { arrayBufferToBase64, customBeginAnalyzeDocument } from "./chat-document-helper"
 import { chunkDocumentWithOverlap } from "./text-chunk"
@@ -103,6 +103,7 @@ export const IndexDocuments = async (
   fileName: string,
   docs: string[],
   chatThreadId: string,
+  documentId: string,
   contentsToSave?: string,
   extraContents?: string
 ): ServerActionResponseAsync<AzureCogDocumentIndex[]> => {
@@ -115,7 +116,7 @@ export const IndexDocuments = async (
       userId,
       pageContent: docContent,
       order: index + 1,
-      metadata: fileName,
+      metadata: documentId,
       tenantId,
       createdDate: new Date().toISOString(),
       fileName,
@@ -128,7 +129,7 @@ export const IndexDocuments = async (
 
     const modelToSave: ChatDocumentModel = {
       chatThreadId,
-      id: uniqueId(),
+      id: documentId,
       userId,
       createdAt: new Date(),
       type: ChatRecordType.Document,
@@ -225,6 +226,8 @@ export const UpdateChatDocument = async (
       }
     }
 
+    await deleteDocumentById(documentId, userId, tenantId)
+
     const splitDocuments = chunkDocumentWithOverlap(updatedContents)
     const path = `${APP_URL}/chat/${resource.chatThreadId}`
     const documentsToIndex: AzureCogDocumentIndex[] = splitDocuments.map((docContent, index) => ({
@@ -233,7 +236,7 @@ export const UpdateChatDocument = async (
       userId,
       pageContent: docContent,
       order: index + 1,
-      metadata: resource.title,
+      metadata: documentId,
       tenantId,
       createdDate: new Date().toISOString(),
       fileName: resource.title,
