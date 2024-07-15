@@ -1,7 +1,9 @@
 import { FilePlus } from "lucide-react"
 
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
+
 import { Button } from "@/features/ui/button"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/features/ui/sheet"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/features/ui/sheet"
 
 import { ChatFileUI } from "./chat-file-ui"
 
@@ -17,6 +19,9 @@ export const ChatFileSlider = (): JSX.Element => {
         <SheetContent>
           <SheetHeader>
             <SheetTitle>Upload File</SheetTitle>
+            <VisuallyHidden.Root>
+              <SheetDescription>File Upload Dialog</SheetDescription>
+            </VisuallyHidden.Root>
           </SheetHeader>
           <div className="py-4">
             <ChatFileUI />
