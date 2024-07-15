@@ -195,3 +195,64 @@ export const FindAllChatDocumentsForCurrentUser = async (
     }
   }
 }
+
+export const UpdateChatDocument = async (
+  documentId: string,
+  updatedContents: string
+): ServerActionResponseAsync<ChatDocumentModel> => {
+  try {
+    const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
+
+    const container = await HistoryContainer()
+    const { resource } = await container.item(documentId, [tenantId, userId]).read<ChatDocumentModel>()
+    if (!resource) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Document not found" }],
+      }
+    }
+
+    const updatedDocument: ChatDocumentModel = {
+      ...resource,
+      updatedContents,
+    }
+
+    const { resource: updatedResource } = await container.items.upsert<ChatDocumentModel>(updatedDocument)
+    if (!updatedResource) {
+      return {
+        status: "ERROR",
+        errors: [{ message: "Failed to update document" }],
+      }
+    }
+
+    const splitDocuments = chunkDocumentWithOverlap(updatedContents)
+    const path = `${APP_URL}/chat/${resource.chatThreadId}`
+    const documentsToIndex: AzureCogDocumentIndex[] = splitDocuments.map((docContent, index) => ({
+      id: uniqueId(),
+      chatThreadId: resource.chatThreadId,
+      userId,
+      pageContent: docContent,
+      order: index + 1,
+      metadata: resource.title,
+      tenantId,
+      createdDate: new Date().toISOString(),
+      fileName: resource.title,
+      filePath: path,
+      url: path,
+      title: resource.title,
+      embedding: [],
+    }))
+
+    await indexDocuments(documentsToIndex)
+
+    return {
+      status: "OK",
+      response: updatedResource,
+    }
+  } catch (error) {
+    return {
+      status: "ERROR",
+      errors: [{ message: `${error}` }],
+    }
+  }
+}

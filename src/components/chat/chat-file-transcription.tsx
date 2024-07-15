@@ -15,9 +15,13 @@ import { CheckTranscriptionButton } from "@/features/ui/assistant-buttons/rewrit
 import { Button } from "@/features/ui/button"
 import { useWindowSize } from "@/features/ui/windowsize"
 
+import { SaveButton } from "./chat-transcript-change"
+
 interface ChatFileTranscriptionProps {
+  documentId: string
   name: string
   contents: string
+  updatedContents: string
   vtt: string
 }
 
@@ -26,15 +30,17 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   const [feedbackMessage, setFeedbackMessage] = useState("")
   const fileTitle = props.name.replace(/[^a-zA-Z0-9]/g, " ").trim()
 
+  const currentContents = props.updatedContents || props.contents
+
   const onDownloadTranscription = async (): Promise<void> => {
     const fileName = `${fileTitle}-transcription.docx`
-    await convertTranscriptionToWordDocument([props.contents], fileName)
+    await convertTranscriptionToWordDocument([currentContents], fileName)
   }
 
   const onDownloadReport = async (): Promise<void> => {
     const fileName = `${fileTitle}-report.docx`
     const chatThreadName = chatBody.chatThreadName || `${APP_NAME} ${fileName}`
-    await convertTranscriptionReportToWordDocument([props.contents], props.name, fileName, APP_NAME, chatThreadName)
+    await convertTranscriptionReportToWordDocument([currentContents], props.name, fileName, APP_NAME, chatThreadName)
   }
 
   const onDownloadVttFile = (): void => {
@@ -44,7 +50,6 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
 
     document.body.appendChild(element)
     element.click()
-
     document.body.removeChild(element)
   }
 
@@ -86,7 +91,6 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
             >
               <FileTextIcon size={iconSize} />
             </Button>
-
             {props.vtt.length > 0 && (
               <Button
                 ariaLabel="Download WebVTT subtitles file"
@@ -99,13 +103,13 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
                 <CaptionsIcon size={iconSize} />
               </Button>
             )}
-
-            <CheckTranscriptionButton transcription={props.contents} onAssistantButtonClick={setInput} />
-            <CopyButton message={props.contents} onFeedbackChange={setFeedbackMessage} />
+            <CheckTranscriptionButton transcription={currentContents} onAssistantButtonClick={setInput} />
+            <CopyButton message={currentContents} onFeedbackChange={setFeedbackMessage} />
+            <SaveButton documentId={props.documentId} updatedContents={"hello"} />
           </div>
         </header>
         <div className="prose prose-slate max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
-          <Markdown content={props.contents.replaceAll("\n", "\n\n") || ""} />
+          <Markdown content={currentContents.replaceAll("\n", "\n\n") || ""} />
         </div>
         <div className="sr-only" aria-live="assertive">
           {feedbackMessage}

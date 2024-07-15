@@ -81,8 +81,10 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
             ? chatFiles.map(document => (
                 <ChatFileTranscription
                   key={document.id}
+                  documentId={document.id}
                   name={document.name}
                   contents={document.contents || ""}
+                  updatedContents={document.updatedContents || "hello"}
                   vtt={document.extraContents || ""}
                 />
               ))

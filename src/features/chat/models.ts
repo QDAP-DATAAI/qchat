@@ -131,6 +131,7 @@ export interface ChatDocumentModel {
   createdAt: Date
   contents?: string
   extraContents?: string
+  updatedContents?: string
   type: ChatRecordType.Document
   filePath: string
   title: string
