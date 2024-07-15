@@ -1,5 +1,5 @@
 import { DownloadIcon, CaptionsIcon, FileTextIcon } from "lucide-react"
-import { FC, useState } from "react"
+import { FC, useState, useEffect } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -13,11 +13,13 @@ import {
 import { CopyButton } from "@/features/ui/assistant-buttons"
 import { CheckTranscriptionButton } from "@/features/ui/assistant-buttons/rewrite-message-button"
 import { Button } from "@/features/ui/button"
+import { Textarea } from "@/features/ui/textarea"
 import { useWindowSize } from "@/features/ui/windowsize"
 
-import { SaveButton } from "./chat-transcript-change"
+import { ChangeTranscriptButton } from "./chat-transcript-change"
 
 interface ChatFileTranscriptionProps {
+  chatThreadId: string
   documentId: string
   name: string
   contents: string
@@ -29,17 +31,23 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   const { chatBody, setInput } = useChatContext()
   const [feedbackMessage, setFeedbackMessage] = useState("")
   const [editorContents, setEditorContents] = useState(props.updatedContents || props.contents)
+  const [displayedContents, setDisplayedContents] = useState(props.updatedContents || props.contents)
   const fileTitle = props.name.replace(/[^a-zA-Z0-9]/g, " ").trim()
+
+  useEffect(() => {
+    setEditorContents(props.updatedContents || props.contents)
+    setDisplayedContents(props.updatedContents || props.contents)
+  }, [props.updatedContents, props.contents])
 
   const onDownloadTranscription = async (): Promise<void> => {
     const fileName = `${fileTitle}-transcription.docx`
-    await convertTranscriptionToWordDocument([editorContents], fileName)
+    const chatThreadName = chatBody.chatThreadName || `${APP_NAME} ${fileName}`
+    await convertTranscriptionToWordDocument([displayedContents], props.name, fileName, APP_NAME, chatThreadName)
   }
 
   const onDownloadReport = async (): Promise<void> => {
     const fileName = `${fileTitle}-report.docx`
-    const chatThreadName = chatBody.chatThreadName || `${APP_NAME} ${fileName}`
-    await convertTranscriptionReportToWordDocument([editorContents], props.name, fileName, APP_NAME, chatThreadName)
+    await convertTranscriptionReportToWordDocument([displayedContents], fileName)
   }
 
   const onDownloadVttFile = (): void => {
@@ -64,10 +72,18 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
     iconSize = 16
   }
 
+  const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+    setEditorContents(e.target.value)
+  }
+
+  const handleSave = (): void => {
+    setDisplayedContents(editorContents)
+  }
+
   return (
-    <article className="container mx-auto flex flex-col py-1 pb-4">
-      <section className="flex-col gap-4 overflow-hidden rounded-md bg-background p-4">
-        <header className="flex w-full items-center justify-between">
+    <div className="container mx-auto flex flex-col py-1 pb-4">
+      <div className="flex-col gap-4 overflow-hidden rounded-md bg-background p-4">
+        <div className="flex w-full items-center justify-between">
           <Typography variant="h3">{fileTitle}</Typography>
           <div className="container flex w-full gap-4 p-2">
             <Button
@@ -104,31 +120,39 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
             )}
             <CheckTranscriptionButton transcription={editorContents} onAssistantButtonClick={setInput} />
             <CopyButton message={editorContents} onFeedbackChange={setFeedbackMessage} />
-            <SaveButton documentId={props.documentId} updatedContents={editorContents} />
           </div>
-        </header>
-        <div>
-          {" "}
-          <textarea
+        </div>
+        <div className="mt-4 flex justify-end">
+          <Textarea
             title="Editor Contents"
             value={editorContents}
-            onChange={e => setEditorContents(e.target.value)}
-            className="h-64 w-1/2 rounded border border-gray-300 p-2"
+            onChange={handleEditorChange}
+            className="h-64 w-full rounded border border-gray-300 p-2"
+          />
+        </div>
+        <div className="m-4 flex justify-end p-2">
+          <ChangeTranscriptButton
+            documentId={props.documentId}
+            chatThreadId={props.chatThreadId}
+            updatedContents={editorContents}
+            onSave={handleSave}
           />
         </div>
         <div className="flex gap-4">
           <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
+            <Typography variant="h4">Original Transcription</Typography>
             <Markdown content={props.contents.replace(/\n/g, "\n\n")} />
           </div>
           <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
-            <Markdown content={props.updatedContents.replace(/\n/g, "\n\n")} />
+            <Typography variant="h4">Updated Transcription</Typography>
+            <Markdown content={displayedContents.replace(/\n/g, "\n\n")} />
+          </div>
+          <div className="sr-only" aria-live="assertive">
+            {feedbackMessage}
           </div>
         </div>
-        <div className="sr-only" aria-live="assertive">
-          {feedbackMessage}
-        </div>
-      </section>
-    </article>
+      </div>
+    </div>
   )
 }
 

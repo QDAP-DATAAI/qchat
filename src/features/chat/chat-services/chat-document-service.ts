@@ -262,6 +262,7 @@ export const FindAllChatDocumentsForCurrentUser = async (
 
 export const UpdateChatDocument = async (
   documentId: string,
+  chatThreadId: string,
   updatedContents: string
 ): ServerActionResponseAsync<ChatDocumentModel> => {
   try {
@@ -279,7 +280,7 @@ export const UpdateChatDocument = async (
 
     const updatedDocument: ChatDocumentModel = {
       ...resource,
-      contents: updatedContents,
+      updatedContents: updatedContents,
     }
 
     const { resource: updatedResource } = await container.items.upsert<ChatDocumentModel>(updatedDocument)
@@ -291,7 +292,7 @@ export const UpdateChatDocument = async (
       }
     }
 
-    await deleteDocumentById(documentId, userId, tenantId)
+    await deleteDocumentById(documentId, chatThreadId, userId, tenantId)
 
     const splitDocuments = chunkDocumentWithOverlap(updatedContents)
 
@@ -302,10 +303,10 @@ export const UpdateChatDocument = async (
       }
     }
 
-    const path = `${APP_URL}/chat/${resource.chatThreadId}`
+    const path = `${APP_URL}/chat/${chatThreadId}`
     const documentsToIndex: AzureCogDocumentIndex[] = splitDocuments.map((docContent, index) => ({
       id: uniqueId(),
-      chatThreadId: resource.chatThreadId,
+      chatThreadId: chatThreadId,
       userId,
       pageContent: docContent,
       order: index + 1,
