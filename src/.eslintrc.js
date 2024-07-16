@@ -7,7 +7,7 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "prettier",
   ],
-  plugins: ["@typescript-eslint", "no-relative-import-paths", "import", "react-perf"],
+  plugins: ["@typescript-eslint", "no-relative-import-paths", "import"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: "latest",
@@ -87,8 +87,5 @@ module.exports = {
       },
     ],
     "no-else-return": ["warn", { allowElseIf: false }],
-    "react-perf/jsx-no-new-object-as-prop": "warn",
-    "react-perf/jsx-no-new-array-as-prop": "warn",
-    "react-perf/jsx-no-new-function-as-prop": "warn",
   },
 }
