@@ -144,8 +144,8 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
             <Markdown content={props.contents.replace(/\n/g, "\n\n")} />
           </div>
           <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
-            <Typography variant="h4">Updated Transcription</Typography>
-            <Markdown content={displayedContents.replace(/\n/g, "\n\n")} />
+            <Typography variant="h4">Updated Transcription with Speaker Preview</Typography>
+            <Markdown content={"**Speaker:** " + displayedContents.replace(/\n/g, "\n\n**Speaker:** ")} />
           </div>
           <div className="sr-only" aria-live="assertive">
             {feedbackMessage}
