@@ -12,6 +12,7 @@ const getContainer = async (
   config: CosmosConfig
 ): Promise<Container> => {
   const client = await createCosmosClient(config)
+  logger.info(`🚀 > getContainer > new instance of ${containerName}`)
   const { database } = await client.databases.createIfNotExists({ id: config.dbName })
   const { container } = await database.containers.createIfNotExists({ id: containerName, partitionKey })
   return container

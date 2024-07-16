@@ -1,3 +1,4 @@
+import logger from "@/features/insights/app-insights"
 import { CosmosClient } from "@azure/cosmos"
 
 let _cosmosAccessToken: string | null = null
@@ -19,9 +20,13 @@ export const getCosmosAccessToken = async ({ endpoint, key }: CosmosConfig): Pro
       cache: "reload",
     })
 
-    if (!response.ok) throw new Error(`${response.statusText}`)
+    if (!response.ok) {
+      logger.error(`🚀 > getCosmosAccessToken > ${response.status} ${response.statusText}`)
+      throw new Error(`${response.statusText}`)
+    }
 
     _cosmosAccessToken = await response.text()
+    logger.info(`🚀 > getCosmosAccessToken > ${_cosmosAccessToken}`)
     return await response.text()
   } catch (error) {
     throw new Error(`Failed to fetch Cosmos Auth Token: ${JSON.stringify(error)}`)
@@ -30,10 +35,11 @@ export const getCosmosAccessToken = async ({ endpoint, key }: CosmosConfig): Pro
 
 export const isTokenExpired = (authToken: string | null = _cosmosAccessToken): boolean => {
   try {
+    return true
     if (!authToken) return true
-    const expiry = JSON.parse(Buffer.from(authToken.split(".")[1], "base64").toString()).exp
-    const currentTime = Math.floor(Date.now() / 1000) // in seconds
-    return expiry <= currentTime
+    // const expiry = JSON.parse(Buffer.from(authToken.split(".")[1], "base64").toString()).exp
+    // const currentTime = Math.floor(Date.now() / 1000) // in seconds
+    // return expiry <= currentTime
   } catch (error) {
     throw new Error(`Failed to check token expiry: ${error}`)
   }
