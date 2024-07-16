@@ -215,7 +215,6 @@ export const UpdateChatDocument = async (
         errors: [{ message: "Document not found" }],
       }
     }
-
     const updatedDocument: ChatDocumentModel = {
       ...resource,
       updatedContents: updatedContents,

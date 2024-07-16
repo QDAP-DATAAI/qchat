@@ -76,22 +76,26 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   }
 
   const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
-    setEditorContents(e.target.value)
+    const newEditorContents = e.target.value
+    setEditorContents(newEditorContents)
+    const newAccuracy = calculateAccuracy(newEditorContents)
+    setAccuracy(newAccuracy)
   }
 
   const handleSave = (): void => {
-    setDisplayedContents(editorContents)
-    calculateAccuracy()
+    const newDisplayedContents = editorContents
+    setDisplayedContents(newDisplayedContents)
+    const newAccuracy = calculateAccuracy(newDisplayedContents)
+    setAccuracy(newAccuracy)
   }
 
-  const calculateAccuracy = (): void => {
+  const calculateAccuracy = (updatedContents: string): number => {
     const normalize = (str: string): string => str.trim().replace(/\s+/g, " ")
     const normalizedOriginal = normalize(props.contents)
-    const normalizedUpdated = normalize(editorContents)
+    const normalizedUpdated = normalize(updatedContents)
 
     if (normalizedOriginal === normalizedUpdated) {
-      setAccuracy(100)
-      return
+      return 100
     }
 
     const originalWords = normalizedOriginal.split(/\s+/).length
@@ -100,16 +104,17 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
       .filter(part => part.added || part.removed)
       .reduce((acc, part) => acc + part.value.split(/\s+/).length, 0)
 
-    const accuracyScore = ((originalWords - changedWords) / originalWords) * 100
-    setAccuracy(accuracyScore)
+    return ((originalWords - changedWords) / originalWords) * 100
   }
 
   return (
     <div className="container mx-auto flex flex-col py-1 pb-4">
       <div className="flex-col gap-4 overflow-hidden rounded-md bg-background p-4">
-        <div className="flex w-full items-center justify-between">
-          <Typography variant="h3">{fileTitle}</Typography>
-          <div className="container flex w-full gap-4 p-2">
+        <div className="flex w-full items-center justify-end">
+          <Typography variant="h3" className="w-full">
+            Transcription of: {fileTitle}
+          </Typography>
+          <div className="container flex w-full justify-end gap-4 p-2">
             <Button
               ariaLabel="Download Transcription"
               variant={"ghost"}
@@ -159,7 +164,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
             documentId={props.documentId}
             chatThreadId={props.chatThreadId}
             updatedContents={editorContents}
-            accuracy={accuracy ?? 0}
+            accuracy={accuracy}
             onSave={handleSave}
           />
         </div>

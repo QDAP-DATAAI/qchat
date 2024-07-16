@@ -1,6 +1,6 @@
 "use client"
 import { SaveIcon } from "lucide-react"
-import React, { useState } from "react"
+import React from "react"
 
 import { UpdateChatDocument } from "@/features/chat/chat-services/chat-document-service"
 import { showError, showSuccess } from "@/features/globals/global-message-store"
@@ -23,10 +23,8 @@ export const ChangeTranscriptButton: React.FC<ChangeTranscriptButtonProps> = ({
   onSave,
 }) => {
   const { iconSize, buttonClass } = useButtonStyles()
-  const [saveClicked, setSaveClicked] = useState(false)
 
   const handleSaveButton = async (): Promise<void> => {
-    setSaveClicked(true)
     try {
       const response = await UpdateChatDocument(documentId, chatThreadId, updatedContents, accuracy)
       if (response.status !== "OK") {
@@ -37,10 +35,6 @@ export const ChangeTranscriptButton: React.FC<ChangeTranscriptButtonProps> = ({
     } catch (err) {
       const error = err instanceof Error ? err.message : "Something went wrong and the document has not been saved."
       showError(error)
-    } finally {
-      setTimeout(() => {
-        setSaveClicked(false)
-      }, 2000)
     }
   }
 
@@ -49,7 +43,7 @@ export const ChangeTranscriptButton: React.FC<ChangeTranscriptButtonProps> = ({
       ariaLabel="Save changes"
       variant={"default"}
       size={"default"}
-      className={`${buttonClass} ${saveClicked ? "mr-2 bg-button text-buttonText" : ""}`}
+      className={`${buttonClass}`}
       title="Save changes"
       onClick={handleSaveButton}
     >
