@@ -1,5 +1,5 @@
 import { DownloadIcon, CaptionsIcon, FileTextIcon } from "lucide-react"
-import { FC, useState, useCallback, useMemo } from "react"
+import { FC, useCallback, useState } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -14,20 +14,22 @@ import { CopyButton } from "@/features/ui/assistant-buttons"
 import { CheckTranscriptionButton } from "@/features/ui/assistant-buttons/rewrite-message-button"
 import { Button } from "@/features/ui/button"
 import { useWindowSize } from "@/features/ui/windowsize"
+
 interface ChatFileTranscriptionProps {
   name: string
   contents: string
   vtt: string
 }
+
 export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   const { chatBody, setInput } = useChatContext()
   const [feedbackMessage, setFeedbackMessage] = useState("")
-  const fileTitle = useMemo(() => props.name.replace(/[^a-zA-Z0-9]/g, " ").trim(), [props.name])
+  const fileTitle = props.name.replace(/[^a-zA-Z0-9]/g, " ").trim()
 
   const onDownloadTranscription = useCallback(async (): Promise<void> => {
     const fileName = `${fileTitle}-transcription.docx`
     await convertTranscriptionToWordDocument([props.contents], fileName)
-  }, [fileTitle, props.contents])
+  }, [props.contents, fileTitle])
 
   const onDownloadReport = useCallback(async (): Promise<void> => {
     const fileName = `${fileTitle}-report.docx`
@@ -46,20 +48,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   }, [fileTitle, props.vtt])
 
   const { width } = useWindowSize()
-  const { iconSize, buttonClass } = useMemo(() => {
-    let iconSize = 10
-    let buttonClass = "h-9"
-
-    if (width < 768) {
-      buttonClass = "h-7"
-    } else if (width >= 768 && width < 1024) {
-      iconSize = 12
-    } else if (width >= 1024) {
-      iconSize = 16
-    }
-
-    return { iconSize, buttonClass }
-  }, [width])
+  const { iconSize, buttonClass } = getIconSize(width)
 
   return (
     <article className="container mx-auto flex flex-col py-1 pb-4">
@@ -87,6 +76,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
             >
               <FileTextIcon size={iconSize} />
             </Button>
+
             {props.vtt.length > 0 && (
               <Button
                 ariaLabel="Download WebVTT subtitles file"
@@ -99,6 +89,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
                 <CaptionsIcon size={iconSize} />
               </Button>
             )}
+
             <CheckTranscriptionButton transcription={props.contents} onAssistantButtonClick={setInput} />
             <CopyButton message={props.contents} onFeedbackChange={setFeedbackMessage} />
           </div>
@@ -113,10 +104,19 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
     </article>
   )
 }
+
 const toBinaryBase64 = (text: string): string => {
   const codeUnits = new Uint16Array(text.length)
   for (let i = 0; i < codeUnits.length; i++) {
     codeUnits[i] = text.charCodeAt(i)
   }
+
   return btoa(String.fromCharCode(...new Uint8Array(codeUnits.buffer)))
+}
+
+const getIconSize = (width: number): { iconSize: number; buttonClass: string } => {
+  if (width < 768) return { iconSize: 10, buttonClass: "h-7" }
+  if (width >= 768 && width < 1024) return { iconSize: 12, buttonClass: "h-9" }
+  if (width >= 1024) return { iconSize: 16, buttonClass: "h-9" }
+  return { iconSize: 10, buttonClass: "h-9" }
 }

@@ -97,10 +97,13 @@ export const MenuItems: FC = () => {
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null)
   const [modalType, setModalType] = useState<"edit" | "delete" | null>(null)
 
-  const handleOpenModal = useCallback((chatThreadId: string, type: "edit" | "delete") => {
-    setSelectedThreadId(chatThreadId)
-    setModalType(type)
-  }, [])
+  const handleOpenModal = useCallback(
+    (chatThreadId: string, type: "edit" | "delete") => () => {
+      setSelectedThreadId(chatThreadId)
+      setModalType(type)
+    },
+    []
+  )
 
   const handleCloseModal = useCallback(() => {
     setSelectedThreadId(null)
@@ -155,7 +158,7 @@ export const MenuItems: FC = () => {
           size="sm"
           variant="accent"
           ariaLabel={`Rename ${thread.name}`}
-          onClick={() => handleOpenModal(thread.chatThreadId, "edit")}
+          onClick={handleOpenModal(thread.chatThreadId, "edit")}
         >
           <PencilIcon size={16} />
         </Button>
@@ -164,7 +167,7 @@ export const MenuItems: FC = () => {
           size="sm"
           variant="destructive"
           ariaLabel={`Delete ${thread.name}`}
-          onClick={() => handleOpenModal(thread.chatThreadId, "delete")}
+          onClick={handleOpenModal(thread.chatThreadId, "delete")}
         >
           <TrashIcon size={16} />
         </Button>

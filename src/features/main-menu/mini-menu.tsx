@@ -1,101 +1,95 @@
 "use client"
 
-import { X, LogOut, LogIn, Sun, Moon } from "lucide-react"
+import { UrlObject } from "url"
+
+import { CloudUpload, SpellCheck2, X, LogIn, LogOut, Moon, Sun, Home, Bookmark, UserCog } from "lucide-react"
 import Link from "next/link"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { useTheme } from "next-themes"
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useState } from "react"
+
+import { signInProvider } from "@/app-global"
 
 import Typography from "@/components/typography"
 import { cn } from "@/lib/utils"
 
-import { useMenuContext } from "./menu-context"
+interface MiniMenuItemProps extends React.HTMLAttributes<HTMLAnchorElement> {
+  href: UrlObject | string
+  icon: React.ElementType
+  name: string
+  ariaLabel: string
+  closeMenu: () => void
+}
 
-import { MenuItem, menuItems } from "@/app/menus"
-
-const MiniMenuItem: React.FC<MenuItem & { _closeMenu: () => void }> = ({
-  href,
-  icon: Icon,
-  name,
-  ariaLabel,
-  _closeMenu,
-}) => {
+const MiniMenuItem: React.FC<MiniMenuItemProps> = ({ href, icon: Icon, name, ariaLabel, closeMenu, ...props }) => {
   const menuItemClass = cn(
-    "cursor-pointer px-6 py-2 hover:bg-accent hover:text-accent-foreground flex items-center whitespace-nowrap"
+    "cursor-pointer px-6 py-2 hover:bg-accent hover:text-accent-foreground flex items-center whitespace-nowrap",
+    props.className
   )
 
-  const handleClick = useCallback(() => {
-    _closeMenu()
-  }, [_closeMenu])
-
   return (
-    <Link href={href} passHref>
-      <div className={menuItemClass} role="button" tabIndex={0} aria-label={ariaLabel} onClick={handleClick}>
+    <Link href={href} passHref={true} onClick={closeMenu}>
+      <div className={menuItemClass} role="button" tabIndex={0} aria-label={ariaLabel}>
         <Icon className="mr-2 size-4" aria-hidden="true" />
         {name}
+        <span className="hidden"></span>
       </div>
     </Link>
   )
 }
 
 export const MiniMenu: React.FC = () => {
-  const { isMenuOpen, toggleMenu } = useMenuContext()
-  const { data: session } = useSession()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { data: session } = useSession({ required: false })
   const { theme, setTheme } = useTheme()
 
-  const toggleTheme = useCallback(() => {
-    setTheme(theme === "light" ? "dark" : "light")
-  }, [theme, setTheme])
-  const handleMenuClose = useCallback(() => {
-    if (isMenuOpen) {
-      toggleMenu()
-    }
-  }, [isMenuOpen, toggleMenu])
-
-  const authenticatedItems = useMemo(() => {
-    return menuItems.filter(item => item.condition !== "authenticated" || session)
-  }, [session])
-
-  const handleSignOut = useCallback(async () => {
+  const toggleMenu = useCallback(() => setIsMenuOpen(prev => !prev), [])
+  const toggleThemeAndClose = useCallback(() => {
+    setIsMenuOpen(prev => !prev)
+    setTheme(prev => (prev === "light" ? "dark" : "light"))
+  }, [setTheme])
+  const signout = useCallback(async () => {
     await signOut({ callbackUrl: "/" })
-    handleMenuClose()
-  }, [handleMenuClose])
+    setIsMenuOpen(false)
+  }, [])
+  const signin = useCallback(async () => {
+    await signIn(signInProvider)
+    setIsMenuOpen(false)
+  }, [])
 
-  const handleSignIn = useCallback(async () => {
-    await signIn()
-    handleMenuClose()
-  }, [handleMenuClose])
+  const menuItems = [
+    { name: "Home", href: "/chat", icon: Home, ariaLabel: "Navigate to home page" },
+    { name: "Settings", href: "/settings", icon: UserCog, ariaLabel: "Navigate to settings" },
+    { name: "Prompt Guide", href: "/prompt-guide", icon: Bookmark, ariaLabel: "Navigate to prompt guide" },
+    { name: "What's New", href: "/whats-new", icon: CloudUpload, ariaLabel: "Navigate to what's new page" },
+    {
+      name: "Factual Errors",
+      href: "/hallucinations",
+      icon: SpellCheck2,
+      ariaLabel: "Help with factual errors",
+    },
+  ]
 
   return (
     <>
-      {isMenuOpen ? (
-        <div
-          onClick={toggleMenu}
-          className="h-full cursor-pointer flex-col items-center justify-center border-accent text-darkAltButton hover:bg-background hover:underline"
-          aria-expanded="true"
-          aria-label="Close menu"
-          role="button"
-          tabIndex={0}
-        >
+      <div
+        onClick={toggleMenu}
+        className="h-full cursor-pointer flex-col items-center justify-center border-accent text-darkAltButton hover:bg-background hover:underline"
+        aria-expanded="false"
+        aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+        role="button"
+        tabIndex={0}
+      >
+        {isMenuOpen ? (
           <X className="items-center hover:bg-link" aria-hidden="true" />
-          Menu
-        </div>
-      ) : (
-        <div
-          onClick={toggleMenu}
-          className="h-full cursor-pointer flex-col items-center justify-center border-accent text-darkAltButton hover:bg-background hover:underline"
-          aria-expanded="false"
-          aria-label="Open menu"
-          role="button"
-          tabIndex={0}
-        >
+        ) : (
           <div
             className="hover:text-darkAltButtonHover rounded-md pl-2 text-darkAltButton hover:bg-buttonHover"
             aria-hidden="true"
           />
-          Menu
-        </div>
-      )}
+        )}
+        Menu
+      </div>
       {isMenuOpen && (
         <div className="fixed inset-0 z-[99999] bg-altBackground text-link" role="dialog" aria-modal="true">
           <div className="absolute right-0 top-0 m-4 h-2/6">
@@ -113,11 +107,11 @@ export const MiniMenu: React.FC = () => {
             Menu
           </Typography>
           <div className="mt-16 p-2">
-            {authenticatedItems.map(item => (
-              <MiniMenuItem key={item.name} _closeMenu={handleMenuClose} {...item} />
+            {menuItems.map(item => (
+              <MiniMenuItem key={item.name} closeMenu={toggleMenu} {...item} />
             ))}
             <div
-              onClick={toggleTheme}
+              onClick={toggleThemeAndClose}
               className="flex cursor-pointer items-center whitespace-nowrap px-6 py-2 text-link hover:bg-accent hover:text-accent-foreground"
               aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               role="button"
@@ -128,7 +122,7 @@ export const MiniMenu: React.FC = () => {
             </div>
             {session ? (
               <div
-                onClick={handleSignOut}
+                onClick={signout}
                 className="flex cursor-pointer items-center whitespace-nowrap px-6 py-2 hover:bg-accent hover:text-accent-foreground"
                 aria-label="Logout"
                 role="button"
@@ -139,7 +133,7 @@ export const MiniMenu: React.FC = () => {
               </div>
             ) : (
               <div
-                onClick={handleSignIn}
+                onClick={signin}
                 className="flex cursor-pointer items-center whitespace-nowrap px-6 py-2 hover:bg-accent hover:text-accent-foreground"
                 aria-label="Login"
                 role="button"

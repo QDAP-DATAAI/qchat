@@ -1,6 +1,6 @@
 import { Loader, Send, StopCircle } from "lucide-react"
 import { getSession } from "next-auth/react"
-import { FC, FormEvent, useRef, useMemo } from "react"
+import { FC, FormEvent, useRef, useCallback } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -15,68 +15,71 @@ import ChatInputMenu from "./chat-input-menu"
 interface Props {}
 
 const ChatInput: FC<Props> = () => {
-  const { setInput, handleSubmit, isLoading, input, chatBody, isModalOpen, messages, fileState, stop } =
-    useChatContext()
+  const { setInput, handleSubmit, isLoading, input, chatBody, messages, fileState, stop } = useChatContext()
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const isDataChat = useMemo(() => chatBody.chatType === "data" || chatBody.chatType === "audio", [chatBody.chatType])
+  const isDataChat = chatBody.chatType === "data" || chatBody.chatType === "audio"
   const fileChatVisible = (chatBody.chatType === "data" || chatBody.chatType === "audio") && chatBody.chatOverFileName
 
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Australia/Brisbane"
-  const getNameInline = async (): Promise<string> => {
-    const session = await getSession()
-    const name = session?.user?.name || "You"
-    return name
-  }
-
-  const getFormattedDateTime = (): string => {
-    const date = new Date()
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      timeZone: timeZone,
+  const exportDocument = useCallback(async (): Promise<void> => {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Australia/Brisbane"
+    const getNameInline = async (): Promise<string> => {
+      const session = await getSession()
+      const name = session?.user?.name || "You"
+      return name
     }
-    const formattedDate = new Intl.DateTimeFormat("en-AU", options).format(date)
-    return formattedDate.split(",").join("_").split(" ").join("_").split(":").join("_")
-  }
 
-  const exportDocument = async (): Promise<void> => {
+    const getFormattedDateTime = (): string => {
+      const date = new Date()
+      const options: Intl.DateTimeFormatOptions = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        timeZone: timeZone,
+      }
+      const formattedDate = new Intl.DateTimeFormat("en-AU", options).format(date)
+      return formattedDate.split(",").join("_").split(" ").join("_").split(":").join("_")
+    }
     const fileName = APP_NAME + ` Export_${getFormattedDateTime()}.docx`
     const userName = await getNameInline()
     const chatThreadName = chatBody.chatThreadName || APP_NAME + ` Export_${getFormattedDateTime()}.docx`
     await convertMarkdownToWordDocument(messages, fileName, APP_NAME, userName, chatThreadName)
-  }
+  }, [chatBody.chatThreadName, messages])
 
-  const submit = (e: FormEvent<HTMLFormElement>): void => {
-    e.preventDefault()
-    if (isLoading) {
-      stop()
-    } else if (!isModalOpen && !fileState.isUploadingFile) {
-      handleSubmit(e)
-      setInput("")
-    }
-  }
-
-  const onChange = (event: React.ChangeEvent<HTMLTextAreaElement>): void => {
-    setInput(event.target.value)
-  }
-
-  const onKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>): void => {
-    if (event.key === "Enter" && !event.shiftKey && !isModalOpen) {
-      event.preventDefault()
-      if (!isLoading && !fileState.isUploadingFile) {
-        handleSubmit(event as unknown as FormEvent<HTMLFormElement>)
+  const submit = useCallback(
+    (e: FormEvent<HTMLFormElement>): void => {
+      e.preventDefault()
+      if (isLoading) {
+        stop()
+        return
+      }
+      if (!fileState.isUploadingFile) {
+        handleSubmit(e)
         setInput("")
       }
-    }
-  }
+    },
+    [handleSubmit, isLoading, setInput, stop, fileState.isUploadingFile]
+  )
 
-  if (isModalOpen) {
-    return null
-  }
+  const onChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>): void => setInput(event.target.value),
+    [setInput]
+  )
+
+  const onKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLTextAreaElement>): void => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault()
+        if (!isLoading && !fileState.isUploadingFile) {
+          handleSubmit(event as unknown as FormEvent<HTMLFormElement>)
+          setInput("")
+        }
+      }
+    },
+    [handleSubmit, isLoading, setInput, fileState.isUploadingFile]
+  )
 
   return (
     <form onSubmit={submit} className="absolute bottom-0 z-70 flex w-full items-center">

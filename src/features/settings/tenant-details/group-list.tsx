@@ -136,14 +136,14 @@ const DeleteGroupDialog: React.FC<{
   onConfirm: (group: string) => Promise<void>
   onClose: () => void
 }> = ({ group, loading, onConfirm, onClose }) => {
-  const handleConfirm = useCallback(async () => {
+  const handleConfirm = async (): Promise<void> => {
     try {
       await onConfirm(group)
       onClose()
     } catch (error) {
       logger.error("Error confirming group", { error })
     }
-  }, [onConfirm, onClose, group])
+  }
 
   return (
     <div

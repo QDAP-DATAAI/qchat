@@ -15,7 +15,7 @@ import { SmartGen } from "@/features/ui/smart-gen"
 import { Textarea } from "@/features/ui/textarea"
 import { UserPreferences } from "@/features/user-management/models"
 
-type UserDetailsFormProps = { preferences: UserPreferences; name: string; email: string }
+export type UserDetailsFormProps = { preferences: UserPreferences; name: string; email: string }
 
 export const UserDetailsForm: React.FC<UserDetailsFormProps> = ({ preferences, name, email }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)

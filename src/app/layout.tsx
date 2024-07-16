@@ -22,7 +22,7 @@ import { Header } from "./header"
 
 import "./globals.css"
 
-const notoSans = Noto_Sans({ subsets: ["latin"] })
+const notoSans = Noto_Sans({ subsets: ["latin"], display: "swap" })
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),

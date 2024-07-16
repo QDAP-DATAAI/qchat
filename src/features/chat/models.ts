@@ -1,4 +1,3 @@
-import { TextCategoriesAnalysisOutput } from "@azure-rest/ai-content-safety"
 import { Message } from "ai"
 
 export enum ConversationStyle {
@@ -111,7 +110,7 @@ export interface PromptBody {
 }
 
 export interface PromptMessage extends Message {
-  contentFilterResult?: TextCategoriesAnalysisOutput
+  contentFilterResult?: { category: string; severity: number }
   sentiment?: ChatSentiment
   feedback?: FeedbackType
   reason?: string

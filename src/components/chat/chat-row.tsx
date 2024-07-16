@@ -1,7 +1,7 @@
 "use client"
 
 import { OctagonAlert, SearchX } from "lucide-react"
-import React, { FC, useState, useMemo, useCallback } from "react"
+import React, { FC, useState } from "react"
 
 import ErrorBoundary from "@/components/error-boundary"
 import { Markdown } from "@/components/markdown/markdown"
@@ -20,57 +20,37 @@ interface ChatRowProps {
   chatThreadId: string
   showAssistantButtons: boolean
   threadLocked?: boolean
-  disableButtons?: boolean
+  disableButtons?: boolean // Add this prop
 }
 
-const ChatRow: FC<ChatRowProps> = ({
-  chatMessageId,
-  name,
-  message,
-  type,
-  chatThreadId,
-  showAssistantButtons,
-  threadLocked,
-  disableButtons,
-}) => {
+export const ChatRow: FC<ChatRowProps> = props => {
   const { setInput } = useChatContext()
-  const [feedbackMessage, setFeedbackMessage] = useState<string>("")
-  const content = useMemo(
-    () => (type === "assistant" ? message.content : `**${name || "You"}**: ${message.content}`),
-    [type, message.content, name]
-  )
+  const [feedbackMessage, setFeedbackMessage] = useState("")
+  const content =
+    props.type === "assistant" ? props.message.content : `**${props.name || "You"}**: ${props.message.content}`
 
-  const fleschScore = useMemo(() => calculateFleschKincaidScore(message.content), [message.content])
-
-  const handleAssistantButtonClick = useCallback(
-    (result: string) => {
-      setInput(result)
-    },
-    [setInput]
-  )
+  const fleschScore = calculateFleschKincaidScore(props.message.content)
 
   return (
-    <article className="container mx-auto flex flex-col py-1 pb-2">
+    <article className={"container mx-auto flex flex-col py-1 pb-2"}>
       <ErrorBoundary fallback={<ErrorSection />}>
         <section
-          className={`prose prose-slate max-w-full flex-col gap-4 overflow-hidden break-words rounded-md px-4 py-2 text-base text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base ${
-            threadLocked ? "border-4 border-error" : ""
-          } ${type === "assistant" ? "bg-backgroundShade" : "bg-altBackgroundShade"}`}
+          className={`prose prose-slate max-w-full flex-col gap-4 overflow-hidden break-words rounded-md px-4 py-2 text-base text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base ${props.threadLocked && "border-4 border-error"} ${props.type === "assistant" && "bg-backgroundShade"} ${props.type != "assistant" && "bg-altBackgroundShade"}`}
         >
-          {type === "assistant" && (
+          {props.type === "assistant" && (
             <div className="flex w-full items-center justify-between">
               <Typography variant="h3" className="m-0 flex-1 text-heading" tabIndex={0}>
-                {name}
+                {props.name}
               </Typography>
               <div className="flex items-center gap-4">
-                {showAssistantButtons && !disableButtons && (
+                {props.showAssistantButtons && !props.disableButtons && (
                   <AssistantButtons
                     fleschScore={fleschScore}
-                    message={message}
-                    chatThreadId={chatThreadId}
-                    chatMessageId={chatMessageId}
+                    message={props.message}
+                    chatThreadId={props.chatThreadId}
+                    chatMessageId={props.chatMessageId}
                     onFeedbackChange={setFeedbackMessage}
-                    onAssistantButtonClick={handleAssistantButtonClick}
+                    onAssistantButtonClick={setInput}
                   />
                 )}
               </div>
@@ -82,17 +62,16 @@ const ChatRow: FC<ChatRowProps> = ({
           >
             <div className="size-full items-center justify-between">
               <Markdown content={content} />
-
-              {message.contentFilterResult && !disableButtons && (
+              {!!props.message.contentFilterResult && !props.disableButtons && (
                 <RewriteMessageButton
                   fleschScore={fleschScore}
-                  message={message}
-                  onAssistantButtonClick={handleAssistantButtonClick}
+                  message={props.message}
+                  onAssistantButtonClick={setInput}
                 />
               )}
             </div>
           </div>
-          {message?.contentFilterResult && typeof message.contentFilterResult === "object" && (
+          {!!props.message?.contentFilterResult && (
             <div
               className="my-2 flex max-w-none justify-center space-x-2 rounded-md bg-alert p-2 text-base text-primary md:text-base"
               tabIndex={0}
@@ -118,10 +97,9 @@ const ChatRow: FC<ChatRowProps> = ({
     </article>
   )
 }
-
 export default ChatRow
 
-const ErrorSection: FC = () => (
+const ErrorSection = (): JSX.Element => (
   <div
     className="my-2 flex max-w-none justify-center space-x-2 rounded-md bg-backgroundShade p-2 text-base text-text md:text-base"
     tabIndex={0}

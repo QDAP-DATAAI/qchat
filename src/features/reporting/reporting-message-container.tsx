@@ -1,8 +1,8 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { useSession } from "next-auth/react"
-import { FC, useEffect, useRef, useState, useCallback } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 
 import { APP_NAME } from "@/app-global"
 
@@ -21,7 +21,6 @@ interface Props {
 }
 export const ReportingMessageContainer: FC<Props> = ({ chatThreadId }) => {
   const { data: session } = useSession()
-  const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
   const { messages, documents, isLoading, chatThreadLocked } = useChatContext()
   const [selectedTab, setSelectedTab] = useState<SectionTabsProps["selectedTab"]>("chat")
@@ -29,45 +28,22 @@ export const ReportingMessageContainer: FC<Props> = ({ chatThreadId }) => {
   useChatScrollAnchor(messages, scrollRef, true)
 
   useEffect(() => {
-    if (!isLoading) {
-      router.refresh()
-    }
-  }, [isLoading, router])
-
-  useEffect(() => {
-    if (!isLoading) {
-      setSelectedTab("chat")
-    }
+    if (isLoading) return
+    setSelectedTab("chat")
   }, [isLoading])
 
   const chatFiles = documents.filter(document => document.contents)
 
-  const handleBackToReporting = useCallback((): void => {
-    router.push("/settings/history")
-  }, [router])
-
-  const handleBackToChat = useCallback((): void => {
-    router.push(`/chat/${chatThreadId}`)
-  }, [router, chatThreadId])
-
   return (
     <div className="h-full overflow-y-auto" ref={scrollRef}>
-      <div className="my-4 flex flex-1 flex-col">
-        <div className="container mx-auto grid grid-cols-5 items-center">
-          <div className="col-span-1 justify-start">
-            <Button variant="outline" onClick={handleBackToReporting}>
-              Back to Reporting
-            </Button>
-          </div>
-          <div className="col-span-3 justify-center">
-            <ChatHeader />
-          </div>
-          <div className="col-span-1 justify-self-end">
-            <Button variant="outline" onClick={handleBackToChat}>
-              {chatThreadLocked ? "Continue this chat" : "View this chat"}
-            </Button>
-          </div>
-        </div>
+      <div className="container my-4 flex items-center justify-between">
+        <Button asChild variant="outline">
+          <Link href={"/settings/history"}>Back to Reporting</Link>
+        </Button>
+        <ChatHeader />
+        <Button asChild variant="outline">
+          <Link href={`/chat/${chatThreadId}`}>{chatThreadLocked ? "Continue this chat" : "View this chat"}</Link>
+        </Button>
       </div>
       {chatFiles.length ? <SectionTabs selectedTab={selectedTab} onSelectedTabChange={setSelectedTab} /> : undefined}
       <div className="flex flex-1 flex-col justify-end pb-[140px]">

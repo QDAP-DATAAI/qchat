@@ -1,9 +1,7 @@
-"use client"
-
 import { ToastAction } from "@radix-ui/react-toast"
 import { usePathname } from "next/navigation"
 import { useSession } from "next-auth/react"
-import { createContext, useContext, useEffect, useCallback, useMemo } from "react"
+import { createContext, useContext, useEffect } from "react"
 
 import AgreeTermsAndConditions from "@/components/announcement/agree-terms-and-conditions"
 import WhatsNewModal from "@/components/announcement/whats-new-modal"
@@ -25,70 +23,72 @@ interface MessageProp {
   description: string
 }
 
-export const GlobalMessageProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
+function useGlobalMessageContextHook(): GlobalMessageProps {
   const application = useApplication()
   const { data: session } = useSession()
   const pathname = usePathname()
 
-  const handleDismiss = useCallback(() => {
-    announcement.dismiss()
-  }, [])
-
-  const showError = useCallback((error: string, reload?: () => void): void => {
-    const action = reload ? (
-      <ToastAction altText="Try again" onClick={reload}>
-        Try again
-      </ToastAction>
-    ) : undefined
-
-    toast({
-      variant: "destructive",
-      description: error,
-      action,
-    })
-  }, [])
-
-  const showSuccess = useCallback((message: MessageProp): void => {
-    toast(message)
-  }, [])
-
   useEffect(() => {
     if (!session?.user || !application?.appSettings) return
+    let unsubscribe = false
 
     const timeoutId = setTimeout(() => {
+      // check for terms and conditions
       const tAndCs = application.appSettings.termsAndConditionsDate
       if (
-        (tAndCs && !session.user.acceptedTermsDate) ||
+        (application.appSettings.termsAndConditionsDate && !session.user.acceptedTermsDate) ||
         new Date(tAndCs).getTime() > new Date(session.user.acceptedTermsDate).getTime()
       ) {
-        announcement.newsflash(<AgreeTermsAndConditions onClose={handleDismiss} />)
+        announcement.newsflash(<AgreeTermsAndConditions onClose={() => !unsubscribe && announcement.dismiss()} />)
         return
       }
 
+      // check for new what's new
       if (
         !sessionStorage.getItem("whats-new-dismissed") &&
         !pathname.endsWith("/whats-new") &&
         application.appSettings.version !== session.user.lastVersionSeen
       ) {
         announcement.newsflash(
-          <WhatsNewModal targetVersion={application.appSettings.version} onClose={handleDismiss} />
+          <WhatsNewModal
+            targetVersion={application.appSettings.version}
+            onClose={() => !unsubscribe && announcement.dismiss()}
+          />
         )
         return
       }
     }, DELAY_ANNOUNCEMENTS)
 
     return () => {
+      unsubscribe = true
       clearTimeout(timeoutId)
     }
-  }, [session?.user, application?.appSettings, pathname, handleDismiss])
+  }, [session?.user, application?.appSettings, pathname])
 
-  const value = useMemo(
-    () => ({
-      showSuccess,
-      showError,
-    }),
-    [showSuccess, showError]
-  )
+  const showError = (error: string, reload?: () => void): void => {
+    toast({
+      variant: "destructive",
+      description: error,
+      action: reload ? (
+        <ToastAction altText="Try again" onClick={reload}>
+          Try again
+        </ToastAction>
+      ) : undefined,
+    })
+  }
+
+  const showSuccess = (message: MessageProp): void => {
+    toast(message)
+  }
+
+  return {
+    showError,
+    showSuccess,
+  }
+}
+
+export const GlobalMessageProvider = ({ children }: { children: React.ReactNode }): JSX.Element => {
+  const value = useGlobalMessageContextHook()
 
   return <GlobalMessageContext.Provider value={value}>{children}</GlobalMessageContext.Provider>
 }
