@@ -11,6 +11,7 @@ type ChangeTranscriptButtonProps = {
   documentId: string
   chatThreadId: string
   updatedContents: string
+  accuracy: number
   onSave: () => void
 }
 
@@ -18,6 +19,7 @@ export const ChangeTranscriptButton: React.FC<ChangeTranscriptButtonProps> = ({
   documentId,
   chatThreadId,
   updatedContents,
+  accuracy,
   onSave,
 }) => {
   const { iconSize, buttonClass } = useButtonStyles()
@@ -26,7 +28,7 @@ export const ChangeTranscriptButton: React.FC<ChangeTranscriptButtonProps> = ({
   const handleSaveButton = async (): Promise<void> => {
     setSaveClicked(true)
     try {
-      const response = await UpdateChatDocument(documentId, chatThreadId, updatedContents)
+      const response = await UpdateChatDocument(documentId, chatThreadId, updatedContents, accuracy)
       if (response.status !== "OK") {
         throw new Error("Failed to save document.")
       }

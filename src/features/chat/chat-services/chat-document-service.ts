@@ -200,7 +200,8 @@ export const FindAllChatDocumentsForCurrentUser = async (
 export const UpdateChatDocument = async (
   documentId: string,
   chatThreadId: string,
-  updatedContents: string
+  updatedContents: string,
+  accuracy: number
 ): ServerActionResponseAsync<ChatDocumentModel> => {
   try {
     const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
@@ -218,6 +219,7 @@ export const UpdateChatDocument = async (
     const updatedDocument: ChatDocumentModel = {
       ...resource,
       updatedContents: updatedContents,
+      accuracy: accuracy,
     }
 
     const { resource: updatedResource } = await container.items.upsert<ChatDocumentModel>(updatedDocument)

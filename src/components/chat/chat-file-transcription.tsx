@@ -1,3 +1,4 @@
+import { diffWords } from "diff"
 import { DownloadIcon, CaptionsIcon, FileTextIcon } from "lucide-react"
 import { FC, useState, useEffect } from "react"
 
@@ -24,6 +25,7 @@ interface ChatFileTranscriptionProps {
   name: string
   contents: string
   updatedContents: string
+  accuracy: number
   vtt: string
 }
 
@@ -32,6 +34,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   const [feedbackMessage, setFeedbackMessage] = useState("")
   const [editorContents, setEditorContents] = useState(props.updatedContents || props.contents)
   const [displayedContents, setDisplayedContents] = useState(props.updatedContents || props.contents)
+  const [accuracy, setAccuracy] = useState(props.accuracy)
   const fileTitle = props.name.replace(/[^a-zA-Z0-9]/g, " ").trim()
 
   useEffect(() => {
@@ -78,6 +81,27 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
 
   const handleSave = (): void => {
     setDisplayedContents(editorContents)
+    calculateAccuracy()
+  }
+
+  const calculateAccuracy = (): void => {
+    const normalize = (str: string): string => str.trim().replace(/\s+/g, " ")
+    const normalizedOriginal = normalize(props.contents)
+    const normalizedUpdated = normalize(editorContents)
+
+    if (normalizedOriginal === normalizedUpdated) {
+      setAccuracy(100)
+      return
+    }
+
+    const originalWords = normalizedOriginal.split(/\s+/).length
+    const diff = diffWords(normalizedOriginal, normalizedUpdated)
+    const changedWords = diff
+      .filter(part => part.added || part.removed)
+      .reduce((acc, part) => acc + part.value.split(/\s+/).length, 0)
+
+    const accuracyScore = ((originalWords - changedWords) / originalWords) * 100
+    setAccuracy(accuracyScore)
   }
 
   return (
@@ -135,9 +159,19 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
             documentId={props.documentId}
             chatThreadId={props.chatThreadId}
             updatedContents={editorContents}
+            accuracy={accuracy ?? 0}
             onSave={handleSave}
           />
         </div>
+        {accuracy !== null ? (
+          <div className="m-4 flex justify-end p-2">
+            <Typography variant="h4">Accuracy: {accuracy.toFixed(2)}%</Typography>
+          </div>
+        ) : (
+          <div className="m-4 flex justify-end p-2">
+            <Typography variant="h4">Accuracy: Not calculated</Typography>
+          </div>
+        )}
         <div className="flex gap-4">
           <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
             <Typography variant="h4">Original Transcription</Typography>

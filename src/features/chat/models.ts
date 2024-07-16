@@ -132,6 +132,7 @@ export interface ChatDocumentModel {
   contents?: string
   extraContents?: string
   updatedContents?: string
+  accuracy?: number
   type: ChatRecordType.Document
   filePath: string
   title: string

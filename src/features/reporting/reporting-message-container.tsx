@@ -111,6 +111,7 @@ export const ReportingMessageContainer: FC<Props> = ({ chatThreadId }) => {
                   name={document.name}
                   contents={document.contents || ""}
                   updatedContents={document.updatedContents || ""}
+                  accuracy={document.accuracy || 0}
                   vtt={document.extraContents || ""}
                 />
               ))
