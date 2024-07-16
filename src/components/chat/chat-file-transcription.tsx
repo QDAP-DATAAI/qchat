@@ -46,13 +46,12 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
     const fileName = `${fileTitle}-transcription.docx`
     const chatThreadName = chatBody.chatThreadName || `${APP_NAME} ${fileName}`
     await convertTranscriptionToWordDocument([displayedContents], props.name, fileName, APP_NAME, chatThreadName)
-  }, [displayedContents, props.name, chatBody.chatThreadName])
+  }, [displayedContents, props.name, chatBody.chatThreadName, fileTitle])
 
   const onDownloadReport = useCallback(async (): Promise<void> => {
     const fileName = `${fileTitle}-report.docx`
-    const chatThreadName = chatBody.chatThreadName || `${APP_NAME} ${fileName}`
-    await convertTranscriptionReportToWordDocument([props.contents], props.name, fileName, APP_NAME, chatThreadName)
-  }, [fileTitle, chatBody.chatThreadName, props.contents, props.name])
+    await convertTranscriptionReportToWordDocument([props.contents], fileName)
+  }, [fileTitle, props.contents])
 
   const onDownloadVttFile = useCallback((): void => {
     const element = document.createElement("a")

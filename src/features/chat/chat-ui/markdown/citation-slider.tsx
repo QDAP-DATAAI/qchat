@@ -36,7 +36,7 @@ export const CitationSlider: FC<SliderProps> = props => {
     formData.append("order", props.order.toString())
     formData.append("name", props.name)
     formAction(formData)
-  }, [props.index, props.id, userId, tenantId, chatThreadId, props.order, formAction])
+  }, [props.index, props.id, userId, tenantId, chatThreadId, props.order, props.name, formAction])
 
   return (
     <form>
