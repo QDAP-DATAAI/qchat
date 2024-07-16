@@ -48,6 +48,7 @@ export const MiniMenu: React.FC = () => {
   const toggleMenu = useCallback(() => setIsMenuOpen(prev => !prev), [])
   const toggleThemeAndClose = useCallback(() => {
     setTheme(prev => (prev === "light" ? "dark" : "light"))
+    //TODO fix switching from dark to light mode
     setIsMenuOpen(false)
   }, [setTheme])
   const signout = useCallback(async () => {
