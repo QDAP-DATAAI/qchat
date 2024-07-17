@@ -50,8 +50,8 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
 
   const onDownloadReport = useCallback(async (): Promise<void> => {
     const fileName = `${fileTitle}-report.docx`
-    await convertTranscriptionReportToWordDocument([props.contents], fileName)
-  }, [fileTitle, props.contents])
+    await convertTranscriptionReportToWordDocument([displayedContents], fileName)
+  }, [fileTitle, displayedContents])
 
   const onDownloadVttFile = useCallback((): void => {
     const element = document.createElement("a")
