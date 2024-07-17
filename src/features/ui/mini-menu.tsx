@@ -12,8 +12,7 @@ import { signInProvider } from "@/app-global"
 
 import Typography from "@/components/typography"
 import { cn } from "@/lib/utils"
-
-import { menuItems } from "@/app/menus"
+import { MenuItems, validateCondition } from "@/features/common/menu-items"
 
 interface MiniMenuItemProps extends React.HTMLAttributes<HTMLAnchorElement> {
   href: UrlObject | string
@@ -43,13 +42,9 @@ const MiniMenuItem: React.FC<MiniMenuItemProps> = ({ href, icon: Icon, name, ari
 export const MiniMenu: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { data: session } = useSession({ required: false })
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
 
   const toggleMenu = useCallback(() => setIsMenuOpen(prev => !prev), [])
-  const toggleThemeAndClose = useCallback(() => {
-    setIsMenuOpen(prev => !prev)
-    setTheme(prev => (prev === "light" ? "dark" : "light"))
-  }, [setTheme])
   const signout = useCallback(async () => {
     await signOut({ callbackUrl: "/" })
     setIsMenuOpen(false)
@@ -59,9 +54,7 @@ export const MiniMenu: React.FC = () => {
     setIsMenuOpen(false)
   }, [])
 
-  const filteredMenuItems = session
-    ? menuItems.filter(item => item.condition !== "unauthenticated")
-    : menuItems.filter(item => item.condition !== "authenticated")
+  const filteredMenuItems = MenuItems.filter(validateCondition(session))
 
   return (
     <>
@@ -113,37 +106,58 @@ export const MiniMenu: React.FC = () => {
             {filteredMenuItems.map(item => (
               <MiniMenuItem key={item.name} closeMenu={toggleMenu} {...item} />
             ))}
-            <div
-              onClick={toggleThemeAndClose}
-              className="flex cursor-pointer items-center whitespace-nowrap px-6 py-2 text-link hover:bg-accent hover:text-accent-foreground"
-              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              role="button"
-              tabIndex={0}
-            >
-              {theme === "dark" ? <Sun className="mr-2 size-4" /> : <Moon className="mr-2 size-4" />}
-              {theme === "dark" ? "Light Mode" : "Dark Mode"}
-            </div>
+            <hr className="mx-4 my-2 w-1/2 border-t border-text" />
+            {resolvedTheme === "dark" ? (
+              <div
+                onClick={() => {
+                  setTheme("light")
+                  setIsMenuOpen(false)
+                }}
+                className="flex cursor-pointer items-center gap-2 whitespace-nowrap px-6 py-2 text-link hover:bg-accent hover:text-accent-foreground"
+                aria-label="Switch to light mode"
+                role="button"
+                tabIndex={0}
+              >
+                <Sun className="size-4" />
+                Switch to light mode
+              </div>
+            ) : (
+              <div
+                onClick={() => {
+                  setTheme("dark")
+                  setIsMenuOpen(false)
+                }}
+                className="flex cursor-pointer items-center gap-2 whitespace-nowrap px-6 py-2 text-link hover:bg-accent hover:text-accent-foreground"
+                aria-label="Switch to dark mode"
+                role="button"
+                tabIndex={0}
+              >
+                <Moon className="size-4" />
+                Switch to dark mode
+              </div>
+            )}
+            <hr className="m-4 border-t border-text" />
             {session ? (
               <div
                 onClick={signout}
-                className="flex cursor-pointer items-center whitespace-nowrap px-6 py-2 hover:bg-accent hover:text-accent-foreground"
+                className="flex cursor-pointer items-center justify-end gap-2 whitespace-nowrap px-6 py-2 hover:bg-accent hover:text-accent-foreground"
                 aria-label="Logout"
                 role="button"
                 tabIndex={0}
               >
-                <LogOut className="mr-2 size-4" />
                 Logout
+                <LogOut className="size-4" />
               </div>
             ) : (
               <div
                 onClick={signin}
-                className="flex cursor-pointer items-center whitespace-nowrap px-6 py-2 hover:bg-accent hover:text-accent-foreground"
+                className="flex cursor-pointer items-center justify-end gap-2 whitespace-nowrap px-6 py-2 hover:bg-accent hover:text-accent-foreground"
                 aria-label="Login"
                 role="button"
                 tabIndex={0}
               >
-                <LogIn className="mr-2 size-4" />
                 Login
+                <LogIn className="size-4" />
               </div>
             )}
           </div>

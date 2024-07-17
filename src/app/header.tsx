@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth"
 import { APP_NAME } from "@/app-global"
 
 import Typography from "@/components/typography"
-import { MiniMenu } from "@/features/main-menu/mini-menu"
+import { MiniMenu } from "@/features/ui/mini-menu"
 import { AI_TAGLINE, APP_VANITY_URL } from "@/features/theme/theme-config"
 import { QgovSvg } from "@/features/ui/qldgovlogo"
 import { QgovMiniSvg } from "@/features/ui/qldgovminilogo"
