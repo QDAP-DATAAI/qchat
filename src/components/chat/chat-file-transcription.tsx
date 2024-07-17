@@ -42,6 +42,8 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
     setDisplayedContents(props.updatedContents || props.contents)
   }, [props.updatedContents, props.contents])
 
+  const showTranscriptWithSpeakers = "**Speaker:** " + displayedContents.replace(/\n/g, "\n\n**Speaker:** ")
+
   const onDownloadTranscription = useCallback(async (): Promise<void> => {
     const fileName = `${fileTitle}-transcription.docx`
     const chatThreadName = chatBody.chatThreadName || `${APP_NAME} ${fileName}`
@@ -137,8 +139,8 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
                 <CaptionsIcon size={iconSize} />
               </Button>
             )}
-            <CheckTranscriptionButton transcription={editorContents} onAssistantButtonClick={setInput} />
-            <CopyButton message={editorContents} onFeedbackChange={setFeedbackMessage} />
+            <CheckTranscriptionButton transcription={showTranscriptWithSpeakers} onAssistantButtonClick={setInput} />
+            <CopyButton message={showTranscriptWithSpeakers} onFeedbackChange={setFeedbackMessage} />
           </div>
         </div>
         <div className="mt-4 flex justify-end">
@@ -174,7 +176,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
           </div>
           <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
             <Typography variant="h4">Updated Transcription with Speaker Preview</Typography>
-            <Markdown content={"**Speaker:** " + displayedContents.replace(/\n/g, "\n\n**Speaker:** ")} />
+            <Markdown content={showTranscriptWithSpeakers} />
           </div>
           <div className="sr-only" aria-live="assertive">
             {feedbackMessage}
