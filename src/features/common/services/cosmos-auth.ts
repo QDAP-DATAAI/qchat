@@ -36,11 +36,10 @@ export const getCosmosAccessToken = async ({ endpoint, key }: CosmosConfig): Pro
 
 export const isTokenExpired = (authToken: string | null = _cosmosAccessToken): boolean => {
   try {
-    return true
     if (!authToken) return true
-    // const expiry = JSON.parse(Buffer.from(authToken.split(".")[1], "base64").toString()).exp
-    // const currentTime = Math.floor(Date.now() / 1000) // in seconds
-    // return expiry <= currentTime
+    const expiry = JSON.parse(Buffer.from(authToken.split(".")[1], "base64").toString()).exp
+    const currentTime = Math.floor(Date.now() / 1000)
+    return expiry <= currentTime
   } catch (error) {
     throw new Error(`Failed to check token expiry: ${error}`)
   }
