@@ -1,7 +1,5 @@
 import { CosmosClient } from "@azure/cosmos"
 
-import logger from "@/features/insights/app-insights"
-
 let _cosmosAccessToken: string | null = null
 
 export const CONFIG = {
@@ -22,12 +20,10 @@ export const getCosmosAccessToken = async ({ endpoint, key }: CosmosConfig): Pro
     })
 
     if (!response.ok) {
-      logger.error(`🚀 > getCosmosAccessToken > ${response.status} ${response.statusText}`)
       throw new Error(`${response.statusText}`)
     }
 
     _cosmosAccessToken = await response.text()
-    logger.info(`🚀 > getCosmosAccessToken > ${_cosmosAccessToken}`)
     return await response.text()
   } catch (error) {
     throw new Error(`Failed to fetch Cosmos Auth Token: ${JSON.stringify(error)}`)
