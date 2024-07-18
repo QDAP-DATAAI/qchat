@@ -261,6 +261,13 @@ const memoizedCallback = useCallback(() => {
 }, [a, b]); // Dependencies array: `useCallback` will return the same function instance until `a` or `b` changes
 ```
 
+### Interact with backend features
+
+There are 2 ways of interacting with backend features, either via an api route or by calling a backend function directly. It's important to use the right way depending on the situation:
+
+- **React Server Components** (aka. RSC): Directly call backend functions.
+- **Client-Side Components** (with `"use client"` directive): Use API routes to interact with the backend, typically wrapped in a `useEffect`
+
 > **Note :** Understanding and applying these patterns and practices can enhance code readability, maintainability, and performance.
 
 ### Enforcing the Style Guide

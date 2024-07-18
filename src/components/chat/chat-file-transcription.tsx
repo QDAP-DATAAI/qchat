@@ -1,10 +1,8 @@
-import { diffWords } from "diff"
 import { DownloadIcon, CaptionsIcon, FileTextIcon } from "lucide-react"
 import { FC, useCallback, useState, useEffect } from "react"
 
 import { APP_NAME } from "@/app-global"
 
-import { Markdown } from "@/components/markdown/markdown"
 import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import {
@@ -14,10 +12,11 @@ import {
 import { CopyButton } from "@/features/ui/assistant-buttons"
 import { CheckTranscriptionButton } from "@/features/ui/assistant-buttons/rewrite-message-button"
 import { Button } from "@/features/ui/button"
-import { Textarea } from "@/features/ui/textarea"
-import { useWindowSize } from "@/features/ui/windowsize"
 
-import { ChangeTranscriptButton } from "./chat-transcript-change"
+import { ChatTranscriptEditor } from "./chat-transcript-change"
+import { UpdateChatDocument } from "@/features/chat/chat-services/chat-document-service"
+import { showSuccess, showError } from "@/features/globals/global-message-store"
+import { useButtonStyles } from "@/features/ui/assistant-buttons/use-button-styles"
 
 interface ChatFileTranscriptionProps {
   chatThreadId: string
@@ -64,49 +63,27 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
     document.body.removeChild(element)
   }, [fileTitle, props.vtt])
 
-  const { width } = useWindowSize()
-  const { iconSize, buttonClass } = getIconSize(width)
+  const { iconSize, buttonClass } = useButtonStyles()
 
-  const handleEditorChange = (e: React.ChangeEvent<HTMLTextAreaElement>): void => {
-    const newEditorContents = e.target.value
-    setEditorContents(newEditorContents)
-    const newAccuracy = calculateAccuracy(newEditorContents)
-    setAccuracy(newAccuracy)
-  }
-
-  const handleSave = (): void => {
-    const newDisplayedContents = editorContents
-    setDisplayedContents(newDisplayedContents)
-    const newAccuracy = calculateAccuracy(newDisplayedContents)
-    setAccuracy(newAccuracy)
-  }
-
-  const calculateAccuracy = (updatedContents: string): number => {
-    const normalize = (str: string): string => str.trim().replace(/\s+/g, " ")
-    const normalizedOriginal = normalize(props.contents)
-    const normalizedUpdated = normalize(updatedContents)
-
-    if (normalizedOriginal === normalizedUpdated) {
-      return 100
+  const handleSave = async (updatedContent: string): Promise<void> => {
+    try {
+      const response = await UpdateChatDocument(props.documentId, props.chatThreadId, updatedContent, accuracy)
+      if (response.status !== "OK") throw new Error("Failed to save document.")
+      showSuccess({ title: "Document saved successfully" })
+    } catch (err) {
+      const error = err instanceof Error ? err.message : "Something went wrong and the document has not been saved."
+      showError(error)
     }
-
-    const originalWords = normalizedOriginal.split(/\s+/).length
-    const diff = diffWords(normalizedOriginal, normalizedUpdated)
-    const changedWords = diff
-      .filter(part => part.added || part.removed)
-      .reduce((acc, part) => acc + part.value.split(/\s+/).length, 0)
-
-    return ((originalWords - changedWords) / originalWords) * 100
   }
 
   return (
     <div className="container mx-auto flex flex-col py-1 pb-4">
       <div className="flex-col gap-4 overflow-hidden rounded-md bg-background p-4">
-        <div className="flex w-full items-center justify-end">
-          <Typography variant="h3" className="w-full">
-            Transcription of: {fileTitle}
+        <div className="flex w-full items-center">
+          <Typography variant="h3" className="flex-1">
+            Transcription of: <b>{props.name}</b>
           </Typography>
-          <div className="container flex w-full justify-end gap-4 p-2">
+          <div className="flex flex-1 justify-end gap-2">
             <Button
               ariaLabel="Download Transcription"
               variant={"ghost"}
@@ -127,7 +104,7 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
             >
               <FileTextIcon size={iconSize} />
             </Button>
-            {props.vtt.length > 0 && (
+            {props.vtt.length && (
               <Button
                 ariaLabel="Download WebVTT subtitles file"
                 variant={"ghost"}
@@ -143,44 +120,13 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
             <CopyButton message={showTranscriptWithSpeakers} onFeedbackChange={setFeedbackMessage} />
           </div>
         </div>
-        <div className="mt-4 flex justify-end">
-          <Textarea
-            title="Editor Contents"
-            value={editorContents}
-            onChange={handleEditorChange}
-            className="h-64 w-full rounded border border-gray-300 p-2"
-          />
-        </div>
-        <div className="m-4 flex justify-end p-2">
-          <ChangeTranscriptButton
-            documentId={props.documentId}
-            chatThreadId={props.chatThreadId}
-            updatedContents={editorContents}
-            accuracy={accuracy}
-            onSave={handleSave}
-          />
-        </div>
-        {accuracy !== null ? (
-          <div className="m-4 flex justify-end p-2">
-            <Typography variant="h4">Accuracy: {accuracy.toFixed(2)}%</Typography>
-          </div>
-        ) : (
-          <div className="m-4 flex justify-end p-2">
-            <Typography variant="h4">Accuracy: Not calculated</Typography>
-          </div>
-        )}
-        <div className="flex gap-4">
-          <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
-            <Typography variant="h4">Original Transcription</Typography>
-            <Markdown content={props.contents.replace(/\n/g, "\n\n")} />
-          </div>
-          <div className="prose prose-slate w-1/2 max-w-none break-words text-base italic text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base">
-            <Typography variant="h4">Updated Transcription with Speaker Preview</Typography>
-            <Markdown content={showTranscriptWithSpeakers} />
-          </div>
-          <div className="sr-only" aria-live="assertive">
-            {feedbackMessage}
-          </div>
+        <ChatTranscriptEditor
+          originalContent={props.contents}
+          updatedContent={displayedContents}
+          onChange={handleSave}
+        />
+        <div className="sr-only" aria-live="assertive">
+          {feedbackMessage}
         </div>
       </div>
     </div>
@@ -194,11 +140,4 @@ const toBinaryBase64 = (text: string): string => {
   }
 
   return btoa(String.fromCharCode(...new Uint8Array(codeUnits.buffer)))
-}
-
-const getIconSize = (width: number): { iconSize: number; buttonClass: string } => {
-  if (width < 768) return { iconSize: 10, buttonClass: "h-7" }
-  if (width >= 768 && width < 1024) return { iconSize: 12, buttonClass: "h-9" }
-  if (width >= 1024) return { iconSize: 16, buttonClass: "h-9" }
-  return { iconSize: 10, buttonClass: "h-9" }
 }
