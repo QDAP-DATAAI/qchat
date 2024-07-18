@@ -1,5 +1,7 @@
 import { CosmosClient } from "@azure/cosmos"
 
+import logger from "@/features/insights/app-insights"
+
 let _cosmosAccessToken: string | null = null
 
 export const CONFIG = {
