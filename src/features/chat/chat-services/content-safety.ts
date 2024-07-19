@@ -87,10 +87,10 @@ export const categoryIconMap: Record<ContentSafetyCategory, React.ElementType> =
 }
 
 export const categorySeverityMap: Record<ContentSafetyCategory, number> = {
-  [ContentSafetyCategory.Hate]: 10,
-  [ContentSafetyCategory.SexualContent]: 9,
-  [ContentSafetyCategory.Violence]: 8,
-  [ContentSafetyCategory.SelfHarm]: 7,
+  [ContentSafetyCategory.SelfHarm]: 10,
+  [ContentSafetyCategory.Hate]: 9,
+  [ContentSafetyCategory.SexualContent]: 8,
+  [ContentSafetyCategory.Violence]: 7,
   [ContentSafetyCategory.Ethical]: 6,
   [ContentSafetyCategory.Impartial]: 5,
   [ContentSafetyCategory.Fairness]: 4,
@@ -105,7 +105,7 @@ export const categorySeverityMessageMap: Record<ContentSafetyCategory, string> =
   [ContentSafetyCategory.SexualContent]: "contain sexual content",
   [ContentSafetyCategory.Violence]: "contain violent content",
   [ContentSafetyCategory.SelfHarm]:
-    "contain self-harm content; remember that support services are available. If you are in danger please call 000 or Lifeline on 13 11 14. Otherwise, please reach out to a trusted friend, colleague, or Employee Assistance Program (EAP) for support.",
+    "contain self-harm content; remember that support services are available. If you are in danger please call 000, 13YARN 13 92 76 or Lifeline on 13 11 14. Otherwise, please reach out to a trusted friend, colleague, or Employee Assistance Program (EAP) for support.",
   [ContentSafetyCategory.Ethical]: "contain unethical content",
   [ContentSafetyCategory.Impartial]: "lack impartiality",
   [ContentSafetyCategory.Fairness]: "contain unfair content",
