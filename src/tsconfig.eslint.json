@@ -1,7 +1,4 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "types": ["@types/node"]
-  },
-  "include": ["./.eslintrc.js", "./tailwind.config.js"]
+  "include": [".prettierrc.js", ".stylelintrc.mjs", "eslint.config.js", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
 }

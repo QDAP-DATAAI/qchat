@@ -1,4 +1,3 @@
-// These are all the custom `@` (at) rules that we use within our custom PostCSS plugins
 const CUSTOM_AT_RULES = [
   // Tailwind-specific at-rules
   "apply",
@@ -13,13 +12,12 @@ const CUSTOM_AT_RULES = [
 ]
 
 // Enforces certain selectors to be only in camelCase notation
-// We use these for id selectors and classname selectors
 const ONLY_ALLOW_CAMEL_CASE_SELECTORS = [
   /^(?:[a-z]+(?:[A-Z][a-z]*)*)$/,
   { message: s => `Expected '${s}' to be in camelCase` },
 ]
 
-export default {
+const stylelintConfig = {
   extends: ["stylelint-config-standard"],
   plugins: ["stylelint-order", "stylelint-selector-bem-pattern"],
   rules: {
@@ -41,3 +39,5 @@ export default {
     "custom-property-pattern": null,
   },
 }
+
+export default stylelintConfig

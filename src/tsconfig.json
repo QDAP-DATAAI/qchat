@@ -20,19 +20,28 @@
     "jsx": "preserve",
     "typeRoots": ["./types", "./node_modules/@types"],
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
       "@/*": ["./*"],
       "@/ui/*": ["./features/ui/*"],
       "@/services/*": ["./features/common/services/*"],
       "@/components/*": ["./components/*"]
     },
-    "rootDir": "."
+    "rootDir": ".",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": [".next/types/**/*.ts", "next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
+  "include": [
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.jsx",
+    ".prettierrc.js",
+    ".stylelintrc.mjs"
+  ],
   "exclude": ["node_modules", "coverage"]
 }
