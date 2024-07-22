@@ -1,6 +1,6 @@
 export const APP_VERSION = "1.6.3"
-export const APP_NAME = "QChat"
-export const APP_DESCRIPTION = "QChat is a chatbot for Queensland Government"
+export const APP_NAME = "Classroom AI"
+export const APP_DESCRIPTION = "Classroom AI is a chatbot for Queensland Schools"
 export const signInProvider = "azure-ad"
 export const SUPPORT_EMAIL = "help@ai.qld.gov.au"
 export const STATUS_ERROR = "ERROR"

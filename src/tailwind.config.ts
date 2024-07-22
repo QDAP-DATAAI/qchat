@@ -30,6 +30,12 @@ const config: Config = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
         "pattern-bg": "url('/pattern.webp')",
+        "custom-gradient":
+          "linear-gradient(90deg, #0f2d52 0%, #0f2d52 25%, #ffcf01 25%, #ffcf01 33%, #65cbe6 33%, #65cbe6 59%, #f6861f 59%, #f6861f 72%, #00babe 72%, #00babe 83%, #a6ce39 83%, #a6ce39 100%)",
+      },
+      borderImage: {
+        "custom-gradient":
+          "linear-gradient(90deg, #0f2d52 0%, #0f2d52 25%, #ffcf01 25%, #ffcf01 33%, #65cbe6 33%, #65cbe6 59%, #f6861f 59%, #f6861f 72%, #00babe 72%, #00babe 83%, #a6ce39 83%, #a6ce39 100%) 1",
       },
       borderRadius: {
         lg: "var(--radius)",

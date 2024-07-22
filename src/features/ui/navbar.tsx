@@ -29,7 +29,15 @@ export const NavBar: React.FC<{ session: Session | null }> = ({ session }) => {
   const visibleLinks = links.filter(link => !link.condition || validateCondition(link)(session))
 
   return (
-    <nav aria-label="Main navigation" className="m:h-[44px] border-b-4 border-accent bg-backgroundShade">
+    <nav
+      aria-label="Main navigation"
+      className="m:h-[44px] border-b-4 border-transparent bg-backgroundShade"
+      style={{
+        borderImageSource:
+          "linear-gradient(90deg, #0f2d52 0%, #0f2d52 25%, #ffcf01 25%, #ffcf01 33%, #65cbe6 33%, #65cbe6 59%, #f6861f 59%, #f6861f 72%, #00babe 72%, #00babe 83%, #a6ce39 83%, #a6ce39 100%)",
+        borderImageSlice: 1,
+      }}
+    >
       <div className="container hidden md:block">
         <div dir="ltr" className="grid grid-cols-6">
           {visibleLinks.map(link => (
