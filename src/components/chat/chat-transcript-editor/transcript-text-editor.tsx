@@ -1,16 +1,16 @@
 "use client"
 
+import { useEffect, useState } from "react"
+
 import { Textarea } from "@/features/ui/textarea"
-import { useState, useEffect } from "react"
 
 type TranscriptionTextEditorProps = {
   initialContent: string
   onChange: (value: string) => void
-  reset: boolean
 }
-export const TranscriptionTextEditor = ({ initialContent, onChange, reset }: TranscriptionTextEditorProps) => {
-  const [content, setContent] = useState(initialContent)
-  useEffect(() => setContent(initialContent), [reset])
+export const TranscriptionTextEditor = ({ initialContent, onChange }: TranscriptionTextEditorProps): JSX.Element => {
+  const [content, setContent] = useState("")
+  useEffect(() => setContent(initialContent), [initialContent])
 
   return (
     <Textarea

@@ -27,11 +27,9 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
 
   const [content, setContent] = useState(updatedContent)
   const [sentences, setSentences] = useState(updatedContent.split("\n"))
-  const [resetChanges, setResetChanges] = useState(false)
   const [editorType, setEditorType] = useState<"text" | "form">("form")
 
   const handleReset = (content: string) => () => {
-    setResetChanges(prev => !prev)
     setSentences(content.split("\n"))
     setContent(content)
     const newAccuracy = calculateAccuracy(originalContent, content)
@@ -93,12 +91,8 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
             </Button>
           </Typography>
           <Panel ref={rightPanel}>
-            {editorType === "text" && (
-              <TranscriptionTextEditor initialContent={content} onChange={onContentChange} reset={resetChanges} />
-            )}
-            {editorType === "form" && (
-              <TranscriptForm initialContent={sentences} onChange={onSentencesChange} reset={resetChanges} />
-            )}
+            {editorType === "text" && <TranscriptionTextEditor initialContent={content} onChange={onContentChange} />}
+            {editorType === "form" && <TranscriptForm initialContent={sentences} onChange={onSentencesChange} />}
           </Panel>
         </div>
       </section>

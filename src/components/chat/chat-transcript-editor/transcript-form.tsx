@@ -2,9 +2,12 @@
 
 import { Form } from "@radix-ui/react-form"
 import { uniqueId } from "docx"
-import { useState, useEffect } from "react"
-import { Sentence } from "./sentence"
+import { useEffect, useState } from "react"
+
 import { Button } from "@/features/ui/button"
+
+import { TranscriptSentence } from "./transcript-sentence"
+import { Sentence, Speaker } from "./types"
 
 const defaultColorPairs = [
   { color: "bg-lime-700", background: "" },
@@ -17,37 +20,38 @@ const defaultColorPairs = [
 type TranscriptFormProps = {
   initialContent: string[]
   onChange: (value: string[]) => void
-  reset: boolean
 }
-export const TranscriptForm = ({ initialContent, onChange, reset }: TranscriptFormProps) => {
+export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps): JSX.Element => {
   const colorMap = new Map<string, string>()
   defaultColorPairs.forEach(pair => {
     colorMap.set(pair.color, pair.background)
   })
-  const initialFormValue = initialContent.map((line, index) => ({ line, id: `${index}` }))
-  const initialSpeakers = initialContent.reduce((acc, curr) => {
-    const speakerName = curr.match(/\[(.*?)\]/)?.[1] || curr.match(/\((.*?)\)/)?.[1] || curr.match(/(.*?):/)?.[1]
-    if (!speakerName) return acc
-    if (!acc.find(s => s.name === speakerName)) {
-      const newSpeaker = {
-        name: speakerName || `Speaker ${acc.length + 1}`,
-        color: defaultColorPairs[acc.length % defaultColorPairs.length].color,
-        background: defaultColorPairs[acc.length % defaultColorPairs.length].background,
-        id: acc.length,
-      }
-      acc.push(newSpeaker)
-    }
-    return acc
-  }, [] as Speaker[])
-  const [formValue, setFormValue] = useState<Sentence[]>(initialFormValue)
-  const [speakers, setSpeakers] = useState<Speaker[]>(initialSpeakers)
+
+  const [formValue, setFormValue] = useState<Sentence[]>([])
+  const [speakers, setSpeakers] = useState<Speaker[]>([])
 
   useEffect(() => {
+    const initialFormValue = initialContent.map((line, index) => ({ line, id: `${index}` }))
+    const initialSpeakers = initialContent.reduce((acc, curr) => {
+      const speakerName = curr.match(/\[(.*?)\]/)?.[1] || curr.match(/\((.*?)\)/)?.[1] || curr.match(/(.*?):/)?.[1]
+      if (!speakerName) return acc
+      if (!acc.find(s => s.name === speakerName)) {
+        const newSpeaker = {
+          name: speakerName || `Speaker ${acc.length + 1}`,
+          color: defaultColorPairs[acc.length % defaultColorPairs.length].color,
+          background: defaultColorPairs[acc.length % defaultColorPairs.length].background,
+          id: acc.length,
+        }
+        acc.push(newSpeaker)
+      }
+      return acc
+    }, [] as Speaker[])
+
     setFormValue(initialFormValue)
     setSpeakers(initialSpeakers)
-  }, [reset])
+  }, [initialContent])
 
-  const handleChange = (newFormValue: Sentence[]) => {
+  const handleChange = (newFormValue: Sentence[]): void => {
     setFormValue(newFormValue)
     const newSpeakers = newFormValue.reduce((acc, curr) => {
       const speakerName =
@@ -68,7 +72,7 @@ export const TranscriptForm = ({ initialContent, onChange, reset }: TranscriptFo
     onChange(newFormValue.map(s => s.line))
   }
 
-  const handleSentenceChange = (id: string, updatedSentence: Sentence) => {
+  const handleSentenceChange = (id: string, updatedSentence: Sentence): void => {
     const itemIndex = formValue.findIndex(sentence => sentence.id === id)
     const linesToAdd = updatedSentence.line
       .split("\n")
@@ -82,7 +86,7 @@ export const TranscriptForm = ({ initialContent, onChange, reset }: TranscriptFo
     handleChange(newFormValue)
   }
 
-  const handleMergeUp = (id: string) => () => {
+  const handleMergeUp = (id: string) => (): void => {
     const itemIndex = formValue.findIndex(sentence => sentence.id === id)
     const prevItemIndex = Math.max(itemIndex - 1, 0)
     const lineToConcat = formValue[itemIndex].line
@@ -101,7 +105,7 @@ export const TranscriptForm = ({ initialContent, onChange, reset }: TranscriptFo
     handleChange(newFormValue)
   }
 
-  const handleMergeDown = (id: string) => () => {
+  const handleMergeDown = (id: string) => (): void => {
     const itemIndex = formValue.findIndex(sentence => sentence.id === id)
     const nextItemIndex = Math.min(itemIndex + 1, formValue.length - 1)
     const lineToConcat = formValue[nextItemIndex].line
@@ -120,7 +124,7 @@ export const TranscriptForm = ({ initialContent, onChange, reset }: TranscriptFo
     handleChange(newFormValue)
   }
 
-  const prefillSpeakers = () => {
+  const prefillSpeakers = (): void => {
     const speakers = [
       {
         name: "Speaker 1",
@@ -157,7 +161,7 @@ export const TranscriptForm = ({ initialContent, onChange, reset }: TranscriptFo
       )}
       <div>
         {formValue.map((item, index) => (
-          <Sentence
+          <TranscriptSentence
             key={item.id}
             id={item.id}
             sentence={item}
