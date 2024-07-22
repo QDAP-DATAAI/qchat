@@ -56,7 +56,9 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
 
   return (
     <div className="h-full overflow-y-auto" ref={scrollRef} onScroll={onScroll}>
-      <div className="flex h-auto justify-center p-2">{/* <ChatHeader /> */}</div>
+      <div className="flex h-auto justify-center p-2">
+        <ChatHeader />
+      </div>
 
       {chatFiles.length ? <SectionTabs selectedTab={selectedTab} onSelectedTabChange={setSelectedTab} /> : undefined}
 
