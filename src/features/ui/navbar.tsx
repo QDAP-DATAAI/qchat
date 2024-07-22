@@ -2,8 +2,8 @@ import { Session } from "next-auth"
 import React from "react"
 
 import Typography from "@/components/typography"
-import { ThemeSwitch } from "@/features/theme/theme-switch"
 import { MenuItems, validateCondition } from "@/features/common/menu-items"
+import { ThemeSwitch } from "@/features/theme/theme-switch"
 
 export const NavBar: React.FC<{ session: Session | null }> = ({ session }) => {
   const visibleLinks = MenuItems.filter(validateCondition(session))

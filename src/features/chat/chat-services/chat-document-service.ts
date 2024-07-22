@@ -10,6 +10,7 @@ import { ServerActionResponseAsync } from "@/features/common/server-action-respo
 import { HistoryContainer } from "@/features/common/services/cosmos-service"
 import logger from "@/features/insights/app-insights"
 import { APP_URL } from "@/features/theme/theme-config"
+import { calculateAccuracy } from "@/lib/calculate-accuracy"
 import { uniqueId } from "@/lib/utils"
 
 import { AzureCogDocumentIndex, deleteDocumentById, indexDocuments } from "./azure-cog-search/azure-cog-vector-store"
@@ -17,7 +18,6 @@ import { transcribeAudio } from "./chat-audio-helper"
 import { arrayBufferToBase64, customBeginAnalyzeDocument } from "./chat-document-helper"
 import { chunkDocumentWithOverlap } from "./text-chunk"
 import { isNotNullOrEmpty } from "./utils"
-import { calculateAccuracy } from "@/lib/calculate-accuracy"
 
 const LoadFile = async (formData: FormData, chatType: string): Promise<string[]> => {
   try {

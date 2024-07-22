@@ -1,13 +1,14 @@
 "use client"
 
+import { PencilRulerIcon } from "lucide-react"
 import React, { useState } from "react"
 
-import Typography from "../typography"
-import useSyncScroll from "../hooks/use-sync-scroll"
-import { PencilRulerIcon } from "lucide-react"
+import useSyncScroll from "@/components/hooks/use-sync-scroll"
+import Typography from "@/components/typography"
 import { Button } from "@/features/ui/button"
-import { TranscriptForm, TranscriptionTextEditor } from "./chat-transcript-editor"
 import { calculateAccuracy } from "@/lib/calculate-accuracy"
+
+import { TranscriptForm, TranscriptionTextEditor } from "./chat-transcript-editor"
 
 type ChatTranscriptEditorProps = {
   originalContent: string
@@ -37,14 +38,14 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
     setAccuracy(newAccuracy)
   }
 
-  const onContentChange = (value: string) => {
+  const onContentChange = (value: string): void => {
     setSentences(value.split("\n"))
     setContent(value)
     const newAccuracy = calculateAccuracy(originalContent, value)
     setAccuracy(newAccuracy)
   }
 
-  const onSentencesChange = (value: string[]) => {
+  const onSentencesChange = (value: string[]): void => {
     const update = value.join("\n")
     setSentences(value)
     setContent(update)
@@ -52,7 +53,7 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
     setAccuracy(newAccuracy)
   }
 
-  const handleSubmit = (value: string[] | string) => () => {
+  const handleSubmit = (value: string[] | string) => (): void => {
     const newContent = typeof value === "string" ? value : value.join("\n")
     setContent(newContent)
     const newSentences = typeof value === "string" ? value.split("\n") : value
@@ -128,3 +129,4 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
 const Panel = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(({ ...props }, ref) => (
   <div ref={ref} className="border-1 h-full max-h-[750px] overflow-y-auto break-words text-text shadow-xl" {...props} />
 ))
+Panel.displayName = "Panel"

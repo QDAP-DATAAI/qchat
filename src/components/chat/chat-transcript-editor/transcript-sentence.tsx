@@ -1,9 +1,12 @@
 "use client"
 
-import { Textarea } from "@/features/ui/textarea"
 import { Field, Control } from "@radix-ui/react-form"
 import { MergeIcon, EditIcon } from "lucide-react"
 import { useState } from "react"
+
+import { Textarea } from "@/features/ui/textarea"
+
+import { Sentence, Speaker } from "./types"
 
 type SentenceProps = {
   id: string
@@ -13,7 +16,13 @@ type SentenceProps = {
   onMergeUp?: () => void
   onMergeDown?: () => void
 }
-export const Sentence = ({ sentence, speaker, onChange, onMergeUp, onMergeDown }: SentenceProps) => {
+export const TranscriptSentence = ({
+  sentence,
+  speaker,
+  onChange,
+  onMergeUp,
+  onMergeDown,
+}: SentenceProps): JSX.Element => {
   const [isEditing, setIsEditing] = useState(false)
 
   return (
@@ -49,7 +58,13 @@ type SentenceDisplayProps = {
   onMergeUp?: () => void
   onMergeDown?: () => void
 }
-const SentenceDisplay = ({ sentence, speaker, onMergeDown, onMergeUp, switchToEdit }: SentenceDisplayProps) => {
+const SentenceDisplay = ({
+  sentence,
+  speaker,
+  onMergeDown,
+  onMergeUp,
+  switchToEdit,
+}: SentenceDisplayProps): JSX.Element => {
   const { line } = sentence
   return (
     <>
@@ -89,18 +104,17 @@ type SentenceFormProps = {
   line: string
   onChange: (line: string) => void
 }
-const SentenceForm = ({ id, line, onChange }: SentenceFormProps) => {
+const SentenceForm = ({ id, line, onChange }: SentenceFormProps): JSX.Element => {
   const [input, setInput] = useState(line)
   return (
     <Field name={`sentence_${id}`} asChild>
       <Control asChild>
         <Textarea
-          className={`w-full rounded-md border-2 p-2`}
+          className={"w-full rounded-md border-2 p-2"}
           value={input}
           autoFocus
           onChange={e => setInput(e.target.value)}
           onBlur={() => onChange(input)}
-          // rows={4}
         />
       </Control>
     </Field>

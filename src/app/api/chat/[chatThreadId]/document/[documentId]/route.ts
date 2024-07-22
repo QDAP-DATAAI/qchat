@@ -1,7 +1,8 @@
-import { userSession } from "@/features/auth/helpers"
-import { UpdateChatDocument } from "@/features/chat/chat-services/chat-document-service"
 import { NextRequest } from "next/server"
 import * as yup from "yup"
+
+import { userSession } from "@/features/auth/helpers"
+import { UpdateChatDocument } from "@/features/chat/chat-services/chat-document-service"
 
 const documentUpdateSchema = yup.object({
   updatedContent: yup.string().required(),

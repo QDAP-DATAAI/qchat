@@ -23,7 +23,7 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
   const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
   const { messages, documents, isLoading, chatThreadLocked } = useChatContext()
-  const [selectedTab, setSelectedTab] = useState<SectionTabsProps["selectedTab"]>("transcription") // TODO: change back to "chat"
+  const [selectedTab, setSelectedTab] = useState<SectionTabsProps["selectedTab"]>("chat")
 
   const [previousScrollTop, setPreviousScrollTop] = useState(0)
   const [suppressScrolling, setSuppressScrolling] = useState(false)
