@@ -14,7 +14,6 @@ import { CheckTranscriptionButton } from "@/features/ui/assistant-buttons/rewrit
 import { Button } from "@/features/ui/button"
 
 import { ChatTranscriptEditor } from "./chat-transcript-change"
-import { UpdateChatDocument } from "@/features/chat/chat-services/chat-document-service"
 import { showSuccess, showError } from "@/features/globals/global-message-store"
 import { useButtonStyles } from "@/features/ui/assistant-buttons/use-button-styles"
 
@@ -31,13 +30,10 @@ interface ChatFileTranscriptionProps {
 export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
   const { chatBody, setInput } = useChatContext()
   const [feedbackMessage, setFeedbackMessage] = useState("")
-  const [editorContents, setEditorContents] = useState(props.updatedContents || props.contents)
   const [displayedContents, setDisplayedContents] = useState(props.updatedContents || props.contents)
-  const [accuracy, setAccuracy] = useState(props.accuracy)
   const fileTitle = props.name.replace(/[^a-zA-Z0-9]/g, " ").trim()
 
   useEffect(() => {
-    setEditorContents(props.updatedContents || props.contents)
     setDisplayedContents(props.updatedContents || props.contents)
   }, [props.updatedContents, props.contents])
 
@@ -67,8 +63,12 @@ export const ChatFileTranscription: FC<ChatFileTranscriptionProps> = props => {
 
   const handleSave = async (updatedContent: string): Promise<void> => {
     try {
-      const response = await UpdateChatDocument(props.documentId, props.chatThreadId, updatedContent, accuracy)
-      if (response.status !== "OK") throw new Error("Failed to save document.")
+      const response = await fetch(`/api/chat/${props.chatThreadId}/document/${props.documentId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ updatedContent }),
+      })
+      if (!response.ok) throw new Error("Failed to save document.")
       showSuccess({ title: "Document saved successfully" })
     } catch (err) {
       const error = err instanceof Error ? err.message : "Something went wrong and the document has not been saved."

@@ -17,6 +17,7 @@ import { transcribeAudio } from "./chat-audio-helper"
 import { arrayBufferToBase64, customBeginAnalyzeDocument } from "./chat-document-helper"
 import { chunkDocumentWithOverlap } from "./text-chunk"
 import { isNotNullOrEmpty } from "./utils"
+import { calculateAccuracy } from "@/lib/calculate-accuracy"
 
 const LoadFile = async (formData: FormData, chatType: string): Promise<string[]> => {
   try {
@@ -200,8 +201,7 @@ export const FindAllChatDocumentsForCurrentUser = async (
 export const UpdateChatDocument = async (
   documentId: string,
   chatThreadId: string,
-  updatedContents: string,
-  accuracy: number
+  updatedContents: string
 ): ServerActionResponseAsync<ChatDocumentModel> => {
   try {
     const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
@@ -209,38 +209,34 @@ export const UpdateChatDocument = async (
     const container = await HistoryContainer()
     const { resource } = await container.item(documentId, [tenantId, userId]).read<ChatDocumentModel>()
 
-    if (!resource) {
+    if (!resource)
       return {
         status: "ERROR",
         errors: [{ message: "Document not found" }],
       }
-    }
-    const updatedDocument: ChatDocumentModel = {
+
+    const accuracy = calculateAccuracy(resource.contents || "", updatedContents)
+    const { resource: updatedResource } = await container.items.upsert<ChatDocumentModel>({
       ...resource,
       updatedContents: updatedContents,
-      accuracy: accuracy,
-    }
+      accuracy,
+    })
 
-    const { resource: updatedResource } = await container.items.upsert<ChatDocumentModel>(updatedDocument)
-    //TOOO Move to only upserting the updated contents
-
-    if (!updatedResource) {
+    if (!updatedResource)
       return {
         status: "ERROR",
         errors: [{ message: "Failed to update document" }],
       }
-    }
 
     await deleteDocumentById(documentId, chatThreadId, userId, tenantId)
 
     const splitDocuments = chunkDocumentWithOverlap(updatedContents)
 
-    if (splitDocuments.length === 0) {
+    if (splitDocuments.length === 0)
       return {
         status: "ERROR",
         errors: [{ message: "No split documents found for indexing" }],
       }
-    }
 
     const path = `${APP_URL}/chat/${chatThreadId}`
     const documentsToIndex: AzureCogDocumentIndex[] = splitDocuments.map((docContent, index) => ({
