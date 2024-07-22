@@ -146,7 +146,12 @@ export const TranscriptForm = ({ initialContent, onChange, reset }: TranscriptFo
   return (
     <Form className="flex size-full">
       {!speakers.length && (
-        <Button variant={"outline"} className="ml-2 mt-4 border-2" onClick={prefillSpeakers}>
+        <Button
+          variant={"outline"}
+          className="ml-2 mt-4 border-2"
+          onClick={prefillSpeakers}
+          ariaLabel="prefill speakers"
+        >
           Prefill&nbsp;speakers
         </Button>
       )}

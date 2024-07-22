@@ -85,6 +85,7 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
               variant={"secondary"}
               onClick={() => setEditorType(prev => (prev === "text" ? "form" : "text"))}
               className="flex items-center gap-2"
+              ariaLabel="Toggle editor type"
             >
               <PencilRulerIcon size={16} />
               {`${editorType.toLocaleUpperCase()} Editor`}
@@ -101,17 +102,22 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
         </div>
       </section>
       <div className="flex w-full justify-end gap-4">
-        <Button variant="destructive" onClick={handleReset(originalContent)}>
+        <Button variant="destructive" onClick={handleReset(originalContent)} ariaLabel="Reset from original">
           Reset from original
         </Button>
         <Button
           variant="outline"
           onClick={handleReset(updatedContent)}
           className="text-destructive-foreground hover:bg-error"
+          ariaLabel="Reset from latest update"
         >
           Reset from latest update
         </Button>
-        <Button variant="accent" onClick={handleSubmit(editorType === "text" ? content : sentences)}>
+        <Button
+          variant="accent"
+          onClick={handleSubmit(editorType === "text" ? content : sentences)}
+          ariaLabel="Save changes"
+        >
           Save changes
         </Button>
       </div>

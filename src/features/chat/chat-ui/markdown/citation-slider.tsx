@@ -44,7 +44,7 @@ export const CitationSlider: FC<SliderProps> = props => {
       <Sheet>
         <SheetTrigger asChild>
           <Button
-            aria-label={`Open citation number ${props.order}`}
+            ariaLabel={`Open citation number ${props.order}`}
             variant="outline"
             onClick={handleButtonClick}
             type="button"
