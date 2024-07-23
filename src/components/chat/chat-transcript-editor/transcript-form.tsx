@@ -2,7 +2,7 @@
 
 import { Form } from "@radix-ui/react-form"
 import { uniqueId } from "docx"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 
 import { Button } from "@/features/ui/button"
 
@@ -39,78 +39,90 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
     setSpeakers(initialSpeakers)
   }, [initialContent])
 
-  const handleChange = (newFormValue: Sentence[]): void => {
-    setFormValue(newFormValue)
-    const newSpeakers = newFormValue.reduce((acc, curr) => {
-      const speakerName =
-        curr.line.match(/\[(.*?)\]/)?.[1] || curr.line.match(/\((.*?)\)/)?.[1] || curr.line.match(/(.*?):/)?.[1]
-      if (!speakerName) return acc
-      if (!acc.find(s => s.name === speakerName)) {
-        const newSpeaker = {
-          name: speakerName || `Speaker ${acc.length + 1}`,
-          id: acc.length,
+  const handleChange = useCallback(
+    (newFormValue: Sentence[]): void => {
+      setFormValue(newFormValue)
+      const newSpeakers = newFormValue.reduce((acc, curr) => {
+        const speakerName =
+          curr.line.match(/\[(.*?)\]/)?.[1] || curr.line.match(/\((.*?)\)/)?.[1] || curr.line.match(/(.*?):/)?.[1]
+        if (!speakerName) return acc
+        if (!acc.find(s => s.name === speakerName)) {
+          const newSpeaker = {
+            name: speakerName || `Speaker ${acc.length + 1}`,
+            id: acc.length,
+          }
+          acc.push(newSpeaker)
         }
-        acc.push(newSpeaker)
+        return acc
+      }, [] as Speaker[])
+      setSpeakers(newSpeakers)
+      onChange(newFormValue.map(s => s.line))
+    },
+    [onChange]
+  )
+
+  const handleSentenceChange = useCallback(
+    (id: string, updatedSentence: Sentence): void => {
+      const itemIndex = formValue.findIndex(sentence => sentence.id === id)
+      const linesToAdd = updatedSentence.line
+        .split("\n")
+        .filter(line => line.trim())
+        .map(line => ({ line, id: uniqueId() }))
+      const newFormValue = formValue.reduce((acc, curr, index) => {
+        if (index === itemIndex) acc.push(...linesToAdd)
+        else acc.push(curr)
+        return acc
+      }, [] as Sentence[])
+      handleChange(newFormValue)
+    },
+    [formValue, handleChange]
+  )
+
+  const handleMergeUp = useCallback(
+    (id: string) => (): void => {
+      const itemIndex = formValue.findIndex(sentence => sentence.id === id)
+      const prevItemIndex = Math.max(itemIndex - 1, 0)
+      const lineToConcat = formValue[itemIndex].line
+        .replace(/\[(.*?)\]/, "")
+        .replace(/\((.*?)\)/, "")
+        .replace(/(.*?):/, "")
+      const lineToAdd = {
+        ...formValue[prevItemIndex],
+        line: `${formValue[prevItemIndex].line} ${lineToConcat}`,
       }
-      return acc
-    }, [] as Speaker[])
-    setSpeakers(newSpeakers)
-    onChange(newFormValue.map(s => s.line))
-  }
+      const newFormValue = formValue.reduce((acc, curr, index) => {
+        if (index === prevItemIndex) acc.push(lineToAdd)
+        else if (index !== itemIndex) acc.push(curr)
+        return acc
+      }, [] as Sentence[])
+      handleChange(newFormValue)
+    },
+    [formValue, handleChange]
+  )
 
-  const handleSentenceChange = (id: string, updatedSentence: Sentence): void => {
-    const itemIndex = formValue.findIndex(sentence => sentence.id === id)
-    const linesToAdd = updatedSentence.line
-      .split("\n")
-      .filter(line => line.trim())
-      .map(line => ({ line, id: uniqueId() }))
-    const newFormValue = formValue.reduce((acc, curr, index) => {
-      if (index === itemIndex) acc.push(...linesToAdd)
-      else acc.push(curr)
-      return acc
-    }, [] as Sentence[])
-    handleChange(newFormValue)
-  }
+  const handleMergeDown = useCallback(
+    (id: string) => (): void => {
+      const itemIndex = formValue.findIndex(sentence => sentence.id === id)
+      const nextItemIndex = Math.min(itemIndex + 1, formValue.length - 1)
+      const lineToConcat = formValue[nextItemIndex].line
+        .replace(/\[(.*?)\]/, "")
+        .replace(/\((.*?)\)/, "")
+        .replace(/(.*?):/, "")
+      const lineToAdd = {
+        ...formValue[itemIndex],
+        line: `${formValue[itemIndex].line} ${lineToConcat}`,
+      }
+      const newFormValue = formValue.reduce((acc, curr, index) => {
+        if (index === itemIndex) acc.push(lineToAdd)
+        else if (index !== nextItemIndex) acc.push(curr)
+        return acc
+      }, [] as Sentence[])
+      handleChange(newFormValue)
+    },
+    [formValue, handleChange]
+  )
 
-  const handleMergeUp = (id: string) => (): void => {
-    const itemIndex = formValue.findIndex(sentence => sentence.id === id)
-    const prevItemIndex = Math.max(itemIndex - 1, 0)
-    const lineToConcat = formValue[itemIndex].line
-      .replace(/\[(.*?)\]/, "")
-      .replace(/\((.*?)\)/, "")
-      .replace(/(.*?):/, "")
-    const lineToAdd = {
-      ...formValue[prevItemIndex],
-      line: `${formValue[prevItemIndex].line} ${lineToConcat}`,
-    }
-    const newFormValue = formValue.reduce((acc, curr, index) => {
-      if (index === prevItemIndex) acc.push(lineToAdd)
-      else if (index !== itemIndex) acc.push(curr)
-      return acc
-    }, [] as Sentence[])
-    handleChange(newFormValue)
-  }
-
-  const handleMergeDown = (id: string) => (): void => {
-    const itemIndex = formValue.findIndex(sentence => sentence.id === id)
-    const nextItemIndex = Math.min(itemIndex + 1, formValue.length - 1)
-    const lineToConcat = formValue[nextItemIndex].line
-      .replace(/\[(.*?)\]/, "")
-      .replace(/\((.*?)\)/, "")
-      .replace(/(.*?):/, "")
-    const lineToAdd = {
-      ...formValue[itemIndex],
-      line: `${formValue[itemIndex].line} ${lineToConcat}`,
-    }
-    const newFormValue = formValue.reduce((acc, curr, index) => {
-      if (index === itemIndex) acc.push(lineToAdd)
-      else if (index !== nextItemIndex) acc.push(curr)
-      return acc
-    }, [] as Sentence[])
-    handleChange(newFormValue)
-  }
-
-  const prefillSpeakers = (): void => {
+  const prefillSpeakers = useCallback((): void => {
     const speakers = [
       {
         name: "Speaker 1",
@@ -127,7 +139,8 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
       return { ...sentence, speaker, line: `[${speaker.name}] ${sentence.line}` }
     })
     handleChange(newFormValue)
-  }
+  }, [formValue, handleChange])
+
   return (
     <Form className="flex size-full">
       {!speakers.length && (

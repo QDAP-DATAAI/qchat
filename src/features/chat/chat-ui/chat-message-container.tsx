@@ -22,7 +22,7 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
   const { data: session } = useSession()
   const router = useRouter()
   const scrollRef = useRef<HTMLDivElement>(null)
-  const { messages, documents, isLoading, chatThreadLocked } = useChatContext()
+  const { messages, documents, isLoading, chatThreadLocked, chatBody } = useChatContext()
   const [selectedTab, setSelectedTab] = useState<SectionTabsProps["selectedTab"]>("chat")
 
   const [previousScrollTop, setPreviousScrollTop] = useState(0)
@@ -39,8 +39,17 @@ export const ChatMessageContainer: React.FC<Props> = ({ chatThreadId }) => {
   useEffect(() => {
     if (isLoading) return
     setSuppressScrolling(false)
-    // setSelectedTab("chat")
-  }, [isLoading])
+    if (messages.length === 0 && documents.length > 0) {
+      const chatFiles = documents.filter(document => document.contents)
+      if (chatFiles.length > 0) {
+        if (chatBody.chatType === "audio") {
+          setSelectedTab("transcription")
+        } else {
+          setSelectedTab("chat")
+        }
+      }
+    }
+  }, [isLoading, messages, documents, chatBody.chatType])
 
   const onScroll = useCallback(
     (e: React.UIEvent<HTMLDivElement>): void => {

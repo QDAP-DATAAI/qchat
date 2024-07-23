@@ -87,7 +87,7 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
               ariaLabel="Toggle editor type"
             >
               <PencilRulerIcon size={16} />
-              {`${editorType.toLocaleUpperCase()} Editor`}
+              {`Switch to ${editorType === "text" ? "Form" : "Text"} Editor`}
             </Button>
           </Typography>
           <Panel ref={rightPanel}>

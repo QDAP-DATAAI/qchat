@@ -2,7 +2,7 @@
 
 import { Field, Control } from "@radix-ui/react-form"
 import { ArrowUp, ArrowDown, Pencil } from "lucide-react"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 
 import { Button } from "@/features/ui/button"
 import { Textarea } from "@/features/ui/textarea"
@@ -29,26 +29,29 @@ export const TranscriptSentence = ({
 }: SentenceProps): JSX.Element => {
   const [isEditing, setIsEditing] = useState(false)
 
+  const handleChange = useCallback(
+    (newSentence: string): void => {
+      setIsEditing(false)
+      onChange({ ...sentence, line: newSentence })
+    },
+    [onChange, sentence]
+  )
+
+  const switchToEdit = useCallback((): void => setIsEditing(prev => !prev), [])
+
   return (
     <div
       className={`${background} group flex cursor-pointer items-start gap-2 rounded-sm border-2 border-transparent p-2 hover:border-accent`}
     >
       {isEditing ? (
-        <SentenceForm
-          id={sentence.id}
-          line={sentence.line}
-          onChange={newSentence => {
-            setIsEditing(false)
-            onChange({ ...sentence, line: newSentence })
-          }}
-        />
+        <SentenceForm id={sentence.id} line={sentence.line} onChange={handleChange} />
       ) : (
         <SentenceDisplay
           sentence={sentence}
           speaker={speaker}
           onMergeDown={onMergeDown}
           onMergeUp={onMergeUp}
-          switchToEdit={() => setIsEditing(prev => !prev)}
+          switchToEdit={switchToEdit}
         />
       )}
     </div>
@@ -71,6 +74,19 @@ const SentenceDisplay = ({
   switchToEdit,
 }: SentenceDisplayProps): JSX.Element => {
   const { line } = sentence
+
+  const handleMergeUpClick = useCallback((): void => {
+    if (onMergeUp) {
+      onMergeUp()
+    }
+  }, [onMergeUp])
+
+  const handleMergeDownClick = useCallback((): void => {
+    if (onMergeDown) {
+      onMergeDown()
+    }
+  }, [onMergeDown])
+
   return (
     <>
       <div className={`flex flex-col ${speaker ? "gap-2" : ""}`}>
@@ -82,7 +98,7 @@ const SentenceDisplay = ({
               size="sm"
               variant="accent"
               ariaLabel="Merge Up"
-              onClick={onMergeUp}
+              onClick={handleMergeUpClick}
             >
               <ArrowUp size={16} />
             </Button>
@@ -104,7 +120,7 @@ const SentenceDisplay = ({
               size="sm"
               variant="accent"
               ariaLabel="Merge Down"
-              onClick={onMergeDown}
+              onClick={handleMergeDownClick}
             >
               <ArrowDown size={16} />
             </Button>
@@ -130,6 +146,15 @@ type SentenceFormProps = {
 
 const SentenceForm = ({ id, line, onChange }: SentenceFormProps): JSX.Element => {
   const [input, setInput] = useState(line)
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>): void => {
+    setInput(e.target.value)
+  }, [])
+
+  const handleBlur = useCallback((): void => {
+    onChange(input)
+  }, [input, onChange])
+
   return (
     <Field name={`sentence_${id}`} asChild>
       <Control asChild>
@@ -137,8 +162,8 @@ const SentenceForm = ({ id, line, onChange }: SentenceFormProps): JSX.Element =>
           className={"w-full rounded-md border-2 p-2"}
           value={input}
           autoFocus
-          onChange={e => setInput(e.target.value)}
-          onBlur={() => onChange(input)}
+          onChange={handleInputChange}
+          onBlur={handleBlur}
         />
       </Control>
     </Field>
