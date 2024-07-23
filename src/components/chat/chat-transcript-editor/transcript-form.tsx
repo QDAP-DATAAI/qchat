@@ -9,13 +9,7 @@ import { Button } from "@/features/ui/button"
 import { TranscriptSentence } from "./transcript-sentence"
 import { Sentence, Speaker } from "./types"
 
-const defaultColorPairs = [
-  { color: "bg-accent", background: "bg-background" },
-  { color: "bg-button", background: "bg-altBackground" },
-  { color: "bg-buttonHover", background: "bg-background" },
-  { color: "bg-focus", background: "bg-altBackground" },
-  { color: "bg-information", background: "bg-background" },
-]
+const defaultBackgrounds = ["bg-background", "bg-altBackground"]
 
 type TranscriptFormProps = {
   initialContent: string[]
@@ -23,11 +17,6 @@ type TranscriptFormProps = {
 }
 
 export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps): JSX.Element => {
-  const colorMap = new Map<string, string>()
-  defaultColorPairs.forEach(pair => {
-    colorMap.set(pair.color, pair.background)
-  })
-
   const [formValue, setFormValue] = useState<Sentence[]>([])
   const [speakers, setSpeakers] = useState<Speaker[]>([])
 
@@ -39,8 +28,6 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
       if (!acc.find(s => s.name === speakerName)) {
         const newSpeaker = {
           name: speakerName || `Speaker ${acc.length + 1}`,
-          color: defaultColorPairs[acc.length % defaultColorPairs.length].color,
-          background: defaultColorPairs[acc.length % defaultColorPairs.length].background,
           id: acc.length,
         }
         acc.push(newSpeaker)
@@ -61,8 +48,6 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
       if (!acc.find(s => s.name === speakerName)) {
         const newSpeaker = {
           name: speakerName || `Speaker ${acc.length + 1}`,
-          color: defaultColorPairs[acc.length % defaultColorPairs.length].color,
-          background: defaultColorPairs[acc.length % defaultColorPairs.length].background,
           id: acc.length,
         }
         acc.push(newSpeaker)
@@ -129,14 +114,10 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
     const speakers = [
       {
         name: "Speaker 1",
-        color: defaultColorPairs[0].color,
-        background: defaultColorPairs[0].background,
         id: 0,
       },
       {
         name: "Speaker 2",
-        color: defaultColorPairs[1].color,
-        background: defaultColorPairs[1].background,
         id: 1,
       },
     ]
@@ -147,7 +128,6 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
     })
     handleChange(newFormValue)
   }
-
   return (
     <Form className="flex size-full">
       {!speakers.length && (
@@ -162,6 +142,7 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
             id={item.id}
             sentence={item}
             speaker={speakers.find(s => item.line.includes(s.name)) || speakers[0]}
+            background={defaultBackgrounds[index % defaultBackgrounds.length]}
             onChange={update => handleSentenceChange(item.id, update)}
             onMergeUp={index ? handleMergeUp(item.id) : undefined}
             onMergeDown={index !== formValue.length - 1 ? handleMergeDown(item.id) : undefined}

@@ -13,6 +13,7 @@ type SentenceProps = {
   id: string
   sentence: Sentence
   speaker: Speaker
+  background: string
   onChange: (sentence: Sentence) => void
   onMergeUp?: () => void
   onMergeDown?: () => void
@@ -21,6 +22,7 @@ type SentenceProps = {
 export const TranscriptSentence = ({
   sentence,
   speaker,
+  background,
   onChange,
   onMergeUp,
   onMergeDown,
@@ -29,7 +31,7 @@ export const TranscriptSentence = ({
 
   return (
     <div
-      className={`${speaker?.background} group flex cursor-pointer items-start gap-2 rounded-md border-2 border-transparent p-1 py-1 hover:border-accent`}
+      className={`${background} group flex cursor-pointer items-start gap-2 rounded-sm border-2 border-transparent p-2 hover:border-accent`}
     >
       {isEditing ? (
         <SentenceForm
@@ -61,61 +63,6 @@ type SentenceDisplayProps = {
   onMergeDown?: () => void
 }
 
-// const SentenceDisplay = ({
-//   sentence,
-//   speaker,
-//   onMergeDown,
-//   onMergeUp,
-//   switchToEdit,
-// }: SentenceDisplayProps): JSX.Element => {
-//   const { line } = sentence
-//   return (
-//     <>
-//       <div className="flex flex-col gap-2">
-//         <b className="text-nowrap">{speaker?.name}</b>
-//         <div className="flex justify-center gap-1">
-//           {onMergeUp && (
-//             <Button
-//               className="opacity-20 group-hover:opacity-100"
-//               size="sm"
-//               variant="accent"
-//               ariaLabel="Merge Up"
-//               onClick={onMergeUp}
-//             >
-//               <ArrowUp size={16} />
-//             </Button>
-//           )}
-//           <Button
-//             className="opacity-20 group-hover:opacity-100"
-//             size="sm"
-//             variant="accent"
-//             ariaLabel="Edit"
-//             onClick={switchToEdit}
-//           >
-//             <Pencil size={16} />
-//           </Button>
-//           {onMergeDown && (
-//             <Button
-//               className="opacity-20 group-hover:opacity-100"
-//               size="sm"
-//               variant="accent"
-//               ariaLabel="Merge Down"
-//               onClick={onMergeDown}
-//             >
-//               <ArrowDown size={16} />
-//             </Button>
-//           )}
-//         </div>
-//       </div>
-//       <div className="flex flex-1 items-center">
-//         <div className="flex flex-1">
-//           <span className={"w-full"}>{line.replace(/\[(.*?)\]/, "").replace(/\((.*?)\)/, "")}</span>
-//         </div>
-//       </div>
-//     </>
-//   )
-// }
-
 const SentenceDisplay = ({
   sentence,
   speaker,
@@ -128,8 +75,8 @@ const SentenceDisplay = ({
     <>
       <div className={`flex flex-col ${speaker ? "gap-2" : ""}`}>
         {speaker && <b className="text-nowrap">{speaker.name}</b>}
-        <div className="flex justify-center gap-1">
-          {onMergeUp && (
+        <div className="grid grid-cols-3 gap-1">
+          {onMergeUp ? (
             <Button
               className="opacity-20 group-hover:opacity-100"
               size="sm"
@@ -139,6 +86,8 @@ const SentenceDisplay = ({
             >
               <ArrowUp size={16} />
             </Button>
+          ) : (
+            <div />
           )}
           <Button
             className="opacity-20 group-hover:opacity-100"
@@ -149,7 +98,7 @@ const SentenceDisplay = ({
           >
             <Pencil size={16} />
           </Button>
-          {onMergeDown && (
+          {onMergeDown ? (
             <Button
               className="opacity-20 group-hover:opacity-100"
               size="sm"
@@ -159,6 +108,8 @@ const SentenceDisplay = ({
             >
               <ArrowDown size={16} />
             </Button>
+          ) : (
+            <div />
           )}
         </div>
       </div>

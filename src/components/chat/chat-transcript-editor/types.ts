@@ -1,8 +1,6 @@
 export type Speaker = {
   name: string
-  color: string
   id: number
-  background: string
 }
 
 export type Sentence = {
