@@ -142,11 +142,13 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
   }, [formValue, handleChange])
 
   return (
-    <Form className="flex size-full">
+    <Form className="flex size-full flex-col">
       {!speakers.length && (
-        <Button variant={"ghost"} className="ml-2 mt-4" onClick={prefillSpeakers} ariaLabel="prefill speakers">
-          Prefill&nbsp;speakers
-        </Button>
+        <div className="flex justify-end p-2">
+          <Button variant={"default"} className="p-2" onClick={prefillSpeakers} ariaLabel="prefill speakers">
+            Prefill&nbsp;speakers
+          </Button>
+        </div>
       )}
       <div>
         {formValue.map((item, index) => (

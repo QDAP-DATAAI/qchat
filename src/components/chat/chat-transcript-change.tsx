@@ -1,6 +1,5 @@
 "use client"
 
-import { PencilRulerIcon } from "lucide-react"
 import React, { useState } from "react"
 
 import useSyncScroll from "@/components/hooks/use-sync-scroll"
@@ -66,7 +65,7 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
       <section className="grid w-full grid-cols-8 gap-4">
         <div className="col-span-3 flex flex-col">
           <Typography variant="h4" className="flex justify-between">
-            <span className="py-2">Original Transcription</span>
+            Original Transcription
             <span className="py-2">Accuracy: {accuracy !== null ? `${accuracy.toFixed(2)}%` : "Not calculated"}</span>
           </Typography>
           <Panel ref={leftPanel}>
@@ -78,17 +77,36 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
           </Panel>
         </div>
         <div className="col-span-5 flex flex-col">
-          <Typography variant="h4" className="flex justify-between">
+          <Typography variant="h4" className="flex items-center justify-between">
             <span className="py-2">Updated Transcription</span>
-            <Button
-              variant={"secondary"}
-              onClick={() => setEditorType(prev => (prev === "text" ? "form" : "text"))}
-              className="flex items-center gap-2"
-              ariaLabel="Toggle editor type"
-            >
-              <PencilRulerIcon size={16} />
-              {`Switch to ${editorType === "text" ? "Form" : "Text"} Editor`}
-            </Button>
+            <div className="flex gap-2 p-2">
+              <Button
+                variant={"default"}
+                onClick={() => setEditorType(prev => (prev === "text" ? "form" : "text"))}
+                className="flex items-center gap-2"
+                ariaLabel="Toggle editor type"
+              >
+                {`${editorType === "text" ? "Form" : "Text"} Editor`}
+              </Button>
+              <Button variant="destructive" onClick={handleReset(originalContent)} ariaLabel="Reset from original">
+                Reset
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleReset(updatedContent)}
+                className="text-destructive-foreground hover:bg-error"
+                ariaLabel="Reset from latest update"
+              >
+                Undo
+              </Button>
+              <Button
+                variant="accent"
+                onClick={handleSubmit(editorType === "text" ? content : sentences)}
+                ariaLabel="Save changes"
+              >
+                Save
+              </Button>
+            </div>
           </Typography>
           <Panel ref={rightPanel}>
             {editorType === "text" && <TranscriptionTextEditor initialContent={content} onChange={onContentChange} />}
@@ -96,26 +114,6 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
           </Panel>
         </div>
       </section>
-      <div className="flex w-full justify-end gap-4">
-        <Button variant="destructive" onClick={handleReset(originalContent)} ariaLabel="Reset from original">
-          Reset from original
-        </Button>
-        <Button
-          variant="destructive"
-          onClick={handleReset(updatedContent)}
-          className="text-destructive-foreground hover:bg-error"
-          ariaLabel="Reset from latest update"
-        >
-          Reset from latest update
-        </Button>
-        <Button
-          variant="accent"
-          onClick={handleSubmit(editorType === "text" ? content : sentences)}
-          ariaLabel="Save changes"
-        >
-          Save changes
-        </Button>
-      </div>
     </div>
   )
 }
