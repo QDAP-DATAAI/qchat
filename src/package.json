@@ -24,7 +24,7 @@
     "@azure/cosmos": "^4.0.0",
     "@azure/monitor-opentelemetry-exporter": "^1.0.0-beta.24",
     "@azure/msal-node": "^2.10.0",
-    "@azure/openai": "^1.0.0-beta.12",
+    "@azure/openai": "^2.0.0-beta.1",
     "@azure/search-documents": "^12.0.0",
     "@codemirror/lang-javascript": "^6.2.2",
     "@grpc/grpc-js": "^1.10.10",
