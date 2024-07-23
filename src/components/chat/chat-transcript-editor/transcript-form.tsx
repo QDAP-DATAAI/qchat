@@ -10,17 +10,18 @@ import { TranscriptSentence } from "./transcript-sentence"
 import { Sentence, Speaker } from "./types"
 
 const defaultColorPairs = [
-  { color: "bg-lime-700", background: "" },
-  { color: "bg-yellow-700", background: "bg-altBackground" },
-  { color: "bg-violet-700", background: "bg-neutral-600" },
-  { color: "bg-teal-700", background: "bg-neutral-700" },
-  { color: "bg-orange-700", background: "bg-neutral-800" },
+  { color: "bg-accent", background: "bg-background" },
+  { color: "bg-button", background: "bg-altBackground" },
+  { color: "bg-buttonHover", background: "bg-background" },
+  { color: "bg-focus", background: "bg-altBackground" },
+  { color: "bg-information", background: "bg-background" },
 ]
 
 type TranscriptFormProps = {
   initialContent: string[]
   onChange: (value: string[]) => void
 }
+
 export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps): JSX.Element => {
   const colorMap = new Map<string, string>()
   defaultColorPairs.forEach(pair => {
@@ -31,7 +32,7 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
   const [speakers, setSpeakers] = useState<Speaker[]>([])
 
   useEffect(() => {
-    const initialFormValue = initialContent.map((line, index) => ({ line, id: `${index}` }))
+    const initialFormValue = initialContent.filter(line => line.trim()).map((line, index) => ({ line, id: `${index}` }))
     const initialSpeakers = initialContent.reduce((acc, curr) => {
       const speakerName = curr.match(/\[(.*?)\]/)?.[1] || curr.match(/\((.*?)\)/)?.[1] || curr.match(/(.*?):/)?.[1]
       if (!speakerName) return acc
@@ -76,7 +77,7 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
     const itemIndex = formValue.findIndex(sentence => sentence.id === id)
     const linesToAdd = updatedSentence.line
       .split("\n")
-      .filter(line => line)
+      .filter(line => line.trim())
       .map(line => ({ line, id: uniqueId() }))
     const newFormValue = formValue.reduce((acc, curr, index) => {
       if (index === itemIndex) acc.push(...linesToAdd)
@@ -150,12 +151,7 @@ export const TranscriptForm = ({ initialContent, onChange }: TranscriptFormProps
   return (
     <Form className="flex size-full">
       {!speakers.length && (
-        <Button
-          variant={"outline"}
-          className="ml-2 mt-4 border-2"
-          onClick={prefillSpeakers}
-          ariaLabel="prefill speakers"
-        >
+        <Button variant={"ghost"} className="ml-2 mt-4" onClick={prefillSpeakers} ariaLabel="prefill speakers">
           Prefill&nbsp;speakers
         </Button>
       )}

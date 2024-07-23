@@ -1,9 +1,10 @@
 "use client"
 
 import { Field, Control } from "@radix-ui/react-form"
-import { MergeIcon, EditIcon } from "lucide-react"
+import { ArrowUp, ArrowDown, Pencil } from "lucide-react"
 import { useState } from "react"
 
+import { Button } from "@/features/ui/button"
 import { Textarea } from "@/features/ui/textarea"
 
 import { Sentence, Speaker } from "./types"
@@ -16,6 +17,7 @@ type SentenceProps = {
   onMergeUp?: () => void
   onMergeDown?: () => void
 }
+
 export const TranscriptSentence = ({
   sentence,
   speaker,
@@ -27,7 +29,7 @@ export const TranscriptSentence = ({
 
   return (
     <div
-      className={`${speaker?.background} group flex cursor-pointer items-start gap-2 py-1 transition-colors duration-200 hover:shadow-2xl`}
+      className={`${speaker?.background} group flex cursor-pointer items-start gap-2 rounded-md border-2 border-transparent p-1 py-1 hover:border-accent`}
     >
       {isEditing ? (
         <SentenceForm
@@ -58,6 +60,62 @@ type SentenceDisplayProps = {
   onMergeUp?: () => void
   onMergeDown?: () => void
 }
+
+// const SentenceDisplay = ({
+//   sentence,
+//   speaker,
+//   onMergeDown,
+//   onMergeUp,
+//   switchToEdit,
+// }: SentenceDisplayProps): JSX.Element => {
+//   const { line } = sentence
+//   return (
+//     <>
+//       <div className="flex flex-col gap-2">
+//         <b className="text-nowrap">{speaker?.name}</b>
+//         <div className="flex justify-center gap-1">
+//           {onMergeUp && (
+//             <Button
+//               className="opacity-20 group-hover:opacity-100"
+//               size="sm"
+//               variant="accent"
+//               ariaLabel="Merge Up"
+//               onClick={onMergeUp}
+//             >
+//               <ArrowUp size={16} />
+//             </Button>
+//           )}
+//           <Button
+//             className="opacity-20 group-hover:opacity-100"
+//             size="sm"
+//             variant="accent"
+//             ariaLabel="Edit"
+//             onClick={switchToEdit}
+//           >
+//             <Pencil size={16} />
+//           </Button>
+//           {onMergeDown && (
+//             <Button
+//               className="opacity-20 group-hover:opacity-100"
+//               size="sm"
+//               variant="accent"
+//               ariaLabel="Merge Down"
+//               onClick={onMergeDown}
+//             >
+//               <ArrowDown size={16} />
+//             </Button>
+//           )}
+//         </div>
+//       </div>
+//       <div className="flex flex-1 items-center">
+//         <div className="flex flex-1">
+//           <span className={"w-full"}>{line.replace(/\[(.*?)\]/, "").replace(/\((.*?)\)/, "")}</span>
+//         </div>
+//       </div>
+//     </>
+//   )
+// }
+
 const SentenceDisplay = ({
   sentence,
   speaker,
@@ -68,31 +126,45 @@ const SentenceDisplay = ({
   const { line } = sentence
   return (
     <>
-      <b className={`${speaker?.color} text-nowrap rounded-r-md px-1`}>{speaker?.name}</b>
-      <div className="flex flex-1 group-hover:bg-designAccent">
-        <span className={"w-full group-hover:mr-8"}>{line.replace(/\[(.*?)\]/, "").replace(/\((.*?)\)/, "")}</span>
-        <div className={"relative z-10 hidden gap-1 group-hover:flex group-hover:flex-col group-hover:justify-center"}>
+      <div className={`flex flex-col ${speaker ? "gap-2" : ""}`}>
+        {speaker && <b className="text-nowrap">{speaker.name}</b>}
+        <div className="flex justify-center gap-1">
           {onMergeUp && (
-            <MergeIcon
-              size={16}
-              className="absolute -top-6 right-0 h-8 w-8 rounded-t-full p-1 hover:bg-altButton hover:text-background"
+            <Button
+              className="opacity-20 group-hover:opacity-100"
+              size="sm"
+              variant="accent"
+              ariaLabel="Merge Up"
               onClick={onMergeUp}
-            />
+            >
+              <ArrowUp size={16} />
+            </Button>
           )}
-
-          <EditIcon
-            size={16}
-            className="absolute right-0 h-8 w-8 rounded-full p-1 hover:bg-altButton hover:text-background"
+          <Button
+            className="opacity-20 group-hover:opacity-100"
+            size="sm"
+            variant="accent"
+            ariaLabel="Edit"
             onClick={switchToEdit}
-          />
-
+          >
+            <Pencil size={16} />
+          </Button>
           {onMergeDown && (
-            <MergeIcon
-              size={16}
-              className="absolute -bottom-6 right-0 h-8 w-8 rotate-180 rounded-t-full p-1 hover:bg-altButton hover:text-background"
+            <Button
+              className="opacity-20 group-hover:opacity-100"
+              size="sm"
+              variant="accent"
+              ariaLabel="Merge Down"
               onClick={onMergeDown}
-            />
+            >
+              <ArrowDown size={16} />
+            </Button>
           )}
+        </div>
+      </div>
+      <div className="flex flex-1 items-center">
+        <div className="flex flex-1">
+          <span className="w-full">{line.replace(/\[(.*?)\]/, "").replace(/\((.*?)\)/, "")}</span>
         </div>
       </div>
     </>
@@ -104,6 +176,7 @@ type SentenceFormProps = {
   line: string
   onChange: (line: string) => void
 }
+
 const SentenceForm = ({ id, line, onChange }: SentenceFormProps): JSX.Element => {
   const [input, setInput] = useState(line)
   return (

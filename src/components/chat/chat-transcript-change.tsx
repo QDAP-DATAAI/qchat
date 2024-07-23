@@ -63,8 +63,8 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <section className="flex w-full flex-wrap gap-4">
-        <div className="flex flex-1 flex-col">
+      <section className="grid w-full grid-cols-8 gap-4">
+        <div className="col-span-3 flex flex-col">
           <Typography variant="h4" className="flex justify-between">
             <span className="py-2">Original Transcription</span>
             <span className="py-2">Accuracy: {accuracy !== null ? `${accuracy.toFixed(2)}%` : "Not calculated"}</span>
@@ -77,7 +77,7 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
             ))}
           </Panel>
         </div>
-        <div className="flex flex-1 flex-col">
+        <div className="col-span-5 flex flex-col">
           <Typography variant="h4" className="flex justify-between">
             <span className="py-2">Updated Transcription</span>
             <Button
@@ -101,7 +101,7 @@ export const ChatTranscriptEditor: React.FC<ChatTranscriptEditorProps> = ({
           Reset from original
         </Button>
         <Button
-          variant="outline"
+          variant="destructive"
           onClick={handleReset(updatedContent)}
           className="text-destructive-foreground hover:bg-error"
           ariaLabel="Reset from latest update"
