@@ -1,6 +1,6 @@
 "use client"
 
-import { OctagonAlert, SearchX } from "lucide-react"
+import { OctagonAlert, SearchX, SmilePlus } from "lucide-react"
 import React, { FC, useState } from "react"
 
 import ErrorBoundary from "@/components/error-boundary"
@@ -20,7 +20,7 @@ interface ChatRowProps {
   chatThreadId: string
   showAssistantButtons: boolean
   threadLocked?: boolean
-  disableButtons?: boolean // Add this prop
+  disableButtons?: boolean
 }
 
 export const ChatRow: FC<ChatRowProps> = props => {
@@ -30,6 +30,8 @@ export const ChatRow: FC<ChatRowProps> = props => {
     props.type === "assistant" ? props.message.content : `**${props.name || "You"}**: ${props.message.content}`
 
   const fleschScore = calculateFleschKincaidScore(props.message.content)
+
+  const isShortInput = (text: string): boolean => text.length < 30
 
   return (
     <article className={"container mx-auto flex flex-col py-1 pb-2"}>
@@ -86,6 +88,20 @@ export const ChatRow: FC<ChatRowProps> = props => {
               </div>
               <div className="flex items-center justify-center">
                 <OctagonAlert size={20} />
+              </div>
+            </div>
+          )}
+          {props.type !== "assistant" && isShortInput(props.message.content) && (
+            <div
+              className="my-2 flex max-w-none justify-center space-x-2 rounded-md bg-information p-2 text-base md:text-base"
+              tabIndex={0}
+              aria-label="Input Warning"
+            >
+              <div className="flex items-center justify-center">
+                <SmilePlus size={20} />
+              </div>
+              <div className="flex flex-col items-center justify-center text-center">
+                Your message is a bit short. For the best results, please provide more context or details.
               </div>
             </div>
           )}
