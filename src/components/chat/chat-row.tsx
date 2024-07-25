@@ -19,12 +19,12 @@ interface ChatRowProps {
   type: ChatRole
   chatThreadId: string
   showAssistantButtons: boolean
-  threadLocked?: boolean
+  lockMessage?: boolean
   disableButtons?: boolean
 }
 
 export const ChatRow: FC<ChatRowProps> = props => {
-  const { setInput } = useChatContext()
+  const { setInput, chatThreadLocked } = useChatContext()
   const [feedbackMessage, setFeedbackMessage] = useState("")
   const content =
     props.type === "assistant" ? props.message.content : `**${props.name || "You"}**: ${props.message.content}`
@@ -37,7 +37,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
     <article className={"container mx-auto flex flex-col py-1 pb-2"}>
       <ErrorBoundary fallback={<ErrorSection />}>
         <section
-          className={`prose prose-slate max-w-full flex-col gap-4 overflow-hidden break-words rounded-md px-4 py-2 text-base text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base ${props.threadLocked && "border-4 border-error"} ${props.type === "assistant" && "bg-backgroundShade"} ${props.type != "assistant" && "bg-altBackgroundShade"}`}
+          className={`prose prose-slate max-w-full flex-col gap-4 overflow-hidden break-words rounded-md px-4 py-2 text-base text-text dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 md:text-base ${props.lockMessage && "border-4 border-error"} ${props.type === "assistant" && "bg-backgroundShade"} ${props.type != "assistant" && "bg-altBackgroundShade"}`}
         >
           {props.type === "assistant" && (
             <div className="flex w-full items-center justify-between">
@@ -64,7 +64,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
           >
             <div className="size-full items-center justify-between">
               <Markdown content={content} />
-              {!!props.message.contentFilterResult && !props.disableButtons && (
+              {!!props.message.contentFilterResult && !props.disableButtons && !chatThreadLocked && (
                 <RewriteMessageButton
                   fleschScore={fleschScore}
                   message={props.message}
