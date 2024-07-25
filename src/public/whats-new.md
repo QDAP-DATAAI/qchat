@@ -6,7 +6,7 @@ Below are the updates for the {{AGENCY NAME}} {{APP_NAME}} Virtual Assistant.
 
 - If you are a technical or business staff member working on AI Projects, you can click [here](https://forms.office.com/r/YZzMFLexPK) to request to join the {{AGENCY NAME}} AI Community of Practice. This platform is designed to facilitate knowledge sharing and collaboration among AI professionals within the government.
 
-## 🎨 Version 2.0.0 Updates - 25 July 2024
+## 🎨 Version 2.0.0 Updates - 25 July 2024
 
 We have made {{APP_NAME}} easier to customise and whitelabel. In doing so we have made some background changes.
 
