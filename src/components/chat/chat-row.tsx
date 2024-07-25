@@ -8,6 +8,7 @@ import { Markdown } from "@/components/markdown/markdown"
 import Typography from "@/components/typography"
 import { calculateFleschKincaidScore } from "@/features/chat/chat-services/chat-flesch"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
+import { SHORT_MESSAGE_LENGTH } from "@/features/chat/constants"
 import { ChatRole, PromptMessage } from "@/features/chat/models"
 import { AssistantButtons } from "@/features/ui/assistant-buttons"
 import { RewriteMessageButton } from "@/features/ui/assistant-buttons/rewrite-message-button"
@@ -31,7 +32,7 @@ export const ChatRow: FC<ChatRowProps> = props => {
 
   const fleschScore = calculateFleschKincaidScore(props.message.content)
 
-  const isShortInput = (text: string): boolean => text.length < 30
+  const isShortInput = (text: string): boolean => text.length < SHORT_MESSAGE_LENGTH
 
   return (
     <article className={"container mx-auto flex flex-col py-1 pb-2"}>
