@@ -14,7 +14,7 @@ const Home = (): JSX.Element => {
         <div className="prose max-w-4xl break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0">
           <Typography variant="h3">App Version {APP_VERSION}</Typography>
           <Suspense fallback={<p>Loading video...</p>}>
-            <VideoPlayer />
+            <VideoPlayer videoId="dQw4w9WgXcQ" />
           </Suspense>
         </div>
       </div>
