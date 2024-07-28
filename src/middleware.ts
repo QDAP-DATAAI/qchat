@@ -4,9 +4,18 @@ import { getToken } from "next-auth/jwt"
 const LOGIN_PAGE = "/login"
 const UNAUTHORISED_PAGE = "/unauthorised"
 
-const requireAuthPaths = ["/api", "/chat", "/hallucinations", "/prompt-guide", "/settings", "/terms", "/whats-new"]
+const requireAuthPaths = [
+  "/api",
+  "/chat",
+  "/hallucinations",
+  "/prompt-guide",
+  "/settings",
+  "training",
+  "/terms",
+  "/whats-new",
+]
 
-const requireAdminPaths = ["/api/tenant", "/settings/tenant", "/settings/admin", "/settings/tenants"]
+const requireAdminPaths = ["/api/tenant", "/settings/tenant", "/settings/admin", "settings/manage"]
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const pathname = request.nextUrl.pathname
@@ -38,6 +47,7 @@ export const config = {
     "/hallucinations/:path*",
     "/prompt-guide/:path*",
     "/settings/:path*",
+    "/training/:path*",
     "/terms/:path*",
     "/unauthorised/:path*",
     "/whats-new/:path*",
