@@ -14,7 +14,7 @@ interface Prop {
 }
 const tenants = process.env.NEXT_PUBLIC_FEATURE_TRANSCRIBE_TENANTS?.split(",") || []
 export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
-  const { chatBody, onChatTypeChange } = useChatContext()
+  const { onIndexChange, chatBody, onChatTypeChange } = useChatContext()
   const [isAllowedTenant, setIsAllowedTenant] = useState<boolean>(false)
   useEffect(() => {
     if (chatBody) {
@@ -26,8 +26,9 @@ export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
   const handleValueChange = useCallback(
     (value: string) => {
       onChatTypeChange(value as ChatType)
+      onIndexChange("qchat")
     },
-    [onChatTypeChange]
+    [onChatTypeChange, onIndexChange]
   )
 
   return (
@@ -86,3 +87,5 @@ export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
     </TooltipProvider>
   )
 }
+
+//TODO: Remove adding qchat index directly

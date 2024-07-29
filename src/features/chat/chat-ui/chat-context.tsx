@@ -96,6 +96,8 @@ const useChatHook = (props: ChatProviderProps): ChatContextState => {
   const onConversationSensitivityChange = (value: ConversationSensitivity): void =>
     setChatBody(prev => ({ ...prev, conversationSensitivity: value }))
 
+  const onIndexChange = (value: string): void => setChatBody(prev => ({ ...prev, indexId: value }))
+
   const handleSubmit = async (
     event?: { preventDefault?: () => void },
     options: ChatRequestOptions = {}
@@ -139,6 +141,7 @@ const useChatHook = (props: ChatProviderProps): ChatContextState => {
     onChatTypeChange,
     onConversationStyleChange,
     onConversationSensitivityChange,
+    onIndexChange,
     fileState,
     id: props.id,
   }
@@ -172,6 +175,7 @@ type ChatContextState = UseChatHelpers & {
   onChatTypeChange: (value: ChatType) => void
   onConversationStyleChange: (value: ConversationStyle) => void
   onConversationSensitivityChange: (value: ConversationSensitivity) => void
+  onIndexChange: (value: string) => void
   chatThreadLocked: boolean
   messages: PromptMessage[]
   documents: ChatDocumentModel[]

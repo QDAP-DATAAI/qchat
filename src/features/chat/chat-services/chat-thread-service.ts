@@ -120,6 +120,7 @@ export const UpdateChatThreadTitle = async (
 export const UpdateChatThreadToFileDetails = async (
   chatThreadId: string,
   newType: ChatType,
+  indexId: string,
   chatOverFileName: string
 ): ServerActionResponseAsync<ChatThreadModel> => {
   try {
@@ -130,6 +131,7 @@ export const UpdateChatThreadToFileDetails = async (
     chatThread.name = `Chat with ${chatOverFileName}`
     chatThread.chatType = newType
     chatThread.chatOverFileName = chatOverFileName
+    chatThread.indexId = indexId
     return await UpsertChatThread(chatThread)
   } catch (error) {
     return {
