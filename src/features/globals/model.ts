@@ -6,6 +6,7 @@ export type ApplicationSettings = {
   termsAndConditionsDate: string
   administratorAccess: TenantGroupPairs[]
   transcriptionAccess: TenantGroupPairs[]
+  indexes: ApplicationIndexSettings[]
 }
 
 export type TenantGroupPairs = {
@@ -13,7 +14,7 @@ export type TenantGroupPairs = {
   groups: string[]
 }
 
-type ApplicationIndexSettings = {
+export type ApplicationIndexSettings = {
   id: string
   name: string
   description: string

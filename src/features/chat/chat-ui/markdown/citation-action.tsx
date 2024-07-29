@@ -12,6 +12,7 @@ export const CitationAction = async (_previousState: unknown, formData: FormData
   const chatThreadId = formData.get("chatThreadId") as string
   const userId = formData.get("userId") as string
   const tenantId = formData.get("tenantId") as string
+  const indexId = formData.get("indexId") as string
   const name = formData.get("name") as string
 
   const baseFilter = `chatThreadId eq '${chatThreadId}' and userId eq '${userId}' and tenantId eq '${tenantId}'`
@@ -20,20 +21,20 @@ export const CitationAction = async (_previousState: unknown, formData: FormData
     filter: `${baseFilter} and id eq '${id}'`,
   }
 
-  let result = await simpleSearch(userId, chatThreadId, tenantId, idFilter)
+  let result = await simpleSearch(userId, chatThreadId, tenantId, indexId, idFilter)
 
   if (result.length === 0) {
     const documentIdFilter = {
       filter: `${baseFilter} and metadata eq '${id}'`,
     }
-    result = await simpleSearch(userId, chatThreadId, tenantId, documentIdFilter)
+    result = await simpleSearch(userId, chatThreadId, tenantId, indexId, documentIdFilter)
   }
 
   if (result.length === 0) {
     const fileNameFilter = {
       filter: `${baseFilter} and fileName eq '${name}'`,
     }
-    result = await simpleSearch(userId, chatThreadId, tenantId, fileNameFilter)
+    result = await simpleSearch(userId, chatThreadId, tenantId, indexId, fileNameFilter)
   }
 
   if (result.length === 0) return <div>Not found</div>

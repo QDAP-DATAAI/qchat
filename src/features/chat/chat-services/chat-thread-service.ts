@@ -161,8 +161,9 @@ export const SoftDeleteChatThreadForCurrentUser = async (
     const chatDocumentsResponse = await FindAllChatDocumentsForCurrentUser(chatThreadId)
     if (chatDocumentsResponse.status !== "OK") return chatDocumentsResponse
     if (chatDocumentsResponse.response.length) {
+      const indexId = chatDocumentsResponse.response[0].indexId
       const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
-      await deleteDocuments(chatThreadId, userId, tenantId)
+      await deleteDocuments(chatThreadId, userId, tenantId, indexId)
       const chatDocumentsPromises = chatDocumentsResponse.response.map(
         async chat => await container.items.upsert({ ...chat, isDeleted: true })
       )
@@ -253,6 +254,7 @@ export const CreateChatThread = async (title?: string): ServerActionResponseAsyn
       conversationStyle: ConversationStyle.Precise,
       conversationSensitivity: ConversationSensitivity.Official,
       type: ChatRecordType.Thread,
+      indexId: "",
       chatOverFileName: "",
     }
 
@@ -282,7 +284,7 @@ export type InitChatSessionResponse = {
 }
 
 export const InitThreadSession = async (props: PromptProps): ServerActionResponseAsync<InitChatSessionResponse> => {
-  const { id: chatThreadId, chatType, conversationStyle, conversationSensitivity, chatOverFileName } = props
+  const { id: chatThreadId, chatType, conversationStyle, conversationSensitivity, chatOverFileName, indexId } = props
 
   logger.event("InitThreadSession", {
     chatThreadId,
@@ -290,6 +292,7 @@ export const InitThreadSession = async (props: PromptProps): ServerActionRespons
     conversationStyle,
     conversationSensitivity,
     chatOverFileName,
+    indexId,
   })
 
   const currentChatThreadResponse = await EnsureChatThreadOperation(chatThreadId)
@@ -308,6 +311,7 @@ export const InitThreadSession = async (props: PromptProps): ServerActionRespons
   const updatedChatThreadResponse = await UpsertChatThread({
     ...currentChatThreadResponse.response,
     chatType: chatType,
+    indexId: indexId,
     chatOverFileName: chatOverFileName,
     conversationStyle: conversationStyle,
     conversationSensitivity: conversationSensitivity,

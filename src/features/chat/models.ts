@@ -89,6 +89,7 @@ export interface ChatThreadModel {
   isDeleted: boolean
   chatType: ChatType
   conversationSensitivity: ConversationSensitivity
+  indexId: string
   conversationStyle: ConversationStyle
   chatOverFileName: string
   type: ChatRecordType.Thread
@@ -102,6 +103,7 @@ export interface PromptBody {
   chatType: ChatType
   conversationStyle: ConversationStyle
   conversationSensitivity: ConversationSensitivity
+  indexId: string
   chatOverFileName: string
   tenantId: string
   userId: string
@@ -129,6 +131,7 @@ export interface ChatDocumentModel {
   tenantId: string
   isDeleted: boolean
   createdAt: Date
+  indexId: string
   contents?: string
   extraContents?: string
   updatedContents?: string

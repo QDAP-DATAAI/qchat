@@ -42,6 +42,7 @@ const useChatHook = (props: ChatProviderProps): ChatContextState => {
     userId: props.chatThread.userId,
     internalReference: props.chatThread.internalReference,
     chatThreadName: props.chatThread.name,
+    indexId: props.chatThread.indexId,
   })
 
   const chatThreadNameRef = useRef(chatBody.chatThreadName)

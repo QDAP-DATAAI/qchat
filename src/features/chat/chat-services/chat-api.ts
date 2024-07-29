@@ -59,7 +59,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       metaPrompt = res.systemMessage
       context = res.context
     } else {
-      const res = await buildDataChatMessages(updatedLastHumanMessage, chatThread.chatThreadId)
+      const res = await buildDataChatMessages(updatedLastHumanMessage, chatThread.chatThreadId, chatThread.indexId)
       userMessage = res.userMessage
       metaPrompt = res.systemMessage
       context = res.context

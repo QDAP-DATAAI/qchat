@@ -1,19 +1,21 @@
-// interface IndexModel extends SearchIndex {
-//   id: string
-//   name: string
-//   description: string
-//   longDescription: string
-//   systemInstruction: string
-//   dataOwner: string
-//   isActive: boolean
-//   createdAt: Date
-//   updatedAt: Date
-//   fields: SearchField[]
-//   accessSettings: TenantGroupPairs[]
-//   searchConfiguration: AzureSearchChatExtensionConfiguration
-// }
+import { SearchField, SearchIndex } from "@azure/search-documents"
 
-type IndexEntity = {
+export type IndexStatus = "draft" | "experimental" | "active" | "inactive"
+
+export interface IndexModel extends SearchIndex {
+  id: string
+  name: string
+  description: string
+  longDescription: string
+  systemInstruction: string
+  dataOwner: string
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+  fields: SearchField[]
+}
+
+export type IndexEntity = {
   id: string
   name: string
   description: string
@@ -23,9 +25,8 @@ type IndexEntity = {
   createdAt: string
   updatedAt: string
 }
-type IndexStatus = "draft" | "experimental" | "active" | "inactive"
 
-type ApplicationEntity = {
+export type ApplicationEntity = {
   applicationId: string
   name: string
   description: string
@@ -34,25 +35,27 @@ type ApplicationEntity = {
   features: ApplicationFeature[]
 }
 
-type ApplicationFeature = {
+export type ApplicationFeature = {
   featureId: string
   name: string
   description: string
   isPublic: boolean
 }
 
-type TenantApplicationEntity = {
+export type TenantApplicationEntity = {
   id: string
   tenantId: string
   applicationId: string
   administratorGroups: string[]
-  features: ApplicationFeature &
-    {
+  features: Array<
+    ApplicationFeature & {
       enabled: boolean
       accessGroups: string[]
-    }[]
-  // history?: string[]
-  // config: TenantApplicationConfig
-  // preferences: TenantApplicationPreferences
-  // smartTools: ApplicationSmartToolConfig[]
+    }
+  >
+  // Uncomment and define these types as needed
+  // history?: string[];
+  // config: TenantApplicationConfig;
+  // preferences: TenantApplicationPreferences;
+  // smartTools: ApplicationSmartToolConfig[];
 }

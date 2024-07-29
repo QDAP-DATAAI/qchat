@@ -105,6 +105,7 @@ export const IndexDocuments = async (
   docs: string[],
   chatThreadId: string,
   documentId: string,
+  indexId: string,
   contentsToSave?: string,
   extraContents?: string
 ): ServerActionResponseAsync<AzureCogDocumentIndex[]> => {
@@ -126,7 +127,7 @@ export const IndexDocuments = async (
       title: fileName,
       embedding: [],
     }))
-    await indexDocuments(documentsToIndex)
+    await indexDocuments(documentsToIndex, indexId)
 
     const modelToSave: ChatDocumentModel = {
       chatThreadId,
@@ -139,6 +140,7 @@ export const IndexDocuments = async (
       name: fileName,
       contents: contentsToSave,
       extraContents: extraContents,
+      indexId: indexId,
       filePath: path,
       title: fileName,
       url: path,
@@ -201,6 +203,7 @@ export const FindAllChatDocumentsForCurrentUser = async (
 export const UpdateChatDocument = async (
   documentId: string,
   chatThreadId: string,
+  indexId: string,
   updatedContents: string
 ): ServerActionResponseAsync<ChatDocumentModel> => {
   try {
@@ -228,7 +231,7 @@ export const UpdateChatDocument = async (
         errors: [{ message: "Failed to update document" }],
       }
 
-    await deleteDocumentById(documentId, chatThreadId, userId, tenantId)
+    await deleteDocumentById(documentId, chatThreadId, userId, tenantId, indexId)
 
     const splitDocuments = chunkDocumentWithOverlap(updatedContents)
 
@@ -255,7 +258,7 @@ export const UpdateChatDocument = async (
       embedding: [],
     }))
 
-    await indexDocuments(documentsToIndex)
+    await indexDocuments(documentsToIndex, indexId)
 
     return {
       status: "OK",

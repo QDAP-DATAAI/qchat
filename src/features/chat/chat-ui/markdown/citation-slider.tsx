@@ -24,6 +24,7 @@ export const CitationSlider: FC<SliderProps> = props => {
   const chatContext = useChatContext()
   const { userId, tenantId } = chatContext.chatBody
   const chatThreadId = chatContext.id
+  const indexId = chatContext.chatBody.indexId
   const [node, formAction] = useFormState(CitationAction, null)
 
   const handleButtonClick = useCallback((): void => {
@@ -35,8 +36,9 @@ export const CitationSlider: FC<SliderProps> = props => {
     formData.append("chatThreadId", chatThreadId)
     formData.append("order", props.order.toString())
     formData.append("name", props.name)
+    formData.append("indexId", indexId)
     formAction(formData)
-  }, [props.index, props.id, userId, tenantId, chatThreadId, props.order, props.name, formAction])
+  }, [props.index, props.id, userId, tenantId, chatThreadId, props.order, props.name, indexId, formAction])
 
   return (
     <form>

@@ -5,6 +5,7 @@ import { userSession } from "@/features/auth/helpers"
 import { UpdateChatDocument } from "@/features/chat/chat-services/chat-document-service"
 
 const documentUpdateSchema = yup.object({
+  indexId: yup.string().required(),
   updatedContent: yup.string().required(),
 })
 
@@ -19,9 +20,9 @@ export async function PUT(
     const { chatThreadId, documentId } = params
     const body = await request.json()
     const validatedData = await documentUpdateSchema.validate(body, { abortEarly: false, stripUnknown: true })
-    const { updatedContent } = validatedData
+    const { indexId, updatedContent } = validatedData
 
-    const result = await UpdateChatDocument(documentId, chatThreadId, updatedContent)
+    const result = await UpdateChatDocument(documentId, chatThreadId, indexId, updatedContent)
     if (result.status !== "OK")
       return new Response(JSON.stringify({ error: "Failed to update document" }), { status: 500 })
 

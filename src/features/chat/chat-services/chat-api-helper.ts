@@ -52,10 +52,11 @@ question: ${userQuestion}`
 
 const findRelevantDocuments = async (
   query: string,
-  chatThreadId: string
+  chatThreadId: string,
+  indexId: string
 ): Promise<(AzureCogDocumentIndex & DocumentSearchModel)[]> => {
   const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
-  const relevantDocuments = await similaritySearchVectorWithScore(query, 10, userId, chatThreadId, tenantId)
+  const relevantDocuments = await similaritySearchVectorWithScore(query, 10, userId, chatThreadId, tenantId, indexId)
   return relevantDocuments
 }
 
@@ -81,13 +82,14 @@ export const buildSimpleChatMessages = async (
 
 export const buildDataChatMessages = async (
   lastChatMessage: PromptMessage,
-  chatThreadId: string
+  chatThreadId: string,
+  indexId: string
 ): Promise<{
   systemMessage: ChatCompletionMessageParam
   userMessage: ChatCompletionMessageParam
   context: string
 }> => {
-  const relevantDocuments = await findRelevantDocuments(lastChatMessage.content, chatThreadId)
+  const relevantDocuments = await findRelevantDocuments(lastChatMessage.content, chatThreadId, indexId)
   const context = relevantDocuments
     .map((result, index) => {
       const content = result.pageContent.replace(/(\r\n|\n|\r)/gm, "")

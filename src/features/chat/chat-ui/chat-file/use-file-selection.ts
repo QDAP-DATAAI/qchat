@@ -46,7 +46,15 @@ export const useFileSelection = (
       try {
         setUploadButtonLabel(`Indexing file ${file.name}...`)
         const documentId = uniqueId()
-        const indexResponse = await IndexDocuments(file.name, splitDocuments, props.id, documentId, contents, vtt)
+        const indexResponse = await IndexDocuments(
+          file.name,
+          splitDocuments,
+          props.id,
+          documentId,
+          chatBody.indexId,
+          contents,
+          vtt
+        )
         if (indexResponse.status !== "OK") {
           indexErrors.push(indexResponse.errors[0].message)
         }

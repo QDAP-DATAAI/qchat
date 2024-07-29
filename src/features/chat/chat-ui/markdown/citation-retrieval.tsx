@@ -6,12 +6,13 @@ export const citationRetrieval = async (
   id: string,
   userId: string,
   tenantId: string,
-  chatThreadId: string
+  chatThreadId: string,
+  indexId: string
 ): Promise<{ Filename: string; Content: string; Section: number } | null> => {
   const filter = {
     filter: `id eq '${id}' and chatThreadId eq '${chatThreadId}' and userId eq '${userId}' and tenantId eq '${tenantId}'`,
   }
-  const result = await simpleSearch(userId, chatThreadId, tenantId, filter)
+  const result = await simpleSearch(userId, chatThreadId, tenantId, indexId, filter)
 
   if (result.length === 0) return null
   const firstResult = result[0]
