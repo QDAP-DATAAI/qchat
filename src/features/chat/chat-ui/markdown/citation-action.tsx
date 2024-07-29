@@ -5,7 +5,11 @@ import { ReactElement } from "react"
 import { APP_NAME } from "@/app-global"
 
 import Typography from "@/components/typography"
-import { simpleSearch } from "@/features/chat/chat-services/azure-cog-search/azure-cog-vector-store"
+import {
+  AzureCogDocumentIndex,
+  DocumentSearchModel,
+  simpleSearch,
+} from "@/features/chat/chat-services/azure-cog-search/azure-cog-vector-store"
 
 export const CitationAction = async (_previousState: unknown, formData: FormData): Promise<ReactElement> => {
   const id = formData.get("id") as string
@@ -15,26 +19,15 @@ export const CitationAction = async (_previousState: unknown, formData: FormData
   const indexId = formData.get("indexId") as string
   const name = formData.get("name") as string
 
-  const baseFilter = `chatThreadId eq '${chatThreadId}' and userId eq '${userId}' and tenantId eq '${tenantId}'`
+  const additionalFilters = [`id eq '${id}'`, `metadata eq '${id}'`, `fileName eq '${name}'`]
 
-  const idFilter = {
-    filter: `${baseFilter} and id eq '${id}'`,
-  }
+  let result: Array<AzureCogDocumentIndex & DocumentSearchModel> = []
 
-  let result = await simpleSearch(userId, chatThreadId, tenantId, indexId, idFilter)
-
-  if (result.length === 0) {
-    const documentIdFilter = {
-      filter: `${baseFilter} and metadata eq '${id}'`,
+  for (const additionalFilter of additionalFilters) {
+    result = await simpleSearch(userId, chatThreadId, tenantId, indexId, { filter: additionalFilter })
+    if (result.length > 0) {
+      break
     }
-    result = await simpleSearch(userId, chatThreadId, tenantId, indexId, documentIdFilter)
-  }
-
-  if (result.length === 0) {
-    const fileNameFilter = {
-      filter: `${baseFilter} and fileName eq '${name}'`,
-    }
-    result = await simpleSearch(userId, chatThreadId, tenantId, indexId, fileNameFilter)
   }
 
   if (result.length === 0) return <div>Not found</div>

@@ -51,6 +51,25 @@ type AzureCogRequestObject = {
   vectorQueries: AzureCogVectorField[]
 }
 
+const constructFilter = (userId: string, chatThreadId: string, tenantId: string, additionalFilter?: string): string => {
+  const userFilter = `search.in(userId, '${userId}')`
+  const threadFilter = `search.in(chatThreadId, '${chatThreadId}')`
+  const tenantFilter = `search.in(tenantId, '${tenantId}')`
+  return [additionalFilter, userFilter, threadFilter, tenantFilter].filter(Boolean).join(" and ")
+}
+
+const searchDocuments = async (
+  url: string,
+  searchBody: AzureCogRequestObject
+): Promise<Array<AzureCogDocumentIndex & DocumentSearchModel>> => {
+  const resultDocuments = await fetcher<DocumentSearchResponseModel<AzureCogDocumentIndex & DocumentSearchModel>>(url, {
+    method: "POST",
+    body: JSON.stringify(searchBody),
+  })
+
+  return resultDocuments.value
+}
+
 export const simpleSearch = async (
   userId: string,
   chatThreadId: string,
@@ -59,11 +78,7 @@ export const simpleSearch = async (
   filter?: AzureCogFilter
 ): Promise<Array<AzureCogDocumentIndex & DocumentSearchModel>> => {
   const url = `${baseIndexUrl(indexId)}/docs/search?api-version=${process.env.AZURE_SEARCH_API_VERSION}`
-
-  const userFilter = `search.in(userId, '${userId}')`
-  const threadFilter = `search.in(chatThreadId, '${chatThreadId}')`
-  const tenantFilter = `search.in(tenantId, '${tenantId}')`
-  const combinedFilter = [filter?.filter, userFilter, threadFilter, tenantFilter].filter(Boolean).join(" and ")
+  const combinedFilter = constructFilter(userId, chatThreadId, tenantId, filter?.filter)
 
   const searchBody: AzureCogRequestObject = {
     search: filter?.search || "*",
@@ -73,12 +88,7 @@ export const simpleSearch = async (
     vectorQueries: [],
   }
 
-  const resultDocuments = await fetcher<DocumentSearchResponseModel<AzureCogDocumentIndex & DocumentSearchModel>>(url, {
-    method: "POST",
-    body: JSON.stringify(searchBody),
-  })
-
-  return resultDocuments.value
+  return await searchDocuments(url, searchBody)
 }
 
 export const similaritySearchVectorWithScore = async (
@@ -91,18 +101,13 @@ export const similaritySearchVectorWithScore = async (
   filter?: AzureCogFilter
 ): Promise<Array<AzureCogDocumentIndex & DocumentSearchModel>> => {
   const openai = OpenAIEmbeddingInstance()
-
   const embeddings = await openai.embeddings.create({
     input: query,
     model: process.env.AZURE_OPENAI_API_EMBEDDINGS_DEPLOYMENT_NAME,
   })
 
   const url = `${baseIndexUrl(indexId)}/docs/search?api-version=${process.env.AZURE_SEARCH_API_VERSION}`
-
-  const userFilter = `search.in(userId, '${userId}')`
-  const threadFilter = `search.in(chatThreadId, '${chatThreadId}')`
-  const tenantFilter = `search.in(tenantId, '${tenantId}')`
-  const combinedFilter = [filter?.filter, userFilter, threadFilter, tenantFilter].filter(Boolean).join(" and ")
+  const combinedFilter = constructFilter(userId, chatThreadId, tenantId, filter?.filter)
 
   const searchBody: AzureCogRequestObject = {
     search: filter?.search || "*",
@@ -112,12 +117,7 @@ export const similaritySearchVectorWithScore = async (
     vectorQueries: [{ vector: embeddings.data[0].embedding, fields: "embedding", k: k, kind: "vector" }],
   }
 
-  const resultDocuments = await fetcher<DocumentSearchResponseModel<AzureCogDocumentIndex & DocumentSearchModel>>(url, {
-    method: "POST",
-    body: JSON.stringify(searchBody),
-  })
-
-  return resultDocuments.value
+  return await searchDocuments(url, searchBody)
 }
 
 export const indexDocuments = async (documents: Array<AzureCogDocumentIndex>, indexId: string): Promise<void> => {
@@ -141,17 +141,13 @@ export const deleteDocuments = async (
   indexId: string
 ): Promise<void> => {
   const filter: AzureCogFilter = {
-    filter: `search.in(chatThreadId, '${chatThreadId}') and search.in(userId, '${userId}') and search.in(tenantId, '${tenantId}')`,
+    filter: constructFilter(userId, chatThreadId, tenantId),
   }
   const documentsInChat = await simpleSearch(userId, chatThreadId, tenantId, indexId, filter)
-  const documentsToDelete: DocumentDeleteModel[] = []
-  documentsInChat.forEach(document => {
-    const doc: DocumentDeleteModel = {
-      "@search.action": "delete",
-      id: document.id,
-    }
-    documentsToDelete.push(doc)
-  })
+  const documentsToDelete: DocumentDeleteModel[] = documentsInChat.map(document => ({
+    "@search.action": "delete",
+    id: document.id,
+  }))
 
   await fetcher<void>(`${baseIndexUrl(indexId)}/docs/index?api-version=${process.env.AZURE_SEARCH_API_VERSION}`, {
     method: "POST",
@@ -167,7 +163,7 @@ export const deleteDocumentById = async (
   indexId: string
 ): ServerActionResponseAsync<void> => {
   const filter: AzureCogFilter = {
-    filter: `search.in(metadata, '${documentId}') and search.in(chatThreadId, '${chatThreadId}') and search.in(userId, '${userId}') and search.in(tenantId, '${tenantId}')`,
+    filter: constructFilter(userId, chatThreadId, tenantId, `search.in(metadata, '${documentId}')`),
   }
 
   try {

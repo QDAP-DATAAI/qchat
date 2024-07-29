@@ -203,7 +203,6 @@ export const FindAllChatDocumentsForCurrentUser = async (
 export const UpdateChatDocument = async (
   documentId: string,
   chatThreadId: string,
-  indexId: string,
   updatedContents: string
 ): ServerActionResponseAsync<ChatDocumentModel> => {
   try {
@@ -231,7 +230,7 @@ export const UpdateChatDocument = async (
         errors: [{ message: "Failed to update document" }],
       }
 
-    await deleteDocumentById(documentId, chatThreadId, userId, tenantId, indexId)
+    await deleteDocumentById(documentId, chatThreadId, userId, tenantId, resource.indexId)
 
     const splitDocuments = chunkDocumentWithOverlap(updatedContents)
 
@@ -258,7 +257,7 @@ export const UpdateChatDocument = async (
       embedding: [],
     }))
 
-    await indexDocuments(documentsToIndex, indexId)
+    await indexDocuments(documentsToIndex, resource.indexId)
 
     return {
       status: "OK",
