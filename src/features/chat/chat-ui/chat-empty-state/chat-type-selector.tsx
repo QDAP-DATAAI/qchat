@@ -5,23 +5,32 @@ import React, { useEffect, useState, FC, useCallback } from "react"
 import { APP_NAME } from "@/app-global"
 
 import Typography from "@/components/typography"
+import { hasTranscriptionAccess } from "@/features/auth/helpers"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ChatType } from "@/features/chat/models"
 import { Tabs, TabsList, TabsTrigger } from "@/features/ui/tabs"
 import { TooltipProvider } from "@/features/ui/tooltip-provider"
+
 interface Prop {
   disable: boolean
 }
-const tenants = process.env.NEXT_PUBLIC_FEATURE_TRANSCRIBE_TENANTS?.split(",") || []
+
 export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
   const { onIndexChange, chatBody, onChatTypeChange } = useChatContext()
   const [isAllowedTenant, setIsAllowedTenant] = useState<boolean>(false)
+
   useEffect(() => {
-    if (chatBody) {
-      const tenantId = chatBody.tenantId
-      setIsAllowedTenant(tenants.includes(tenantId))
+    const checkTranscriptionAccess = async (): Promise<void> => {
+      try {
+        const access = await hasTranscriptionAccess()
+        setIsAllowedTenant(access)
+      } catch (_error) {
+        setIsAllowedTenant(false)
+      }
     }
-  }, [chatBody])
+
+    void checkTranscriptionAccess()
+  }, [])
 
   const handleValueChange = useCallback(
     (value: string) => {

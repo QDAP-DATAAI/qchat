@@ -18,6 +18,7 @@ import {
   ChatDocumentModel,
 } from "@/features/chat/models"
 import { showError } from "@/features/globals/global-message-store"
+import { ApplicationSettings } from "@/features/globals/model"
 import { TenantPreferences } from "@/features/tenant-management/models"
 import { uniqueId } from "@/lib/utils"
 
@@ -134,6 +135,7 @@ const useChatHook = (props: ChatProviderProps): ChatContextState => {
     }),
     documents: props.documents,
     tenantPreferences: props.tenantPreferences,
+    appSettings: props.appSettings,
     chatThreadLocked: (props.chatThread?.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED,
     handleSubmit,
     setChatBody,
@@ -161,6 +163,7 @@ type ChatProviderProps = {
   chatThread: ChatThreadModel
   documents: ChatDocumentModel[]
   tenantPreferences?: TenantPreferences
+  appSettings?: ApplicationSettings
 }
 export default function ChatProvider({ children, ...rest }: PropsWithChildren<ChatProviderProps>): JSX.Element {
   const value = useChatHook(rest)
@@ -180,4 +183,5 @@ type ChatContextState = UseChatHelpers & {
   messages: PromptMessage[]
   documents: ChatDocumentModel[]
   tenantPreferences?: TenantPreferences
+  appSettings?: ApplicationSettings
 }

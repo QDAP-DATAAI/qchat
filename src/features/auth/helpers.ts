@@ -2,6 +2,8 @@ import { createHash } from "crypto"
 
 import { getServerSession } from "next-auth"
 
+import { GetApplicationSettings } from "@/features/application/application-service"
+import { ApplicationSettings, TenantGroupPairs } from "@/features/globals/model"
 import { TenantRecord } from "@/features/tenant-management/models"
 import { GetTenantById } from "@/features/tenant-management/tenant-service"
 import { UserRecord } from "@/features/user-management/models"
@@ -72,4 +74,33 @@ export const isAdminOrTenantAdmin = async (): Promise<boolean> => {
   if (tenant.status !== "OK") return false
   const userIdentifier = (userModel.upn || userModel.email).toLowerCase()
   return tenant.response.administrators.map(admin => admin.toLowerCase()).includes(userIdentifier)
+}
+
+export const hasTranscriptionAccess = async (): Promise<boolean> => {
+  try {
+    const [tenant, user] = await getTenantAndUser()
+    if (!user) {
+      return false
+    }
+
+    const appSettingsResponse = await GetApplicationSettings()
+    if (appSettingsResponse.status !== "OK") {
+      return false
+    }
+
+    const appSettings: ApplicationSettings = appSettingsResponse.response
+    const transcriptionAccess: TenantGroupPairs[] = appSettings.transcriptionAccess || []
+
+    const tenantAccess = transcriptionAccess.find(access => access.tenant === tenant.id)
+
+    if (!tenantAccess) {
+      return false
+    }
+
+    const hasAccess = tenantAccess.groups.some(group => user.groups?.includes(group))
+
+    return hasAccess
+  } catch (_error) {
+    return false
+  }
 }
