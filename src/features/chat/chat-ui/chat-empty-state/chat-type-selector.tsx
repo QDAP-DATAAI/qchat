@@ -1,11 +1,11 @@
 import * as Tooltip from "@radix-ui/react-tooltip"
 import { AudioLines, FileText, MessageCircle } from "lucide-react"
-import React, { useEffect, useState, FC, useCallback } from "react"
+import { useSession } from "next-auth/react"
+import React, { FC, useCallback } from "react"
 
 import { APP_NAME } from "@/app-global"
 
 import Typography from "@/components/typography"
-import { hasTranscriptionAccess } from "@/features/auth/helpers"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ChatType } from "@/features/chat/models"
 import { Tabs, TabsList, TabsTrigger } from "@/features/ui/tabs"
@@ -17,20 +17,9 @@ interface Prop {
 
 export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
   const { onIndexChange, chatBody, onChatTypeChange } = useChatContext()
-  const [isAllowedTenant, setIsAllowedTenant] = useState<boolean>(false)
+  const session = useSession()
 
-  useEffect(() => {
-    const checkTranscriptionAccess = async (): Promise<void> => {
-      try {
-        const access = await hasTranscriptionAccess()
-        setIsAllowedTenant(access)
-      } catch (_error) {
-        setIsAllowedTenant(false)
-      }
-    }
-
-    void checkTranscriptionAccess()
-  }, [])
+  const isAllowedTenant = session?.data?.user?.hasTranscribe || false
 
   const handleValueChange = useCallback(
     (value: string) => {

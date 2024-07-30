@@ -75,7 +75,7 @@ export async function isAdmin(user: User | AdapterUser): Promise<boolean> {
   }
 }
 
-export async function hasTranscription(user: User | AdapterUser): Promise<boolean> {
+export async function hasTranscriptionAccess(user: User | AdapterUser): Promise<boolean> {
   try {
     const appSettingsResponse = await GetApplicationSettings()
 
@@ -87,15 +87,9 @@ export async function hasTranscription(user: User | AdapterUser): Promise<boolea
 
     const transcriptionAccess: TenantGroupPairs[] = appSettings.transcriptionAccess || []
 
-    const transcriptAccess = transcriptionAccess.find(access => access.tenant === user.tenantId)
+    const isTranscriber = transcriptionAccess.some(access => access.groups.some(group => user.groups?.includes(group)))
 
-    if (!transcriptAccess) {
-      return false
-    }
-
-    const hasTranscription = transcriptAccess.groups.some(group => user.groups?.includes(group))
-
-    return hasTranscription
+    return isTranscriber
   } catch (_error) {
     return false
   }

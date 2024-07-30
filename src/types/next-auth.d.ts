@@ -19,5 +19,6 @@ declare module "next-auth" {
     groups: string[]
     acceptedTermsDate: string
     lastVersionSeen: string
+    hasTranscribe: boolean
   }
 }
