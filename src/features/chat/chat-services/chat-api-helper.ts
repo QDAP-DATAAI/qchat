@@ -1,20 +1,20 @@
-import { ChatCompletionMessageParam } from "openai/resources"
+import { ChatCompletionMessageParam, ChatCompletionSystemMessageParam } from "openai/resources"
 
 import { APP_NAME } from "@/app-global"
 
-import { getTenantAndUser } from "@/features/auth/helpers"
-import { getTenantId, userHashedId } from "@/features/auth/helpers"
-import { ChatRole, PromptMessage } from "@/features/chat/models"
+import { GetApplicationSettings } from "@/features/application/application-service"
+import { getTenantAndUser, getTenantId, userHashedId } from "@/features/auth/helpers"
+import { PromptMessage } from "@/features/chat/models"
 
 import { DocumentSearchModel } from "./azure-cog-search/azure-cog-vector-store"
 import { AzureCogDocumentIndex, similaritySearchVectorWithScore } from "./azure-cog-search/azure-cog-vector-store"
 import { FindAllChatDocumentsForCurrentThread } from "./chat-document-service"
 
 const DEFAULT_SYSTEM_PROMPT = `
-- You are ${APP_NAME} who is a helpful AI Assistant developed to assist Queensland government employees in their day-to-day tasks. \n
-- You will provide clear and concise queries, and you will respond with polite and professional answers. \n
-- You will answer questions truthfully and accurately. \n
-- You will respond to questions in accordance with rules of Queensland government. \n`.replace(/\s+/g, "^")
+- You are ${APP_NAME}, a helpful AI Assistant developed to assist Queensland government employees in their day-to-day tasks.
+- You will provide clear and concise queries, and you will respond with polite and professional answers.
+- You will answer questions truthfully and accurately.
+- You will respond to questions in accordance with rules of Queensland government.`.replace(/\s+/g, " ")
 
 const buildSimpleChatSystemPrompt = async (): Promise<string> => {
   const metaPrompt = process.env.NEXT_PUBLIC_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT
@@ -38,17 +38,28 @@ export const getContextPrompts = async (): Promise<{
   }
 }
 
-const buildDataChatSystemPrompt = (): string => `You are ${APP_NAME} who is a helpful AI Assistant.`
-const buildDataChatContextPrompt = (context: string, userQuestion: string): string => `
-- Given the following extracted parts of a document, create a final answer. \n
-- If you don't know the answer, just say that you don't know. Don't try to make up an answer.\n
+const buildDataChatSystemPrompt = async (context: string, indexId: string): Promise<string> => {
+  const appSettingsResponse = await GetApplicationSettings()
+
+  if (appSettingsResponse.status !== "OK") {
+    throw new Error("Failed to get application settings")
+  }
+
+  const appSettings = appSettingsResponse.response
+  const index = appSettings.indexes.find(idx => idx.id === indexId)
+  const instructions = index
+    ? index.description
+    : `
+- Given the following extracted parts of a document, create a final answer.\n
+- If the answer is not apparent from the retrieved documents you can respond but let the user know your answer is not based on the documents.\n
 - You must always include a citation at the end of your answer and don't include full stop.\n
 - Use the format for your citation {% citation items=[{name:"filename 1", id:"file id", order:"1"}, {name:"filename 2", id:"file id", order:"2"}] /%}\n
 ----------------\n
-context:\n
-${context}
-----------------\n
-question: ${userQuestion}`
+context:`
+
+  return `${instructions}
+${context}`
+}
 
 const findRelevantDocuments = async (
   query: string,
@@ -63,19 +74,18 @@ const findRelevantDocuments = async (
 export const buildSimpleChatMessages = async (
   lastChatMessage: PromptMessage
 ): Promise<{
-  systemMessage: ChatCompletionMessageParam
+  systemMessage: ChatCompletionSystemMessageParam
   userMessage: ChatCompletionMessageParam
 }> => {
   return {
     systemMessage: {
-      role: ChatRole.System,
+      role: "system",
       content: await buildSimpleChatSystemPrompt(),
-      // name: APP_NAME || "System",
+      name: APP_NAME || "System",
     },
     userMessage: {
-      role: ChatRole.User,
+      role: "user",
       content: lastChatMessage.content,
-      // name: lastChatMessage.name || "User",
     },
   }
 }
@@ -85,7 +95,7 @@ export const buildDataChatMessages = async (
   chatThreadId: string,
   indexId: string
 ): Promise<{
-  systemMessage: ChatCompletionMessageParam
+  systemMessage: ChatCompletionSystemMessageParam
   userMessage: ChatCompletionMessageParam
   context: string
 }> => {
@@ -93,21 +103,19 @@ export const buildDataChatMessages = async (
   const context = relevantDocuments
     .map((result, index) => {
       const content = result.pageContent.replace(/(\r\n|\n|\r)/gm, "")
-      const context = `[${index}]. file name: ${result.fileName} \n file id: ${result.id} \n order: ${result.order} \n ${content}`
-      return context
+      return `[${index}]. file name: ${result.fileName} \n file id: ${result.id} \n order: ${result.order} \n ${content}`
     })
     .join("\n------\n")
 
   return {
     systemMessage: {
-      role: ChatRole.System,
-      content: buildDataChatSystemPrompt(),
-      // name: APP_NAME || "System",
+      content: await buildDataChatSystemPrompt(context, indexId),
+      role: "system",
+      name: APP_NAME || "System",
     },
     userMessage: {
-      role: ChatRole.User,
-      content: buildDataChatContextPrompt(context, lastChatMessage.content),
-      // name: lastChatMessage.name || "User",
+      role: "user",
+      content: lastChatMessage.content,
     },
     context,
   }
@@ -115,9 +123,10 @@ export const buildDataChatMessages = async (
 
 export const buildAudioChatMessages = async (
   lastChatMessage: PromptMessage,
-  chatThreadId: string
+  chatThreadId: string,
+  indexId: string
 ): Promise<{
-  systemMessage: ChatCompletionMessageParam
+  systemMessage: ChatCompletionSystemMessageParam
   userMessage: ChatCompletionMessageParam
   context: string
 }> => {
@@ -126,21 +135,19 @@ export const buildAudioChatMessages = async (
 
   const context = documents.response
     .map((result, index) => {
-      const context = `[${index}]. file name: ${result.name} \n file id: ${result.id} \n ${result.contents}`
-      return context
+      return `[${index}]. file name: ${result.name} \n file id: ${result.id} \n ${result.contents}`
     })
     .join("\n------\n")
 
   return {
     systemMessage: {
-      role: ChatRole.System,
-      content: buildDataChatSystemPrompt(),
-      // name: APP_NAME || "System",
+      role: "system",
+      content: await buildDataChatSystemPrompt(context, indexId),
+      name: APP_NAME || "System",
     },
     userMessage: {
-      role: ChatRole.User,
+      role: "user",
       content: buildAudioChatContextPrompt(context, lastChatMessage.content),
-      // name: lastChatMessage.name || "User",
     },
     context,
   }

@@ -1,6 +1,11 @@
 import { OpenAIStream, StreamingTextResponse, JSONValue, StreamData } from "ai"
 import { BadRequestError } from "openai"
-import { ChatCompletionChunk, ChatCompletionMessageParam, Completion } from "openai/resources"
+import {
+  ChatCompletionChunk,
+  ChatCompletionMessageParam,
+  ChatCompletionSystemMessageParam,
+  Completion,
+} from "openai/resources"
 import { Stream } from "openai/streaming"
 
 import { APP_NAME } from "@/app-global"
@@ -20,12 +25,7 @@ import { mapOpenAIChatMessages } from "@/features/common/mapping-helper"
 import { OpenAIInstance } from "@/features/common/services/open-ai"
 import logger from "@/features/insights/app-insights"
 
-import {
-  buildAudioChatMessages,
-  buildDataChatMessages,
-  buildSimpleChatMessages,
-  getContextPrompts,
-} from "./chat-api-helper"
+import { buildAudioChatMessages, buildDataChatMessages, buildSimpleChatMessages } from "./chat-api-helper"
 import { calculateFleschKincaidScore } from "./chat-flesch"
 import { FindTopChatMessagesForCurrentUser, UpsertChatMessage } from "./chat-message-service"
 import { InitThreadSession, UpsertChatThread } from "./chat-thread-service"
@@ -44,7 +44,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
     const updatedLastHumanMessage = props.messages[props.messages.length - 1]
 
     let userMessage: ChatCompletionMessageParam
-    let metaPrompt: ChatCompletionMessageParam
+    let metaPrompt: ChatCompletionSystemMessageParam
     let context: string = ""
     let shouldTranslate = false
 
@@ -54,7 +54,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       metaPrompt = res.systemMessage
       shouldTranslate = true
     } else if (props.chatType === "audio") {
-      const res = await buildAudioChatMessages(updatedLastHumanMessage, chatThread.chatThreadId)
+      const res = await buildAudioChatMessages(updatedLastHumanMessage, chatThread.chatThreadId, chatThread.indexId)
       userMessage = res.userMessage
       metaPrompt = res.systemMessage
       context = res.context
@@ -83,7 +83,6 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       data
     )
 
-    const contextPrompts = await getContextPrompts()
     const chatMessageResponse = await UpsertChatMessage({
       id: updatedLastHumanMessage.id,
       createdAt: new Date(),
@@ -95,12 +94,11 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       userId: chatThread.userId,
       tenantId: chatThread.tenantId,
       context: context,
-      systemPrompt: contextPrompts.metaPrompt,
-      tenantPrompt: contextPrompts.tenantPrompt,
-      userPrompt: contextPrompts.userPrompt,
+      systemPrompt: metaPrompt.content, // Store the combined metaPrompt
+      tenantPrompt: "",
+      userPrompt: "",
       contentFilterResult,
       fleschKincaidScore: calculateFleschKincaidScore(updatedLastHumanMessage.content),
-      // name: chatThread.useName,
     })
     if (chatMessageResponse.status !== "OK") throw chatMessageResponse
 
@@ -124,7 +122,6 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       sentiment: ChatSentiment.Neutral,
       reason: "",
       fleschKincaidScore: fleschKincaidScore,
-      // name: APP_NAME || "Assistant",
       isPartial: isPartial,
     })
 
@@ -141,7 +138,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       }
 
       timer = setTimeout(async () => {
-        if (completed) return //just in case...
+        if (completed) return
         await UpsertChatMessage(createAssistantChatRecord(partialMessage.join(""), true))
       }, 1000)
     }
@@ -174,7 +171,6 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
           id: addedMessage.response.id,
           role: addedMessage.response.role,
           content: addedMessage.response.content,
-          // name: addedMessage.response.name,
         })
 
         addedMessage.response.content &&
@@ -221,7 +217,7 @@ async function* makeContentFilterResponse(lockChatThread: boolean): AsyncGenerat
 
 async function getChatResponse(
   chatThread: ChatThreadModel,
-  systemPrompt: ChatCompletionMessageParam,
+  systemPrompt: ChatCompletionSystemMessageParam,
   userMessage: ChatCompletionMessageParam,
   history: ChatMessageModel[],
   addMessage: PromptMessage,
