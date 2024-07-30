@@ -18,11 +18,11 @@ export const CitationAction = async (_previousState: unknown, formData: FormData
   const tenantId = formData.get("tenantId") as string
   const indexId = formData.get("indexId") as string
   const name = formData.get("name") as string
+  const appName = APP_NAME
 
   const additionalFilters = [`id eq '${id}'`, `metadata eq '${id}'`, `fileName eq '${name}'`]
 
   let result: Array<AzureCogDocumentIndex & DocumentSearchModel> = []
-
   for (const additionalFilter of additionalFilters) {
     result = await simpleSearch(userId, chatThreadId, tenantId, indexId, { filter: additionalFilter })
     if (result.length > 0) {
@@ -44,9 +44,9 @@ export const CitationAction = async (_previousState: unknown, formData: FormData
         <br />
         <Typography variant="h2">Understanding Citations:</Typography>
         <Typography variant="p">
-          The citation presented is a specific snippet from your document, selected by {APP_NAME} through
+          The citation presented is a specific snippet from your document, selected by {appName} through
           Retrieval-Augmented Generation (RAG) for its relevance to your question. If the snippets seem unrelated, it
-          might suggest that {APP_NAME} needs more context or clearer questions to accurately pinpoint the right
+          might suggest that {appName} needs more context or clearer questions to accurately pinpoint the right
           information. This method aims to deliver focused and relevant insights, but sometimes it may need further
           clarification to match your question precisely.
         </Typography>

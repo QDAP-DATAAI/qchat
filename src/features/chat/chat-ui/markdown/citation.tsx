@@ -46,10 +46,10 @@ export const Citation: FC<Props> = (props: Props) => {
                       index={index + 1}
                       name={item.name}
                       id={item.id}
-                      tenantId={item.tenantId}
-                      userId={item.userId}
                       order={item.order}
                       chatThreadId={item.chatThreadId}
+                      userId="userId"
+                      tenantId="tenantId"
                     />
                   </div>
                 )
