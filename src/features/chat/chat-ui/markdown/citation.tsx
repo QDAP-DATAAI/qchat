@@ -7,8 +7,6 @@ import { CitationSlider } from "./citation-slider"
 interface Citation {
   name: string
   id: string
-  tenantId: string
-  userId: string
   chatThreadId: string
   order: number
 }
@@ -48,8 +46,6 @@ export const Citation: FC<Props> = (props: Props) => {
                       id={item.id}
                       order={item.order}
                       chatThreadId={item.chatThreadId}
-                      userId="userId"
-                      tenantId="tenantId"
                     />
                   </div>
                 )
