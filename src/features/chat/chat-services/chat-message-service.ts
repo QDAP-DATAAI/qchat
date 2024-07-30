@@ -13,7 +13,7 @@ import {
 import { ServerActionResponseAsync } from "@/features/common/server-action-response"
 import { HistoryContainer } from "@/features/common/services/cosmos-service"
 
-export const FindAllChatMessagesForCurrentUser = async (
+export const FindAllChatMessagesForCurrentThread = async (
   chatThreadId: string
 ): ServerActionResponseAsync<(UserChatMessageModel | AssistantChatMessageModel)[]> => {
   try {

@@ -165,7 +165,7 @@ export const IndexDocuments = async (
   }
 }
 
-export const FindAllChatDocumentsForCurrentUser = async (
+export const FindAllChatDocumentsForCurrentThread = async (
   chatThreadId: string
 ): ServerActionResponseAsync<ChatDocumentModel[]> => {
   try {

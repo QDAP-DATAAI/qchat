@@ -4,9 +4,9 @@ import { ReactNode } from "react"
 
 import { APP_NAME } from "@/app-global"
 
-import { FindAllChatDocumentsForCurrentUser } from "@/features/chat/chat-services/chat-document-service"
-import { FindAllChatMessagesForCurrentUser } from "@/features/chat/chat-services/chat-message-service"
-import { FindChatThreadForCurrentUser } from "@/features/chat/chat-services/chat-thread-service"
+import { FindAllChatDocumentsForCurrentThread } from "@/features/chat/chat-services/chat-document-service"
+import { FindAllChatMessagesForCurrentThread } from "@/features/chat/chat-services/chat-message-service"
+import { FindChatThreadById } from "@/features/chat/chat-services/chat-thread-service"
 import ChatProvider from "@/features/chat/chat-ui/chat-context"
 import { GetTenantPreferences } from "@/features/tenant-management/tenant-service"
 
@@ -28,9 +28,9 @@ export default async function RootLayout({
   if (!session) return redirect("/")
 
   const [messages, thread, documents, preferences] = await Promise.all([
-    FindAllChatMessagesForCurrentUser(params.chatThreadId),
-    FindChatThreadForCurrentUser(params.chatThreadId),
-    FindAllChatDocumentsForCurrentUser(params.chatThreadId),
+    FindAllChatMessagesForCurrentThread(params.chatThreadId),
+    FindChatThreadById(params.chatThreadId),
+    FindAllChatDocumentsForCurrentThread(params.chatThreadId),
     GetTenantPreferences(),
   ])
 

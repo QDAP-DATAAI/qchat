@@ -8,7 +8,7 @@ import { ChatRole, PromptMessage } from "@/features/chat/models"
 
 import { DocumentSearchModel } from "./azure-cog-search/azure-cog-vector-store"
 import { AzureCogDocumentIndex, similaritySearchVectorWithScore } from "./azure-cog-search/azure-cog-vector-store"
-import { FindAllChatDocumentsForCurrentUser } from "./chat-document-service"
+import { FindAllChatDocumentsForCurrentThread } from "./chat-document-service"
 
 const DEFAULT_SYSTEM_PROMPT = `
 - You are ${APP_NAME} who is a helpful AI Assistant developed to assist Queensland government employees in their day-to-day tasks. \n
@@ -121,7 +121,7 @@ export const buildAudioChatMessages = async (
   userMessage: ChatCompletionMessageParam
   context: string
 }> => {
-  const documents = await FindAllChatDocumentsForCurrentUser(chatThreadId)
+  const documents = await FindAllChatDocumentsForCurrentThread(chatThreadId)
   if (documents.status !== "OK") throw documents.errors
 
   const context = documents.response
