@@ -8,6 +8,7 @@ import { APP_NAME } from "@/app-global"
 import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ChatType } from "@/features/chat/models"
+import { ApplicationIndexSettings, ApplicationSettings } from "@/features/globals/model"
 import { Tabs, TabsList, TabsTrigger } from "@/features/ui/tabs"
 import { TooltipProvider } from "@/features/ui/tooltip-provider"
 
@@ -15,8 +16,15 @@ interface Prop {
   disable: boolean
 }
 
+const findIndexByName = (appSettings: ApplicationSettings, indexName: string): ApplicationIndexSettings | undefined => {
+  return appSettings?.indexes?.find(index => index.name === indexName)
+}
+
 export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
-  const { onIndexChange, chatBody, onChatTypeChange } = useChatContext()
+  const { onIndexChange, chatBody, onChatTypeChange, appSettings } = useChatContext()
+
+  const index = appSettings ? findIndexByName(appSettings, "qchat") : undefined
+
   const session = useSession()
 
   const isAllowedTenant = session?.data?.user?.hasTranscribe || false
@@ -24,9 +32,11 @@ export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
   const handleValueChange = useCallback(
     (value: string) => {
       onChatTypeChange(value as ChatType)
-      onIndexChange("qchat")
+      if (index) {
+        onIndexChange(index.name)
+      }
     },
-    [onChatTypeChange, onIndexChange]
+    [onChatTypeChange, onIndexChange, index]
   )
 
   return (
@@ -85,5 +95,3 @@ export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
     </TooltipProvider>
   )
 }
-
-//TODO: Remove adding qchat index directly
