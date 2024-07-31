@@ -1,3 +1,11 @@
+const buildSimpleChatSystemPrompt = async (): Promise<string> => {
+  const { systemPrompt, tenantPrompt, userPrompt } = await getContextPrompts()
+
+  const prompts = [systemPrompt, tenantPrompt, userPrompt].filter(Boolean).join("\n\n")
+
+  return prompts
+}
+
 import { ChatCompletionMessageParam, ChatCompletionSystemMessageParam } from "openai/resources"
 
 import { APP_NAME } from "@/app-global"
@@ -11,28 +19,20 @@ import { AzureCogDocumentIndex, similaritySearchVectorWithScore } from "./azure-
 import { FindAllChatDocumentsForCurrentThread } from "./chat-document-service"
 
 const DEFAULT_SYSTEM_PROMPT = `
-- You are ${APP_NAME}, a helpful AI Assistant developed to assist Queensland government employees in their day-to-day tasks.
-- You will provide clear and concise queries, and you will respond with polite and professional answers.
-- You will answer questions truthfully and accurately.
-- You will respond to questions in accordance with rules of Queensland government.`.replace(/\s+/g, " ")
-
-const buildSimpleChatSystemPrompt = async (): Promise<string> => {
-  const metaPrompt = process.env.NEXT_PUBLIC_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT
-  const [tenant, user] = await getTenantAndUser()
-
-  const tenantContextPrompt = (tenant.preferences?.contextPrompt || "").trim()
-  const userContextPrompt = (user.preferences?.contextPrompt || "").trim()
-  return `${metaPrompt}\n\n${tenantContextPrompt}\n\n${userContextPrompt}`
-}
+- You are ${APP_NAME}, a helpful AI Assistant developed to assist Queensland government employees in their day-to-day tasks.\n
+- You will provide clear and concise queries, and you will respond with polite and professional answers.\n
+- You will answer questions truthfully and accurately.\n
+- You will respond to questions in accordance with rules of Queensland government.\n
+`.replace(/\s+/g, " ")
 
 export const getContextPrompts = async (): Promise<{
-  metaPrompt: string
+  systemPrompt: string
   tenantPrompt: string
   userPrompt: string
 }> => {
   const [tenant, user] = await getTenantAndUser()
   return {
-    metaPrompt: process.env.NEXT_PUBLIC_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT,
+    systemPrompt: process.env.NEXT_PUBLIC_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT,
     tenantPrompt: (tenant.preferences?.contextPrompt || "").trim(),
     userPrompt: (user.preferences?.contextPrompt || "").trim(),
   }
@@ -55,7 +55,7 @@ const buildDataChatSystemPrompt = async (context: string, indexId: string): Prom
 - You must always include a citation at the end of your answer and don't include full stop.\n
 - Use the format for your citation {% citation items=[{name:"filename 1", id:"file id", order:"1"}, {name:"filename 2", id:"file id", order:"2"}] /%}\n
 ----------------\n
-context:`
+context:\n`
 
   return `${instructions}
 ${context}`
@@ -155,7 +155,7 @@ export const buildAudioChatMessages = async (
 
 const buildAudioChatContextPrompt = (context: string, userQuestion: string): string => `
 - You are ${APP_NAME} an AI Assistant. Who must review the below audio transcriptions, then create a final answer. \n
-- If you don't know the answer, just say that you don't know. Don't try to make up an answer.\n
+- If the answer is not apparent from the retrieved documents you can respond but let the user know your answer is not based on the transcript.\n
 - You must always include a citation at the end of your answer and don't include full stop.\n
 - Use the format for your citation {% citation items=[{name:"filename 1", id:"file id", order:"1"}, {name:"filename 2", id:"file id", order:"2"}] /%}\n
 ----------------\n
