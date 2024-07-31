@@ -25,11 +25,11 @@ export const transcribeAudio = async (
     },
     body: JSON.stringify({
       audio: await arrayBufferToBase64(await file.arrayBuffer()),
-      action: "transcribe",
+      action: "enhance+transcribe",
       language: "en",
       format: "vtt",
       hallucination_silence_threshold: 2,
-      beam_size: 1,
+      beam_size: 5,
     }),
   })
 
