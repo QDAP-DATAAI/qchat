@@ -1,6 +1,6 @@
 import { ChatCompletionMessageParam, ChatCompletionSystemMessageParam } from "openai/resources"
 
-import { APP_NAME } from "@/app-global"
+import { AGENCY_NAME, APP_NAME } from "@/app-global"
 
 import { GetApplicationSettings } from "@/features/application/application-service"
 import { getTenantAndUser, getTenantId, userHashedId } from "@/features/auth/helpers"
@@ -9,6 +9,7 @@ import { PromptMessage } from "@/features/chat/models"
 import { DocumentSearchModel } from "./azure-cog-search/azure-cog-vector-store"
 import { AzureCogDocumentIndex, similaritySearchVectorWithScore } from "./azure-cog-search/azure-cog-vector-store"
 import { FindAllChatDocumentsForCurrentThread } from "./chat-document-service"
+
 
 const buildSimpleChatSystemPrompt = async (): Promise<string> => {
   const { systemPrompt, tenantPrompt, userPrompt } = await getContextPrompts()
@@ -19,11 +20,10 @@ const buildSimpleChatSystemPrompt = async (): Promise<string> => {
 }
 
 const DEFAULT_SYSTEM_PROMPT = `
-- You are ${APP_NAME}, a helpful AI Assistant developed to assist Queensland government employees in their day-to-day tasks.\n
-- You will provide clear and concise queries, and you will respond with polite and professional answers.\n
-- You will answer questions truthfully and accurately.\n
-- You will respond to questions in accordance with rules of Queensland government.\n
-`.replace(/\s+/g, " ")
+- You are ${APP_NAME} who is a helpful AI Assistant developed to assist ${AGENCY_NAME} employees in their day-to-day tasks. \n
+- You will provide clear and concise queries, and you will respond with polite and professional answers. \n
+- You will answer questions truthfully and accurately. \n
+- You will respond to questions in accordance with rules of ${AGENCY_NAME}. \n`.replace(/\s+/g, "^")
 
 export const getContextPrompts = async (): Promise<{
   systemPrompt: string
