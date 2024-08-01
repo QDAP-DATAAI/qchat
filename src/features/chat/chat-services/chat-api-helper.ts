@@ -10,7 +10,6 @@ import { DocumentSearchModel } from "./azure-cog-search/azure-cog-vector-store"
 import { AzureCogDocumentIndex, similaritySearchVectorWithScore } from "./azure-cog-search/azure-cog-vector-store"
 import { FindAllChatDocumentsForCurrentThread } from "./chat-document-service"
 
-
 const buildSimpleChatSystemPrompt = async (): Promise<string> => {
   const { systemPrompt, tenantPrompt, userPrompt } = await getContextPrompts()
 

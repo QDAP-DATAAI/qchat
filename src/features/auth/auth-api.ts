@@ -3,8 +3,9 @@ import { JWT } from "next-auth/jwt"
 import { Provider } from "next-auth/providers"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
-import { isAdmin, hasTranscriptionAccess } from "@/features/application/application-service"
 import { AGENCY_NAME } from "@/app-global"
+
+import { isAdmin, hasTranscriptionAccess } from "@/features/application/application-service"
 
 import { UserSignInHandler, SignInErrorType, isTenantAdmin, getUser } from "./sign-in"
 
