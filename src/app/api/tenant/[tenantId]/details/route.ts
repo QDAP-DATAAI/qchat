@@ -14,6 +14,7 @@ const tenantUpdateSchema = yup
       .of(yup.string().matches(/^[a-fA-F0-9-]{36}$/, "Invalid group GUID"))
       .optional(),
     requiresGroupLogin: yup.boolean().optional(),
+    dateOnBoarded: yup.string().optional(),
   })
   .noUnknown(true, "Attempted to update invalid fields")
 
