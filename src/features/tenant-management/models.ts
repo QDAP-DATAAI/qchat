@@ -72,4 +72,5 @@ export const toTenantDetails = (tenant: TenantRecord): TenantDetails => ({
   preferences: tenant.preferences || { contextPrompt: "" },
   requiresGroupLogin: tenant.requiresGroupLogin,
   smartTools: tenant.smartTools || [],
+  dateOnBoarded: tenant.dateOnBoarded || "",
 })
