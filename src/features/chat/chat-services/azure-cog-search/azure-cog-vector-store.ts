@@ -242,8 +242,14 @@ export const embedDocuments = async (documents: Array<AzureCogDocumentIndex>): P
   }
 }
 
-const baseIndexUrl = (indexId: string): string => {
-  return `${process.env.APIM_BASE}/indexes/${indexId}`
+// const baseIndexUrl = (indexId: string): string => {
+//   return `${process.env.APIM_BASE}/indexes/${indexId}`
+// }
+
+//TODO: Switch to dynamically assigning the index value after data fix
+
+const baseIndexUrl = (_indexId: string): string => {
+  return `${process.env.APIM_BASE}/indexes/${process.env.AZURE_SEARCH_INDEX_NAME}`
 }
 
 const fetcher = async <T>(url: string, init?: RequestInit): Promise<T> => {

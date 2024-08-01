@@ -333,13 +333,14 @@ export const FindChatThreadByTitleAndEmpty = async (
     const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
     const query: SqlQuerySpec = {
       query:
-        "SELECT * FROM root r WHERE r.type=@type AND r.userId=@userId AND r.name=@name AND r.isDeleted=@isDeleted AND r.tenantId=@tenantId AND r.createdAt >= @createdAt ORDER BY r.createdAt DESC",
+        "SELECT * FROM root r WHERE r.type=@type AND r.userId=@userId AND r.name=@name AND r.isDeleted=@isDeleted AND r.tenantId=@tenantId AND r.chatCategory=@chatCategory AND r.createdAt >= @createdAt ORDER BY r.createdAt DESC",
       parameters: [
         { name: "@type", value: ChatRecordType.Thread },
         { name: "@name", value: title },
         { name: "@isDeleted", value: false },
         { name: "@userId", value: userId },
         { name: "@tenantId", value: tenantId },
+        { name: "@chatCategory", value: "None" },
         { name: "@createdAt", value: xMonthsAgo(DEFAULT_MONTHS_AGO) },
       ],
     }
@@ -390,6 +391,7 @@ export const UpdateChatThreadCreatedAt = async (chatThreadId: string): ServerAct
       conversationStyle: ConversationStyle.Precise,
       conversationSensitivity: ConversationSensitivity.Official,
       chatOverFileName: "",
+      indexId: "",
       internalReference: "",
     }
 
