@@ -1,11 +1,3 @@
-const buildSimpleChatSystemPrompt = async (): Promise<string> => {
-  const { systemPrompt, tenantPrompt, userPrompt } = await getContextPrompts()
-
-  const prompts = [systemPrompt, tenantPrompt, userPrompt].filter(Boolean).join("\n\n")
-
-  return prompts
-}
-
 import { ChatCompletionMessageParam, ChatCompletionSystemMessageParam } from "openai/resources"
 
 import { APP_NAME } from "@/app-global"
@@ -17,6 +9,14 @@ import { PromptMessage } from "@/features/chat/models"
 import { DocumentSearchModel } from "./azure-cog-search/azure-cog-vector-store"
 import { AzureCogDocumentIndex, similaritySearchVectorWithScore } from "./azure-cog-search/azure-cog-vector-store"
 import { FindAllChatDocumentsForCurrentThread } from "./chat-document-service"
+
+const buildSimpleChatSystemPrompt = async (): Promise<string> => {
+  const { systemPrompt, tenantPrompt, userPrompt } = await getContextPrompts()
+
+  const prompts = [systemPrompt, tenantPrompt, userPrompt].filter(Boolean).join("\n\n")
+
+  return prompts
+}
 
 const DEFAULT_SYSTEM_PROMPT = `
 - You are ${APP_NAME}, a helpful AI Assistant developed to assist Queensland government employees in their day-to-day tasks.\n
@@ -72,7 +72,8 @@ const findRelevantDocuments = async (
 }
 
 export const buildSimpleChatMessages = async (
-  lastChatMessage: PromptMessage
+  lastChatMessage: PromptMessage,
+  userName: string
 ): Promise<{
   systemMessage: ChatCompletionSystemMessageParam
   userMessage: ChatCompletionMessageParam
@@ -86,6 +87,7 @@ export const buildSimpleChatMessages = async (
     userMessage: {
       role: "user",
       content: lastChatMessage.content,
+      name: userName,
     },
   }
 }
@@ -93,7 +95,8 @@ export const buildSimpleChatMessages = async (
 export const buildDataChatMessages = async (
   lastChatMessage: PromptMessage,
   chatThreadId: string,
-  indexId: string
+  indexId: string,
+  userName: string
 ): Promise<{
   systemMessage: ChatCompletionSystemMessageParam
   userMessage: ChatCompletionMessageParam
@@ -116,6 +119,7 @@ export const buildDataChatMessages = async (
     userMessage: {
       role: "user",
       content: lastChatMessage.content,
+      name: userName,
     },
     context,
   }
@@ -124,7 +128,8 @@ export const buildDataChatMessages = async (
 export const buildAudioChatMessages = async (
   lastChatMessage: PromptMessage,
   chatThreadId: string,
-  indexId: string
+  indexId: string,
+  userName: string
 ): Promise<{
   systemMessage: ChatCompletionSystemMessageParam
   userMessage: ChatCompletionMessageParam
@@ -148,6 +153,7 @@ export const buildAudioChatMessages = async (
     userMessage: {
       role: "user",
       content: buildAudioChatContextPrompt(context, lastChatMessage.content),
+      name: userName,
     },
     context,
   }

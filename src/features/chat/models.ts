@@ -57,14 +57,12 @@ export interface ChatMessageModel {
   type: ChatRecordType.Message
   role: ChatRole
   fleschKincaidScore?: number
-  // name: string
+  name: string
 }
 export interface UserChatMessageModel extends ChatMessageModel {
   role: ChatRole.User
   context: string
   systemPrompt: string
-  tenantPrompt: string
-  userPrompt: string
   contentFilterResult?: unknown
 }
 export interface AssistantChatMessageModel extends ChatMessageModel {
@@ -109,6 +107,7 @@ export interface PromptBody {
   userId: string
   internalReference?: string
   chatThreadName?: string
+  userName?: string
 }
 
 export interface PromptMessage extends Message {

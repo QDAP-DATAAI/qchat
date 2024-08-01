@@ -39,7 +39,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
   try {
     const threadSession = await InitThreadSession(props)
     if (threadSession.status !== "OK") throw threadSession
-
+    const userName = "User"
     const { chatThread } = threadSession.response
     const updatedLastHumanMessage = props.messages[props.messages.length - 1]
 
@@ -49,17 +49,27 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
     let shouldTranslate = false
 
     if (props.chatType === "simple" || !dataChatTypes.includes(props.chatType)) {
-      const res = await buildSimpleChatMessages(updatedLastHumanMessage)
+      const res = await buildSimpleChatMessages(updatedLastHumanMessage, userName)
       userMessage = res.userMessage
       metaPrompt = res.systemMessage
       shouldTranslate = true
     } else if (props.chatType === "audio") {
-      const res = await buildAudioChatMessages(updatedLastHumanMessage, chatThread.chatThreadId, chatThread.indexId)
+      const res = await buildAudioChatMessages(
+        updatedLastHumanMessage,
+        chatThread.chatThreadId,
+        chatThread.indexId,
+        userName
+      )
       userMessage = res.userMessage
       metaPrompt = res.systemMessage
       context = res.context
     } else {
-      const res = await buildDataChatMessages(updatedLastHumanMessage, chatThread.chatThreadId, chatThread.indexId)
+      const res = await buildDataChatMessages(
+        updatedLastHumanMessage,
+        chatThread.chatThreadId,
+        chatThread.indexId,
+        userName
+      )
       userMessage = res.userMessage
       metaPrompt = res.systemMessage
       context = res.context
@@ -94,11 +104,10 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       userId: chatThread.userId,
       tenantId: chatThread.tenantId,
       context: context,
-      systemPrompt: metaPrompt.content, // Store the combined metaPrompt
-      tenantPrompt: "",
-      userPrompt: "",
+      systemPrompt: metaPrompt.content,
       contentFilterResult,
       fleschKincaidScore: calculateFleschKincaidScore(updatedLastHumanMessage.content),
+      name: userName,
     })
     if (chatMessageResponse.status !== "OK") throw chatMessageResponse
 
@@ -123,6 +132,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       reason: "",
       fleschKincaidScore: fleschKincaidScore,
       isPartial: isPartial,
+      name: APP_NAME || "Assistant",
     })
 
     const partialMessage: string[] = []
@@ -171,6 +181,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
           id: addedMessage.response.id,
           role: addedMessage.response.role,
           content: addedMessage.response.content,
+          name: addedMessage.response.name,
         })
 
         addedMessage.response.content &&

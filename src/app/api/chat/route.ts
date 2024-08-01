@@ -36,6 +36,7 @@ const schema = yup
         id: yup.string().required(),
         content: yup.string().required(),
         role: yup.mixed<ChatRole>().oneOf(Object.values(ChatRole)).required(),
+        name: yup.string().default("User"),
       })
     ),
     data: yup.object().shape({

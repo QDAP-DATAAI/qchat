@@ -20,7 +20,7 @@ interface ChatRowProps {
   chatThreadId: string
   showAssistantButtons: boolean
   threadLocked?: boolean
-  disableButtons?: boolean // Add this prop
+  disableButtons?: boolean
 }
 
 export const ChatRow: FC<ChatRowProps> = props => {
