@@ -181,3 +181,5 @@ const SentenceForm = ({ id, line, onChange }: SentenceFormProps): JSX.Element =>
     </Field>
   )
 }
+
+//TODO: Props must be serializable for components in the "use client" entry file, "onChange" is invalid.ts(71007)

@@ -186,3 +186,5 @@ const FleschButton: React.FC<FleschButtonProps> = ({ fleschScore }) => {
     </TooltipProvider>
   )
 }
+
+//TOD: Props must be serializable for components in the "use client" entry file, "onFeedbackChange" is invalid.ts(71007)

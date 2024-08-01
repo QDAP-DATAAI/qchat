@@ -1,4 +1,8 @@
-/** @type {import('next').NextConfig} */
+// @ts-check
+
+/**
+ * @type {import('next').NextConfig}
+ **/
 
 const securityHeaders = [
   {
@@ -33,7 +37,7 @@ const securityHeaders = [
   {
     key: "Permissions-Policy",
     value:
-      "accelerometer=(),autoplay=(),camera=(),clipboard-read=(self),clipboard-write=(self),display-capture=(),encrypted-media=(),fullscreen=(),geolocation=(),gyroscope=(),magnetometer=(),microphone=(),midi=(),payment=(),picture-in-picture=(),publickey-credentials-get=(),screen-wake-lock=(),sync-xhr=(self),usb=(),xr-spatial-tracking=()",
+      "accelerometer=(), autoplay=(), camera=(), clipboard-read=(self), clipboard-write=(self), display-capture=(), encrypted-media=(), fullscreen=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(self), usb=(), xr-spatial-tracking=()",
   },
   {
     key: "X-DNS-Prefetch-Control",
@@ -57,10 +61,6 @@ const securityHeaders = [
   },
 ]
 
-const withBundleAnalyzer = require("@next/bundle-analyzer")({
-  enabled: process.env.ANALYZE === "true",
-})
-
 const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
@@ -80,6 +80,7 @@ const nextConfig = {
       allowedOrigins: ["*.ai.qld.gov.au", "qggptprodopenai.azurewebsites.net", "qggptdevopenai.azurewebsites.net"],
     },
   },
+  // eslint-disable-next-line require-await
   redirects() {
     return [
       {
@@ -104,6 +105,7 @@ const nextConfig = {
       },
     ]
   },
+  // eslint-disable-next-line require-await
   headers() {
     return [
       {
@@ -145,4 +147,4 @@ const nextConfig = {
   },
 }
 
-module.exports = withBundleAnalyzer(nextConfig)
+module.exports = nextConfig

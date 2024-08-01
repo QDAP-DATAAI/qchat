@@ -36,6 +36,7 @@ const dataChatTypes = ["data", "audio"]
 export const MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED = 3
 
 export const ChatApi = async (props: PromptProps): Promise<Response> => {
+  const data = new StreamData()
   try {
     const threadSession = await InitThreadSession(props)
     if (threadSession.status !== "OK") throw threadSession
@@ -76,13 +77,13 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
     }
 
     if ((chatThread.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED) {
-      return new Response(JSON.stringify({ error: "This thread is locked" }), { status: 400 })
+      return new Response(JSON.stringify({ error: "This thread is locked" }), {
+        status: 400,
+      })
     }
 
     const historyResponse = await FindTopChatMessagesForCurrentUser(chatThread.id)
     if (historyResponse.status !== "OK") throw historyResponse
-
-    const data = new StreamData()
 
     const { response, contentFilterResult, updatedThread } = await getChatResponse(
       chatThread,
@@ -199,6 +200,8 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
 
     logger.error("ChatApi error", { error })
 
+    await data.close()
+
     return new Response(errorResponse, {
       status: 500,
       statusText: errorStatusText,
@@ -241,13 +244,18 @@ async function getChatResponse(
   let contentFilterTriggerCount = chatThread.contentFilterTriggerCount ?? 0
 
   try {
-    const openAI = OpenAIInstance({ contentSafetyOn: !["audio"].includes(chatThread.chatType) })
+    const openAI = OpenAIInstance({
+      contentSafetyOn: !["audio"].includes(chatThread.chatType),
+    })
+
+    const response = await openAI.chat.completions.create({
+      messages: [systemPrompt, ...mapOpenAIChatMessages(history), userMessage],
+      model: process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
+      stream: true,
+    })
+
     return {
-      response: await openAI.chat.completions.create({
-        messages: [systemPrompt, ...mapOpenAIChatMessages(history), userMessage],
-        model: process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
-        stream: true,
-      }),
+      response,
       updatedThread: chatThread,
     }
   } catch (exception) {
@@ -265,16 +273,18 @@ async function getChatResponse(
       contentFilterTriggerCount,
     })
 
-    const upadatedThread = await UpsertChatThread({
+    const updatedThread = await UpsertChatThread({
       ...chatThread,
       contentFilterTriggerCount,
     })
-    if (upadatedThread.status !== "OK") throw upadatedThread.errors
+    if (updatedThread.status !== "OK") throw updatedThread.errors
 
     return {
       response: makeContentFilterResponse(contentFilterTriggerCount >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED),
       contentFilterResult,
-      updatedThread: upadatedThread.response,
+      updatedThread: updatedThread.response,
     }
+  } finally {
+    await data.close()
   }
 }
