@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.0.0"
+export const APP_VERSION = "2.0.2"
 export const APP_NAME = "QChat"
 export const AGENCY_NAME = "Queensland Government"
 export const signInProvider = "azure-ad"
