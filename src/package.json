@@ -63,7 +63,7 @@
     "flesch": "^2.0.1",
     "highlight.js": "^11.10.0",
     "ip": "^2.0.1",
-    "lucide-react": "^0.418.0",
+    "lucide-react": "^0.419.0",
     "marked": "^13.0.2",
     "nanoid": "^5.0.7",
     "next": "^14.2.4",
@@ -114,7 +114,7 @@
     "stylelint-order": "^6.0.4",
     "stylelint-selector-bem-pattern": "^4.0.0",
     "tailwindcss": "^3.4.4",
-    "ts-jest": "^29.1.5",
+    "ts-jest": "^29.2.4",
     "typescript": "^5.5.3"
   },
   "optionalDependencies": {
