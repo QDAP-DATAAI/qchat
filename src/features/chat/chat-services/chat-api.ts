@@ -36,7 +36,6 @@ const dataChatTypes = ["data", "audio"]
 export const MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED = 3
 
 export const ChatApi = async (props: PromptProps): Promise<Response> => {
-  // const data = new StreamData()
   try {
     const threadSession = await InitThreadSession(props)
     if (threadSession.status !== "OK") throw threadSession
@@ -201,8 +200,6 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
     const errorStatusText = error instanceof Error ? error.toString() : "Unknown Error"
 
     logger.error("ChatApi error", { error })
-
-    // await data.close()
 
     return new Response(errorResponse, {
       status: 500,
