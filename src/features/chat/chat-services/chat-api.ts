@@ -36,7 +36,7 @@ const dataChatTypes = ["data", "audio"]
 export const MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED = 3
 
 export const ChatApi = async (props: PromptProps): Promise<Response> => {
-  const data = new StreamData()
+  // const data = new StreamData()
   try {
     const threadSession = await InitThreadSession(props)
     if (threadSession.status !== "OK") throw threadSession
@@ -81,6 +81,8 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
         status: 400,
       })
     }
+
+    const data = new StreamData()
 
     const historyResponse = await FindTopChatMessagesForCurrentUser(chatThread.id)
     if (historyResponse.status !== "OK") throw historyResponse
@@ -200,7 +202,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
 
     logger.error("ChatApi error", { error })
 
-    await data.close()
+    // await data.close()
 
     return new Response(errorResponse, {
       status: 500,
