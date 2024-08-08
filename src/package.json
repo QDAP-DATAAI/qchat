@@ -8,7 +8,7 @@
     "dev": "next dev --experimental-https --experimental-https-key ./certificates/localhost-key.pem --experimental-https-cert ./certificates/localhost.pem --port 443",
     "build": "next build",
     "start": "next start",
-    "lint": "npm-run-all --parallel lint:js lint:css",
+    "lint": "npm-run-all --parallel lint:*",
     "lint:js": "eslint \"**/*.{js,mjs,ts,tsx}\"",
     "lint:css": "stylelint \"**/*.css\" --allow-empty-input",
     "prettier": "prettier \"**/*.{js,mjs,ts,tsx,md,mdx,json,yml,css}\" --check",
