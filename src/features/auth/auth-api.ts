@@ -5,7 +5,7 @@ import AzureADProvider from "next-auth/providers/azure-ad"
 
 import { AGENCY_NAME } from "@/app-global"
 
-import { isAdmin } from "@/features/application/application-service"
+import { isAdmin, hasTranscriptionAccess } from "@/features/application/application-service"
 
 import { UserSignInHandler, SignInErrorType, isTenantAdmin, getUser } from "./sign-in"
 
@@ -54,6 +54,7 @@ const configureIdentityProvider = (): Provider[] => {
           profile.groups = profile.groups || profile.employee_groups
 
           const admin = await isAdmin(profile)
+          const hasTranscribe = await hasTranscriptionAccess(profile)
           const tenantAdmin = admin || (await isTenantAdmin(profile))
 
           const user = await getUser(profile.tenantId, profile.upn)
@@ -70,6 +71,7 @@ const configureIdentityProvider = (): Provider[] => {
             userId: profile.upn,
             acceptedTermsDate: (user?.accepted_terms && user?.accepted_terms_date) || null,
             lastVersionSeen: user?.last_version_seen || null,
+            hasTranscribe: hasTranscribe,
           }
         },
       })
@@ -116,6 +118,7 @@ export const options: NextAuthOptions = {
         authToken.userId = user.userId
         authToken.acceptedTermsDate = user.acceptedTermsDate
         authToken.lastVersionSeen = user.lastVersionSeen
+        authToken.hasTranscribe = user.hasTranscribe
       }
       if (trigger === "update" && session?.acceptedTerms) authToken.acceptedTermsDate = new Date().toISOString()
       if (trigger === "update" && session?.lastVersionSeen) authToken.lastVersionSeen = session.lastVersionSeen
@@ -132,6 +135,7 @@ export const options: NextAuthOptions = {
       session.user.userId = authToken.userId
       session.user.acceptedTermsDate = authToken.acceptedTermsDate
       session.user.lastVersionSeen = authToken.lastVersionSeen
+      session.user.hasTranscribe = authToken.hasTranscribe
       return session
     },
   },

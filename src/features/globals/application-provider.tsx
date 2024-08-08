@@ -18,6 +18,7 @@ const DEFAULT_APPLICATION_SETTINGS: ApplicationSettings = {
   termsAndConditionsDate: new Date().toISOString(),
   administratorAccess: [],
   transcriptionAccess: [],
+  indexes: [],
 }
 
 const useApplicationHook = (settings?: ApplicationSettings): State => {

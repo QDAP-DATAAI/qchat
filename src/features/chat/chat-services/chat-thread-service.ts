@@ -20,8 +20,8 @@ import { HistoryContainer } from "@/features/common/services/cosmos-service"
 import logger from "@/features/insights/app-insights"
 import { uniqueId } from "@/lib/utils"
 
-import { FindAllChatDocumentsForCurrentUser } from "./chat-document-service"
-import { FindAllChatMessagesForCurrentUser } from "./chat-message-service"
+import { FindAllChatDocumentsForCurrentThread } from "./chat-document-service"
+import { FindAllChatMessagesForCurrentThread } from "./chat-message-service"
 
 export const FindAllChatThreadForCurrentUser = async (): ServerActionResponseAsync<ChatThreadModel[]> => {
   try {
@@ -55,9 +55,7 @@ export const FindAllChatThreadForCurrentUser = async (): ServerActionResponseAsy
   }
 }
 
-export const FindChatThreadForCurrentUser = async (
-  chatThreadId: string
-): ServerActionResponseAsync<ChatThreadModel> => {
+export const FindChatThreadById = async (chatThreadId: string): ServerActionResponseAsync<ChatThreadModel> => {
   try {
     const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
     const query: SqlQuerySpec = {
@@ -103,7 +101,7 @@ export const UpdateChatThreadTitle = async (
 ): ServerActionResponseAsync<ChatThreadModel> => {
   try {
     logger.event("UpdateChatThreadTitle", { chatThreadId, newTitle })
-    const response = await FindChatThreadForCurrentUser(chatThreadId)
+    const response = await FindChatThreadById(chatThreadId)
     if (response.status !== "OK") return response
     const chatThread = response.response
     chatThread.previousChatName = chatThread.name
@@ -120,16 +118,18 @@ export const UpdateChatThreadTitle = async (
 export const UpdateChatThreadToFileDetails = async (
   chatThreadId: string,
   newType: ChatType,
+  indexId: string,
   chatOverFileName: string
 ): ServerActionResponseAsync<ChatThreadModel> => {
   try {
     logger.event("UpdateChatThreadToFileDetails", { chatThreadId, newType, chatOverFileName })
-    const response = await FindChatThreadForCurrentUser(chatThreadId)
+    const response = await FindChatThreadById(chatThreadId)
     if (response.status !== "OK") return response
     const chatThread = response.response
     chatThread.name = `Chat with ${chatOverFileName}`
     chatThread.chatType = newType
     chatThread.chatOverFileName = chatOverFileName
+    chatThread.indexId = indexId
     return await UpsertChatThread(chatThread)
   } catch (error) {
     return {
@@ -145,10 +145,10 @@ export const SoftDeleteChatThreadForCurrentUser = async (
   try {
     logger.event("SoftDeleteChatThreadForCurrentUser", { chatThreadId })
 
-    const chatThreadResponse = await FindChatThreadForCurrentUser(chatThreadId)
+    const chatThreadResponse = await FindChatThreadById(chatThreadId)
     if (chatThreadResponse.status !== "OK") return chatThreadResponse
 
-    const chatMessagesResponse = await FindAllChatMessagesForCurrentUser(chatThreadId)
+    const chatMessagesResponse = await FindAllChatMessagesForCurrentThread(chatThreadId)
     if (chatMessagesResponse.status !== "OK") return chatMessagesResponse
 
     const container = await HistoryContainer()
@@ -158,11 +158,12 @@ export const SoftDeleteChatThreadForCurrentUser = async (
     )
     await Promise.all(chatMessagesPromises)
 
-    const chatDocumentsResponse = await FindAllChatDocumentsForCurrentUser(chatThreadId)
+    const chatDocumentsResponse = await FindAllChatDocumentsForCurrentThread(chatThreadId)
     if (chatDocumentsResponse.status !== "OK") return chatDocumentsResponse
     if (chatDocumentsResponse.response.length) {
+      const indexId = chatDocumentsResponse.response[0].indexId
       const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
-      await deleteDocuments(chatThreadId, userId, tenantId)
+      await deleteDocuments(chatThreadId, userId, tenantId, indexId)
       const chatDocumentsPromises = chatDocumentsResponse.response.map(
         async chat => await container.items.upsert({ ...chat, isDeleted: true })
       )
@@ -213,7 +214,7 @@ export const UpsertChatThread = async (chatThread: ChatThreadModel): ServerActio
 }
 
 const EnsureChatThreadOperation = async (chatThreadId: string): ServerActionResponseAsync<ChatThreadModel> => {
-  const response = await FindChatThreadForCurrentUser(chatThreadId)
+  const response = await FindChatThreadById(chatThreadId)
   if (response.status !== "OK") return response
 
   const [currentUser, hashedId] = await Promise.all([userSession(), userHashedId()])
@@ -253,6 +254,7 @@ export const CreateChatThread = async (title?: string): ServerActionResponseAsyn
       conversationStyle: ConversationStyle.Precise,
       conversationSensitivity: ConversationSensitivity.Official,
       type: ChatRecordType.Thread,
+      indexId: "",
       chatOverFileName: "",
       evaluationMetrics: {
         outputLength: null,
@@ -292,7 +294,7 @@ export type InitChatSessionResponse = {
 }
 
 export const InitThreadSession = async (props: PromptProps): ServerActionResponseAsync<InitChatSessionResponse> => {
-  const { id: chatThreadId, chatType, conversationStyle, conversationSensitivity, chatOverFileName } = props
+  const { id: chatThreadId, chatType, conversationStyle, conversationSensitivity, chatOverFileName, indexId } = props
 
   logger.event("InitThreadSession", {
     chatThreadId,
@@ -300,12 +302,13 @@ export const InitThreadSession = async (props: PromptProps): ServerActionRespons
     conversationStyle,
     conversationSensitivity,
     chatOverFileName,
+    indexId,
   })
 
   const currentChatThreadResponse = await EnsureChatThreadOperation(chatThreadId)
   if (currentChatThreadResponse.status !== "OK") return currentChatThreadResponse
 
-  const chatMessagesResponse = await FindAllChatMessagesForCurrentUser(chatThreadId)
+  const chatMessagesResponse = await FindAllChatMessagesForCurrentThread(chatThreadId)
   if (chatMessagesResponse.status !== "OK") return chatMessagesResponse
 
   const user = await userSession()
@@ -318,6 +321,7 @@ export const InitThreadSession = async (props: PromptProps): ServerActionRespons
   const updatedChatThreadResponse = await UpsertChatThread({
     ...currentChatThreadResponse.response,
     chatType: chatType,
+    indexId: indexId,
     chatOverFileName: chatOverFileName,
     conversationStyle: conversationStyle,
     conversationSensitivity: conversationSensitivity,
@@ -339,13 +343,14 @@ export const FindChatThreadByTitleAndEmpty = async (
     const [userId, tenantId] = await Promise.all([userHashedId(), getTenantId()])
     const query: SqlQuerySpec = {
       query:
-        "SELECT * FROM root r WHERE r.type=@type AND r.userId=@userId AND r.name=@name AND r.isDeleted=@isDeleted AND r.tenantId=@tenantId AND r.createdAt >= @createdAt ORDER BY r.createdAt DESC",
+        "SELECT * FROM root r WHERE r.type=@type AND r.userId=@userId AND r.name=@name AND r.isDeleted=@isDeleted AND r.tenantId=@tenantId AND r.chatCategory=@chatCategory AND r.createdAt >= @createdAt ORDER BY r.createdAt DESC",
       parameters: [
         { name: "@type", value: ChatRecordType.Thread },
         { name: "@name", value: title },
         { name: "@isDeleted", value: false },
         { name: "@userId", value: userId },
         { name: "@tenantId", value: tenantId },
+        { name: "@chatCategory", value: "None" },
         { name: "@createdAt", value: xMonthsAgo(DEFAULT_MONTHS_AGO) },
       ],
     }
@@ -359,10 +364,10 @@ export const FindChatThreadByTitleAndEmpty = async (
       }
 
     for (const chatThread of result.resources) {
-      const messageResponse = await FindAllChatMessagesForCurrentUser(chatThread.chatThreadId)
+      const messageResponse = await FindAllChatMessagesForCurrentThread(chatThread.chatThreadId)
       if (messageResponse.status !== "OK") return messageResponse
 
-      const docs = await FindAllChatDocumentsForCurrentUser(chatThread.chatThreadId)
+      const docs = await FindAllChatDocumentsForCurrentThread(chatThread.chatThreadId)
       if (docs.status !== "OK") return docs
 
       if (messageResponse.response.length === 0 && docs.response.length === 0)
@@ -386,7 +391,7 @@ export const FindChatThreadByTitleAndEmpty = async (
 
 export const UpdateChatThreadCreatedAt = async (chatThreadId: string): ServerActionResponseAsync<ChatThreadModel> => {
   try {
-    const threadResponse = await FindChatThreadForCurrentUser(chatThreadId)
+    const threadResponse = await FindChatThreadById(chatThreadId)
     if (threadResponse.status !== "OK") return threadResponse
 
     const threadToUpdate = {
@@ -396,6 +401,7 @@ export const UpdateChatThreadCreatedAt = async (chatThreadId: string): ServerAct
       conversationStyle: ConversationStyle.Precise,
       conversationSensitivity: ConversationSensitivity.Official,
       chatOverFileName: "",
+      indexId: "",
       internalReference: "",
     }
 
@@ -424,7 +430,7 @@ export const AssociateReferenceWithChatThread = async (
   internalReference: string | undefined
 ): ServerActionResponseAsync<ChatThreadModel> => {
   logger.event("AssociateReferenceWithChatThread", { chatThreadId, internalReference })
-  const threadResponse = await FindChatThreadForCurrentUser(chatThreadId)
+  const threadResponse = await FindChatThreadById(chatThreadId)
   if (threadResponse.status !== "OK") return threadResponse
 
   const threadToUpdate = {

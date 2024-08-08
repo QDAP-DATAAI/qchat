@@ -5,7 +5,7 @@ import { APP_DESCRIPTION, APP_NAME, APP_VERSION } from "@/app-global"
 
 import { ServerActionResponseAsync } from "@/features/common/server-action-response"
 import { ApplicationContainer } from "@/features/common/services/cosmos-service"
-import { TenantGroupPairs, ApplicationSettings } from "@/features/globals/model"
+import { TenantGroupPairs, ApplicationSettings, ApplicationIndexSettings } from "@/features/globals/model"
 
 export const GetApplicationSettings = async (): ServerActionResponseAsync<ApplicationSettings> => {
   try {
@@ -25,6 +25,7 @@ export const GetApplicationSettings = async (): ServerActionResponseAsync<Applic
         termsAndConditionsDate: new Date().toISOString(),
         administratorAccess: [],
         transcriptionAccess: [],
+        indexes: [],
       })
       if (!resource)
         return {
@@ -71,5 +72,45 @@ export async function isAdmin(user: User | AdapterUser): Promise<boolean> {
     return isAdmin
   } catch (_error) {
     return false
+  }
+}
+
+export async function hasTranscriptionAccess(user: User | AdapterUser): Promise<boolean> {
+  try {
+    const appSettingsResponse = await GetApplicationSettings()
+
+    if (appSettingsResponse.status !== "OK") {
+      return false
+    }
+
+    const appSettings: ApplicationSettings = appSettingsResponse.response
+
+    const transcriptionAccess: TenantGroupPairs[] = appSettings.transcriptionAccess || []
+
+    const isTranscriber = transcriptionAccess.some(access => access.groups.some(group => user.groups?.includes(group)))
+
+    return isTranscriber
+  } catch (_error) {
+    return false
+  }
+}
+
+export async function getUserIndexes(user: User | AdapterUser): Promise<ApplicationIndexSettings[]> {
+  try {
+    const appSettingsResponse = await GetApplicationSettings()
+
+    if (appSettingsResponse.status !== "OK") {
+      throw new Error("Unable to fetch application settings")
+    }
+
+    const appSettings: ApplicationSettings = appSettingsResponse.response
+
+    const userIndexes = appSettings.indexes.filter(
+      index => index.isActive && (index.isPublic || index.tenantAccess.includes(user.tenantId))
+    )
+
+    return userIndexes
+  } catch (_error) {
+    return []
   }
 }

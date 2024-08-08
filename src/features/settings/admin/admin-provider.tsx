@@ -83,3 +83,5 @@ type ACTION =
   | ActionBase<"SELECT_TENANT", { payload?: TenantDetails }>
   | ActionBase<"SET_USERS", { payload: UserRecord[] }>
   | ActionBase<"SELECT_USER", { payload?: UserRecord }>
+
+//TODO: Props must be serializable for components in the "use client" entry file, "fetchUserRecords" is invalid.ts(71007)

@@ -1,123 +1,116 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
-@layer base {
-  :root {
-    --QLD-color-siteTitle: #022a50;
-    --QLD-color-designAccent: #6bbe27;
-    --QLD-color-heading: #03213f;
-    --QLD-color-text: #414141;
-    --QLD-color-text-muted: #636363;
-    --QLD-color-link: #09549f;
-    --QLD-color-link-visited: #551a8b;
-    --QLD-color-button-text: #fff;
-    --QLD-color-button: #09549f;
-    --QLD-color-button-hover: #003e7d;
-    --QLD-color-focus: #0085b3;
-    --QLD-color-border: #ebebeb;
-    --QLD-color-background: #fff;
-    --QLD-color-dark-background: #09549f;
-    --QLD-color-background-shade: #f5f5f5;
-    --QLD-color-underline: #3f7ab4;
-    --QLD-color-hover-underline: #09549f;
-    --QLD-color-visited-underline: #8b63b0;
-    --QLD-color-hover-visited-underline: #551a8b;
-    --QLD-color-alt-button: #008635;
-    --QLD-color-dark-alt-button: #ffe500;
-    --QLD-color-alt-button-hover: #005b23;
-    --QLD-color-alt-border: #7a7a7a;
-    --QLD-color-alt-background: #e8e8e8;
-    --QLD-color-alt-background-shade: #e0e0e0;
-    --QLD-error: #e22339;
-    --QLD-success: #339d37;
-    --QLD-information: #0085b3;
-    --QLD-alert: #ffcc2c;
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 205, 100%, 18%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-    --accent: 84, 78%, 40%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 84 80% 38%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --QLD-color-siteTitle: #fff;
-    --QLD-color-designAccent: #6bbe27;
-    --QLD-color-heading: #fff;
-    --QLD-color-text: #fff;
-    --QLD-color-text-muted: #deebf9;
-    --QLD-color-link: #fff;
-    --QLD-color-link-visited: #e1bbee;
-    --QLD-color-button-text: #121940;
-    --QLD-color-button: #78ba00;
-    --QLD-color-button-hover: #add33f;
-    --QLD-color-focus: #01b0e5;
-    --QLD-color-border: #2573c1;
-    --QLD-color-background: #09549f;
-    --QLD-color-dark-background: #09549f;
-    --QLD-color-background-shade: #04498f;
-    --QLD-color-underline: #b5cce2;
-    --QLD-color-hover-underline: #fff;
-    --QLD-color-visited-underline: #e1c2ff;
-    --QLD-color-hover-visited-underline: #e1bbee;
-    --QLD-color-alt-button: #ffe500;
-    --QLD-color-dark-alt-button: #ffe500;
-    --QLD-color-alt-button-hover: #ffef60;
-    --QLD-color-alt-border: #09acfe;
-    --QLD-color-alt-background: #05325f;
-    --QLD-color-alt-background-shade: #052c53;
-    --QLD-error: #e22339;
-    --QLD-success: #339d37;
-    --QLD-information: #0085b3;
-    --QLD-alert: #ffcc2c;
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 214 89% 31%;
-    --primary-foreground: 240 5.9% 10%;
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 199 64% 48%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-    --accent: 84, 78%, 40%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 214 89% 31%;
-  }
-
-  :root,
-  .dark {
-    --QLD-border-width-thin: 1px;
-    --QLD-border-width-default: 2px;
-    --QLD-border-width-medium: 3px;
-    --QLD-border-width-thick: 4px;
-    --QLD-border-width-extra-thick: 8px;
-  }
+:root {
+  --QLD-color-siteTitle: #022a50;
+  --QLD-color-designAccent: #6bbe27;
+  --QLD-color-heading: #03213f;
+  --QLD-color-text: #414141;
+  --QLD-color-text-muted: #636363;
+  --QLD-color-link: #09549f;
+  --QLD-color-link-visited: #551a8b;
+  --QLD-color-button-text: #fff;
+  --QLD-color-button: #09549f;
+  --QLD-color-button-hover: #003e7d;
+  --QLD-color-focus: #0085b3;
+  --QLD-color-border: #ebebeb;
+  --QLD-color-background: #fff;
+  --QLD-color-dark-background: #09549f;
+  --QLD-color-background-shade: #f5f5f5;
+  --QLD-color-underline: #3f7ab4;
+  --QLD-color-hover-underline: #09549f;
+  --QLD-color-visited-underline: #8b63b0;
+  --QLD-color-hover-visited-underline: #551a8b;
+  --QLD-color-alt-button: #008635;
+  --QLD-color-dark-alt-button: #ffe500;
+  --QLD-color-alt-button-hover: #005b23;
+  --QLD-color-alt-border: #7a7a7a;
+  --QLD-color-alt-background: #e8e8e8;
+  --QLD-color-alt-background-shade: #e0e0e0;
+  --QLD-error: #e22339;
+  --QLD-success: #339d37;
+  --QLD-information: #0085b3;
+  --QLD-alert: #ffcc2c;
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 205, 100%, 18%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 84, 78%, 40%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 84 80% 38%;
+  --radius: 0.5rem;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+.dark {
+  --QLD-color-siteTitle: #fff;
+  --QLD-color-designAccent: #6bbe27;
+  --QLD-color-heading: #fff;
+  --QLD-color-text: #fff;
+  --QLD-color-text-muted: #deebf9;
+  --QLD-color-link: #fff;
+  --QLD-color-link-visited: #e1bbee;
+  --QLD-color-button-text: #121940;
+  --QLD-color-button: #78ba00;
+  --QLD-color-button-hover: #add33f;
+  --QLD-color-focus: #01b0e5;
+  --QLD-color-border: #2573c1;
+  --QLD-color-background: #09549f;
+  --QLD-color-dark-background: #09549f;
+  --QLD-color-background-shade: #04498f;
+  --QLD-color-underline: #b5cce2;
+  --QLD-color-hover-underline: #fff;
+  --QLD-color-visited-underline: #e1c2ff;
+  --QLD-color-hover-visited-underline: #e1bbee;
+  --QLD-color-alt-button: #ffe500;
+  --QLD-color-dark-alt-button: #ffe500;
+  --QLD-color-alt-button-hover: #ffef60;
+  --QLD-color-alt-border: #09acfe;
+  --QLD-color-alt-background: #05325f;
+  --QLD-color-alt-background-shade: #052c53;
+  --QLD-error: #e22339;
+  --QLD-success: #339d37;
+  --QLD-information: #0085b3;
+  --QLD-alert: #ffcc2c;
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 214 89% 31%;
+  --primary-foreground: 240 5.9% 10%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 199 64% 48%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 84, 78%, 40%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 214 89% 31%;
 }
+
+:root,
+.dark {
+  --QLD-border-width-thin: 1px;
+  --QLD-border-width-default: 2px;
+  --QLD-border-width-medium: 3px;
+  --QLD-border-width-thick: 4px;
+  --QLD-border-width-extra-thick: 8px;
+}
+

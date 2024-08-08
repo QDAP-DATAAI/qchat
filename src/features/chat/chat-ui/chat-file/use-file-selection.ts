@@ -27,6 +27,7 @@ export const useFileSelection = (
       setUploadButtonLabel(chatBody.chatType === "audio" ? "Uploading and transcribing file..." : "Uploading file...")
 
       formData.append("chatType", chatBody.chatType)
+      formData.append("indexId", chatBody.indexId)
       formData.append("id", props.id)
 
       const file = formData.get(chatBody.chatType) as File | null
@@ -46,7 +47,15 @@ export const useFileSelection = (
       try {
         setUploadButtonLabel(`Indexing file ${file.name}...`)
         const documentId = uniqueId()
-        const indexResponse = await IndexDocuments(file.name, splitDocuments, props.id, documentId, contents, vtt)
+        const indexResponse = await IndexDocuments(
+          file.name,
+          splitDocuments,
+          props.id,
+          documentId,
+          chatBody.indexId,
+          contents,
+          vtt
+        )
         if (indexResponse.status !== "OK") {
           indexErrors.push(indexResponse.errors[0].message)
         }
@@ -64,11 +73,12 @@ export const useFileSelection = (
         description: `${file.name} uploaded successfully.`,
       })
 
-      await UpdateChatThreadToFileDetails(props.id, chatBody.chatType, file.name)
+      await UpdateChatThreadToFileDetails(props.id, chatBody.chatType, chatBody.indexId, file.name)
 
       const chatOverFileName = chatBody.chatOverFileName ? `${file.name}, ${chatBody.chatOverFileName}` : file.name
+      const indexId = chatBody.indexId
 
-      setChatBody({ ...chatBody, chatOverFileName })
+      setChatBody({ ...chatBody, chatOverFileName, indexId })
     } catch (error) {
       showError(error instanceof Error ? error.message : "An unexpected error occurred")
     } finally {

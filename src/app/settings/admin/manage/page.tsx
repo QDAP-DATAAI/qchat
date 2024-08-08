@@ -60,3 +60,5 @@ function FancyQuote({
 const getStyles = (index: number, baseDelay: number): React.CSSProperties => ({
   animationDelay: `${((index + 1) / 10 + baseDelay).toFixed(1)}s`,
 })
+
+//TODO: CSS inline styles should not be used, move styles to an external CSS fileMicrosoft Edge Toolsno-inline-styles

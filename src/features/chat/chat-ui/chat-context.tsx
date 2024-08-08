@@ -18,6 +18,7 @@ import {
   ChatDocumentModel,
 } from "@/features/chat/models"
 import { showError } from "@/features/globals/global-message-store"
+import { ApplicationSettings } from "@/features/globals/model"
 import { TenantPreferences } from "@/features/tenant-management/models"
 import { uniqueId } from "@/lib/utils"
 
@@ -42,6 +43,7 @@ const useChatHook = (props: ChatProviderProps): ChatContextState => {
     userId: props.chatThread.userId,
     internalReference: props.chatThread.internalReference,
     chatThreadName: props.chatThread.name,
+    indexId: props.chatThread.indexId,
   })
 
   const chatThreadNameRef = useRef(chatBody.chatThreadName)
@@ -95,6 +97,8 @@ const useChatHook = (props: ChatProviderProps): ChatContextState => {
   const onConversationSensitivityChange = (value: ConversationSensitivity): void =>
     setChatBody(prev => ({ ...prev, conversationSensitivity: value }))
 
+  const onIndexChange = (value: string): void => setChatBody(prev => ({ ...prev, indexId: value }))
+
   const handleSubmit = async (
     event?: { preventDefault?: () => void },
     options: ChatRequestOptions = {}
@@ -131,6 +135,7 @@ const useChatHook = (props: ChatProviderProps): ChatContextState => {
     }),
     documents: props.documents,
     tenantPreferences: props.tenantPreferences,
+    appSettings: props.appSettings,
     chatThreadLocked: (props.chatThread?.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED,
     handleSubmit,
     setChatBody,
@@ -138,6 +143,7 @@ const useChatHook = (props: ChatProviderProps): ChatContextState => {
     onChatTypeChange,
     onConversationStyleChange,
     onConversationSensitivityChange,
+    onIndexChange,
     fileState,
     id: props.id,
   }
@@ -157,6 +163,7 @@ type ChatProviderProps = {
   chatThread: ChatThreadModel
   documents: ChatDocumentModel[]
   tenantPreferences?: TenantPreferences
+  appSettings?: ApplicationSettings
 }
 export default function ChatProvider({ children, ...rest }: PropsWithChildren<ChatProviderProps>): JSX.Element {
   const value = useChatHook(rest)
@@ -171,8 +178,10 @@ type ChatContextState = UseChatHelpers & {
   onChatTypeChange: (value: ChatType) => void
   onConversationStyleChange: (value: ConversationStyle) => void
   onConversationSensitivityChange: (value: ConversationSensitivity) => void
+  onIndexChange: (value: string) => void
   chatThreadLocked: boolean
   messages: PromptMessage[]
   documents: ChatDocumentModel[]
   tenantPreferences?: TenantPreferences
+  appSettings?: ApplicationSettings
 }

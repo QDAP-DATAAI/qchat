@@ -26,6 +26,7 @@ const schema = yup
       .oneOf(Object.values(ConversationSensitivity))
       .required(),
     chatOverFileName: yup.string().defined().strict(true),
+    indexId: yup.string(),
     tenantId: yup.string().required(),
     userId: yup.string().required(),
     internalReference: yup.string(),
@@ -35,6 +36,7 @@ const schema = yup
         id: yup.string().required(),
         content: yup.string().required(),
         role: yup.mixed<ChatRole>().oneOf(Object.values(ChatRole)).required(),
+        name: yup.string().default("User"),
       })
     ),
     data: yup.object().shape({

@@ -1,33 +1,42 @@
 import * as Tooltip from "@radix-ui/react-tooltip"
 import { AudioLines, FileText, MessageCircle } from "lucide-react"
-import React, { useEffect, useState, FC, useCallback } from "react"
+import { useSession } from "next-auth/react"
+import React, { FC, useCallback } from "react"
 
 import { APP_NAME } from "@/app-global"
 
 import Typography from "@/components/typography"
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { ChatType } from "@/features/chat/models"
+import { ApplicationIndexSettings, ApplicationSettings } from "@/features/globals/model"
 import { Tabs, TabsList, TabsTrigger } from "@/features/ui/tabs"
 import { TooltipProvider } from "@/features/ui/tooltip-provider"
+
 interface Prop {
   disable: boolean
 }
-const tenants = process.env.NEXT_PUBLIC_FEATURE_TRANSCRIBE_TENANTS?.split(",") || []
+
+const findIndexByName = (appSettings: ApplicationSettings, indexName: string): ApplicationIndexSettings | undefined => {
+  return appSettings?.indexes?.find(index => index.name === indexName)
+}
+
 export const ChatTypeSelector: FC<Prop> = ({ disable }) => {
-  const { chatBody, onChatTypeChange } = useChatContext()
-  const [isAllowedTenant, setIsAllowedTenant] = useState<boolean>(false)
-  useEffect(() => {
-    if (chatBody) {
-      const tenantId = chatBody.tenantId
-      setIsAllowedTenant(tenants.includes(tenantId))
-    }
-  }, [chatBody])
+  const { onIndexChange, chatBody, onChatTypeChange, appSettings } = useChatContext()
+
+  const index = appSettings ? findIndexByName(appSettings, "qchat") : undefined
+
+  const session = useSession()
+
+  const isAllowedTenant = session?.data?.user?.hasTranscribe || false
 
   const handleValueChange = useCallback(
     (value: string) => {
       onChatTypeChange(value as ChatType)
+      if (index) {
+        onIndexChange(index.name)
+      }
     },
-    [onChatTypeChange]
+    [onChatTypeChange, onIndexChange, index]
   )
 
   return (

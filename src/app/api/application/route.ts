@@ -14,6 +14,7 @@ export async function GET(_request: NextRequest): Promise<Response> {
       termsAndConditionsDate: configResult.response.termsAndConditionsDate,
       administratorAccess: configResult.response.administratorAccess,
       transcriptionAccess: configResult.response.transcriptionAccess,
+      indexes: configResult.response.indexes,
     }
     return new Response(JSON.stringify({ status: "OK", data: response }), {
       status: 200,

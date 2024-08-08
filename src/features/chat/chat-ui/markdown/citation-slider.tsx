@@ -1,12 +1,12 @@
 "use client"
 
-import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
 import { FC, useCallback } from "react"
 import { useFormState } from "react-dom"
 
 import { useChatContext } from "@/features/chat/chat-ui/chat-context"
 import { Button } from "@/features/ui/button"
-import { Sheet, SheetContent, SheetTitle, SheetTrigger, SheetDescription } from "@/features/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/features/ui/sheet"
 
 import { CitationAction } from "./citation-action"
 
@@ -14,15 +14,13 @@ interface SliderProps {
   name: string
   index: number
   id: string
-  tenantId: string
-  userId: string
   order: number
   chatThreadId: string
 }
 
 export const CitationSlider: FC<SliderProps> = props => {
   const chatContext = useChatContext()
-  const { userId, tenantId } = chatContext.chatBody
+  const { userId, tenantId, indexId } = chatContext.chatBody
   const chatThreadId = chatContext.id
   const [node, formAction] = useFormState(CitationAction, null)
 
@@ -34,9 +32,9 @@ export const CitationSlider: FC<SliderProps> = props => {
     formData.append("tenantId", tenantId)
     formData.append("chatThreadId", chatThreadId)
     formData.append("order", props.order.toString())
-    formData.append("name", props.name)
+    formData.append("indexId", indexId)
     formAction(formData)
-  }, [props.index, props.id, userId, tenantId, chatThreadId, props.order, props.name, formAction])
+  }, [props.index, props.id, userId, tenantId, chatThreadId, props.order, indexId, formAction])
 
   return (
     <form>
@@ -44,7 +42,7 @@ export const CitationSlider: FC<SliderProps> = props => {
       <Sheet>
         <SheetTrigger asChild>
           <Button
-            ariaLabel={`Open citation number ${props.order}`}
+            ariaLabel={`Citation number ${props.order}`}
             variant="outline"
             onClick={handleButtonClick}
             type="button"
@@ -53,11 +51,17 @@ export const CitationSlider: FC<SliderProps> = props => {
             {props.order}
           </Button>
         </SheetTrigger>
-        <SheetContent aria-modal="true" role="dialog" aria-labelledby={undefined} aria-describedby={undefined}>
-          <SheetTitle>Citation for Section {props.order}</SheetTitle>
-          <VisuallyHidden.Root>
-            <SheetDescription>Detailed information about citation number {props.order}.</SheetDescription>
-          </VisuallyHidden.Root>
+        <SheetContent
+          aria-modal="true"
+          role="dialog"
+          aria-labelledby={`section-title-${props.order}`}
+          aria-describedby={`section-description-${props.order}`}
+        >
+          <SheetHeader>
+            <VisuallyHidden>
+              <SheetTitle id={`section-title-${props.order}`}>Citation for Section {props.order}</SheetTitle>
+            </VisuallyHidden>
+          </SheetHeader>
           {node}
         </SheetContent>
       </Sheet>

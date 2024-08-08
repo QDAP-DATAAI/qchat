@@ -1,6 +1,11 @@
 import { OpenAIStream, StreamingTextResponse, JSONValue, StreamData } from "ai"
 import { BadRequestError } from "openai"
-import { ChatCompletionChunk, ChatCompletionMessageParam, Completion } from "openai/resources"
+import {
+  ChatCompletionChunk,
+  ChatCompletionMessageParam,
+  ChatCompletionSystemMessageParam,
+  Completion,
+} from "openai/resources"
 import { Stream } from "openai/streaming"
 
 import { APP_NAME } from "@/app-global"
@@ -20,12 +25,7 @@ import { mapOpenAIChatMessages } from "@/features/common/mapping-helper"
 import { OpenAIInstance } from "@/features/common/services/open-ai"
 import logger from "@/features/insights/app-insights"
 
-import {
-  buildAudioChatMessages,
-  buildDataChatMessages,
-  buildSimpleChatMessages,
-  getContextPrompts,
-} from "./chat-api-helper"
+import { buildAudioChatMessages, buildDataChatMessages, buildSimpleChatMessages } from "./chat-api-helper"
 import { calculateFleschKincaidScore } from "./chat-flesch"
 import { FindTopChatMessagesForCurrentUser, UpsertChatMessage } from "./chat-message-service"
 import { InitThreadSession, UpsertChatThread } from "./chat-thread-service"
@@ -39,40 +39,52 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
   try {
     const threadSession = await InitThreadSession(props)
     if (threadSession.status !== "OK") throw threadSession
-
+    const userName = "User"
     const { chatThread } = threadSession.response
     const updatedLastHumanMessage = props.messages[props.messages.length - 1]
 
     let userMessage: ChatCompletionMessageParam
-    let metaPrompt: ChatCompletionMessageParam
+    let metaPrompt: ChatCompletionSystemMessageParam
     let context: string = ""
     let shouldTranslate = false
 
     if (props.chatType === "simple" || !dataChatTypes.includes(props.chatType)) {
-      const res = await buildSimpleChatMessages(updatedLastHumanMessage)
+      const res = await buildSimpleChatMessages(updatedLastHumanMessage, userName)
       userMessage = res.userMessage
       metaPrompt = res.systemMessage
       shouldTranslate = true
     } else if (props.chatType === "audio") {
-      const res = await buildAudioChatMessages(updatedLastHumanMessage, chatThread.chatThreadId)
+      const res = await buildAudioChatMessages(
+        updatedLastHumanMessage,
+        chatThread.chatThreadId,
+        chatThread.indexId,
+        userName
+      )
       userMessage = res.userMessage
       metaPrompt = res.systemMessage
       context = res.context
     } else {
-      const res = await buildDataChatMessages(updatedLastHumanMessage, chatThread.chatThreadId)
+      const res = await buildDataChatMessages(
+        updatedLastHumanMessage,
+        chatThread.chatThreadId,
+        chatThread.indexId,
+        userName
+      )
       userMessage = res.userMessage
       metaPrompt = res.systemMessage
       context = res.context
     }
 
     if ((chatThread.contentFilterTriggerCount || 0) >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED) {
-      return new Response(JSON.stringify({ error: "This thread is locked" }), { status: 400 })
+      return new Response(JSON.stringify({ error: "This thread is locked" }), {
+        status: 400,
+      })
     }
+
+    const data = new StreamData()
 
     const historyResponse = await FindTopChatMessagesForCurrentUser(chatThread.id)
     if (historyResponse.status !== "OK") throw historyResponse
-
-    const data = new StreamData()
 
     const { response, contentFilterResult, updatedThread } = await getChatResponse(
       chatThread,
@@ -83,7 +95,6 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       data
     )
 
-    const contextPrompts = await getContextPrompts()
     const chatMessageResponse = await UpsertChatMessage({
       id: updatedLastHumanMessage.id,
       createdAt: new Date(),
@@ -95,12 +106,10 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       userId: chatThread.userId,
       tenantId: chatThread.tenantId,
       context: context,
-      systemPrompt: contextPrompts.metaPrompt,
-      tenantPrompt: contextPrompts.tenantPrompt,
-      userPrompt: contextPrompts.userPrompt,
+      systemPrompt: metaPrompt.content,
       contentFilterResult,
       fleschKincaidScore: calculateFleschKincaidScore(updatedLastHumanMessage.content),
-      // name: chatThread.useName,
+      name: userName,
     })
     if (chatMessageResponse.status !== "OK") throw chatMessageResponse
 
@@ -124,8 +133,8 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       sentiment: ChatSentiment.Neutral,
       reason: "",
       fleschKincaidScore: fleschKincaidScore,
-      // name: APP_NAME || "Assistant",
       isPartial: isPartial,
+      name: APP_NAME || "Assistant",
     })
 
     const partialMessage: string[] = []
@@ -141,7 +150,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
       }
 
       timer = setTimeout(async () => {
-        if (completed) return //just in case...
+        if (completed) return
         await UpsertChatMessage(createAssistantChatRecord(partialMessage.join(""), true))
       }, 1000)
     }
@@ -174,7 +183,7 @@ export const ChatApi = async (props: PromptProps): Promise<Response> => {
           id: addedMessage.response.id,
           role: addedMessage.response.role,
           content: addedMessage.response.content,
-          // name: addedMessage.response.name,
+          name: addedMessage.response.name,
         })
 
         addedMessage.response.content &&
@@ -221,7 +230,7 @@ async function* makeContentFilterResponse(lockChatThread: boolean): AsyncGenerat
 
 async function getChatResponse(
   chatThread: ChatThreadModel,
-  systemPrompt: ChatCompletionMessageParam,
+  systemPrompt: ChatCompletionSystemMessageParam,
   userMessage: ChatCompletionMessageParam,
   history: ChatMessageModel[],
   addMessage: PromptMessage,
@@ -234,13 +243,18 @@ async function getChatResponse(
   let contentFilterTriggerCount = chatThread.contentFilterTriggerCount ?? 0
 
   try {
-    const openAI = OpenAIInstance({ contentSafetyOn: !["audio"].includes(chatThread.chatType) })
+    const openAI = OpenAIInstance({
+      contentSafetyOn: !["audio"].includes(chatThread.chatType),
+    })
+
+    const response = await openAI.chat.completions.create({
+      messages: [systemPrompt, ...mapOpenAIChatMessages(history), userMessage],
+      model: process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
+      stream: true,
+    })
+
     return {
-      response: await openAI.chat.completions.create({
-        messages: [systemPrompt, ...mapOpenAIChatMessages(history), userMessage],
-        model: process.env.AZURE_OPENAI_API_DEPLOYMENT_NAME,
-        stream: true,
-      }),
+      response,
       updatedThread: chatThread,
     }
   } catch (exception) {
@@ -258,16 +272,18 @@ async function getChatResponse(
       contentFilterTriggerCount,
     })
 
-    const upadatedThread = await UpsertChatThread({
+    const updatedThread = await UpsertChatThread({
       ...chatThread,
       contentFilterTriggerCount,
     })
-    if (upadatedThread.status !== "OK") throw upadatedThread.errors
+    if (updatedThread.status !== "OK") throw updatedThread.errors
 
     return {
       response: makeContentFilterResponse(contentFilterTriggerCount >= MAX_CONTENT_FILTER_TRIGGER_COUNT_ALLOWED),
       contentFilterResult,
-      updatedThread: upadatedThread.response,
+      updatedThread: updatedThread.response,
     }
+  } finally {
+    await data.close()
   }
 }
