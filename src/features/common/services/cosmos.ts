@@ -41,7 +41,6 @@ export function createCosmosClient(config: CosmosConfig): CosmosClient {
   }
 }
 
-// Cache to store container instances
 const _containerCache: Map<string, Container> = new Map()
 
 /**
@@ -78,7 +77,6 @@ async function containerFactory(
 ): Promise<Container> {
   if (!config?.endpoint) throw new Error("Azure Cosmos DB is not configured. Please configure it in the .env file.")
 
-  // Removed isTokenExpired check
   if (containerCache.has(containerName)) return containerCache.get(containerName) as Container
 
   const container = await getContainer(containerName, partitionKey, config)
